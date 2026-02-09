@@ -1,0 +1,138 @@
+# Staging environment: two Phoenix nodes with shared Postgres/Meilisearch
+# and per-node Redis instances for realistic multi-node testing.
+
+services:
+  # ---------- Phoenix application nodes ----------
+  # NOTE: The server Dockerfile does not exist yet.
+  # It will be created in Phase 1. For now, build it manually or
+  # replace with a local build context once the Dockerfile lands.
+  node-a:
+    image: murmuring-server:latest  # will be built in Phase 1
+    ports:
+      - "4000:4000"
+    environment:
+      MIX_ENV: prod
+      PHX_HOST: localhost
+      PHX_PORT: "4000"
+      SECRET_KEY_BASE: "staging-secret-key-base-replace-me-with-64-bytes-of-random-hex!!"
+      DATABASE_URL: "ecto://murmuring:murmuring_staging@postgres:5432/murmuring_node_a"
+      REDIS_URL: "redis://redis-a:6379/0"
+      MEILI_URL: "http://meilisearch:7700"
+      MEILI_MASTER_KEY: murmuring_staging_key
+      RELEASE_NODE: "murmuring@node-a"
+      RELEASE_DISTRIBUTION: name
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-a:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:4000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - murmuring-staging
+
+  node-b:
+    image: murmuring-server:latest  # will be built in Phase 1
+    ports:
+      - "4002:4000"
+    environment:
+      MIX_ENV: prod
+      PHX_HOST: localhost
+      PHX_PORT: "4000"
+      SECRET_KEY_BASE: "staging-secret-key-base-replace-me-with-64-bytes-of-random-hex!!"
+      DATABASE_URL: "ecto://murmuring:murmuring_staging@postgres:5432/murmuring_node_b"
+      REDIS_URL: "redis://redis-b:6379/0"
+      MEILI_URL: "http://meilisearch:7700"
+      MEILI_MASTER_KEY: murmuring_staging_key
+      RELEASE_NODE: "murmuring@node-b"
+      RELEASE_DISTRIBUTION: name
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-b:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:4000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - murmuring-staging
+
+  # ---------- PostgreSQL (shared, two databases) ----------
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: murmuring
+      POSTGRES_PASSWORD: murmuring_staging
+      POSTGRES_DB: murmuring_staging
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-staging-dbs.sql:/docker-entrypoint-initdb.d/init-staging-dbs.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U murmuring"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - murmuring-staging
+
+  # ---------- Redis (one per node) ----------
+  redis-a:
+    image: redis:8-alpine
+    volumes:
+      - redisdata-a:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - murmuring-staging
+
+  redis-b:
+    image: redis:8-alpine
+    volumes:
+      - redisdata-b:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - murmuring-staging
+
+  # ---------- Meilisearch (shared) ----------
+  meilisearch:
+    image: getmeili/meilisearch:v1.13
+    environment:
+      MEILI_MASTER_KEY: murmuring_staging_key
+      MEILI_ENV: development
+    volumes:
+      - meilidata:/meili_data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:7700/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - murmuring-staging
+
+volumes:
+  pgdata:
+  redisdata-a:
+  redisdata-b:
+  meilidata:
+
+networks:
+  murmuring-staging:
+    name: murmuring-staging

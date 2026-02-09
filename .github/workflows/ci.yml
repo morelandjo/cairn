@@ -1,0 +1,167 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ----------------------------------------------------------------
+  # Elixir — compile, lint, test, dialyzer
+  # ----------------------------------------------------------------
+  elixir:
+    name: Elixir
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: murmuring
+          POSTGRES_PASSWORD: murmuring_dev
+          POSTGRES_DB: murmuring_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U murmuring"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:8
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      MIX_ENV: test
+      PGPORT: "5432"
+      REDIS_URL: redis://localhost:6379/0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Erlang & Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "28"
+          elixir-version: "1.19"
+
+      - name: Cache deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            server/deps
+            server/_build
+          key: elixir-${{ runner.os }}-${{ hashFiles('server/mix.lock') }}
+          restore-keys: |
+            elixir-${{ runner.os }}-
+
+      - name: Cache Dialyzer PLTs
+        uses: actions/cache@v4
+        with:
+          path: server/priv/plts
+          key: plts-${{ runner.os }}-${{ hashFiles('server/mix.lock') }}
+          restore-keys: |
+            plts-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Check formatting
+        run: mix format --check-formatted
+
+      - name: Compile (warnings as errors)
+        run: mix compile --warnings-as-errors
+
+      - name: Run tests
+        run: mix test
+
+      - name: Run Dialyzer
+        run: mix dialyzer
+
+  # ----------------------------------------------------------------
+  # TypeScript — lint, build, test (matrix across sub-projects)
+  # ----------------------------------------------------------------
+  typescript:
+    name: TypeScript (${{ matrix.project }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [proto, sfu, client/web]
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.project }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: ${{ matrix.project }}/node_modules
+          key: node-${{ runner.os }}-${{ matrix.project }}-${{ hashFiles(format('{0}/package-lock.json', matrix.project)) }}
+          restore-keys: |
+            node-${{ runner.os }}-${{ matrix.project }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (if script exists)
+        run: |
+          if npm run --silent lint --if-present 2>/dev/null; then
+            echo "Lint passed"
+          fi
+        continue-on-error: false
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+  # ----------------------------------------------------------------
+  # Rust — disabled until Phase 2
+  # ----------------------------------------------------------------
+  rust:
+    name: Rust
+    if: false
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Run tests
+        run: cargo test --all
