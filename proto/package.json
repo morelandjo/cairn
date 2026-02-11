@@ -12,13 +12,20 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js",
       "types": "./dist/esm/index.d.ts"
+    },
+    "./api": {
+      "import": "./dist/esm/api/index.js",
+      "require": "./dist/cjs/api/index.js",
+      "types": "./dist/esm/api/index.d.ts"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "npm run build:esm && npm run build:cjs",
+    "build": "npm run build:wasm && npm run build:esm && npm run build:cjs && npm run postbuild",
+    "postbuild": "mkdir -p dist/mls-wasm/pkg && cp mls-wasm/pkg/mls_wasm.js mls-wasm/pkg/mls_wasm.d.ts mls-wasm/pkg/mls_wasm_bg.wasm dist/mls-wasm/pkg/",
+    "build:wasm": "cargo build --manifest-path mls-wasm/Cargo.toml --target wasm32-unknown-unknown --release && wasm-bindgen mls-wasm/target/wasm32-unknown-unknown/release/mls_wasm.wasm --out-dir mls-wasm/pkg --target web --typescript",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "test": "vitest run",
@@ -30,6 +37,6 @@
     "vitest": "^3.0.0"
   },
   "dependencies": {
-    "libsodium-wrappers": "^0.7.15"
+    "libsodium-wrappers-sumo": "^0.7.15"
   }
 }

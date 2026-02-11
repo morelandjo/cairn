@@ -34,12 +34,46 @@ config :murmuring, Murmuring.Mailer, adapter: Swoosh.Adapters.Local
 # Configure Elixir's Logger with JSON backend for production
 config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
+  metadata: [:request_id, :correlation_id]
 
-config :logger_json, :backend, metadata: [:request_id, :module]
+config :logger_json, :backend, metadata: [:request_id, :correlation_id, :module]
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+# File storage configuration
+config :murmuring, :storage_backend, Murmuring.Storage.LocalBackend
+config :murmuring, Murmuring.Storage.LocalBackend, root: Path.expand("priv/uploads")
+
+# Federation configuration
+config :murmuring, :federation,
+  enabled: false,
+  domain: "localhost"
+
+# SFU configuration
+config :murmuring, :sfu_url, "http://localhost:4001"
+config :murmuring, :sfu_auth_secret, "dev-sfu-secret"
+config :murmuring, :sfu_client, Murmuring.Voice.SfuClient
+
+# TURN configuration
+config :murmuring, :turn_secret, "dev-turn-secret"
+config :murmuring, :turn_urls, []
+
+# Meilisearch configuration
+config :murmuring, :meilisearch,
+  url: "http://localhost:7700",
+  master_key: nil
+
+# Oban job queue
+config :murmuring, Oban,
+  repo: Murmuring.Repo,
+  queues: [federation: 10, moderation: 5, search: 5, export: 2, push: 10],
+  plugins: [
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"0 3 * * *", Murmuring.Audit.Pruner}
+     ]}
+  ]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

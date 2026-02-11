@@ -36,3 +36,26 @@ config :phoenix, :plug_init_mode, :runtime
 # Sort query params output of verified routes for robust url comparisons
 config :phoenix,
   sort_verified_routes_query_params: true
+
+# JWT secret for test
+config :murmuring, :jwt_secret, "test_jwt_secret_not_real"
+
+# Speed up password hashing in tests
+config :argon2_elixir,
+  t_cost: 1,
+  m_cost: 8
+
+# File storage for tests — use a tmp directory
+config :murmuring, Murmuring.Storage.LocalBackend, root: Path.expand("tmp/test_uploads")
+
+# Use Oban testing mode in tests
+config :murmuring, Oban, testing: :inline
+
+# Disable HTTP rate limiting in tests
+config :murmuring, :http_rate_limiting, false
+
+# Disable SSL enforcement in tests
+config :murmuring, :force_ssl, false
+
+# Disable PromEx in tests (pollers conflict with SQL Sandbox)
+config :murmuring, :start_prom_ex, false

@@ -1,0 +1,87 @@
+---
+# Murmuring Backup Playbook
+# Usage: ansible-playbook -i inventory.ini backup.yml
+
+- name: Backup Murmuring
+  hosts: murmuring
+  become: true
+  become_user: murmuring
+
+  vars:
+    deploy_dir: /opt/murmuring
+    backup_dir: /opt/murmuring/backups
+    retain_days: 30
+
+  tasks:
+    - name: Create backup directory
+      file:
+        path: "{{ backup_dir }}"
+        state: directory
+        mode: "0750"
+
+    - name: Generate backup filename
+      set_fact:
+        backup_name: "murmuring-backup-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"
+
+    - name: Dump PostgreSQL
+      command: >
+        docker compose exec -T postgres
+        pg_dump -U murmuring -Fc murmuring
+      args:
+        chdir: "{{ deploy_dir }}"
+      register: pgdump
+
+    - name: Save PostgreSQL dump
+      copy:
+        content: "{{ pgdump.stdout }}"
+        dest: "{{ backup_dir }}/{{ backup_name }}.pgdump"
+        mode: "0640"
+
+    - name: Archive uploads directory
+      command: >
+        docker compose exec -T server
+        tar czf - /app/priv/uploads
+      args:
+        chdir: "{{ deploy_dir }}"
+      register: uploads_tar
+
+    - name: Save uploads archive
+      copy:
+        content: "{{ uploads_tar.stdout }}"
+        dest: "{{ backup_dir }}/{{ backup_name }}-uploads.tar.gz"
+        mode: "0640"
+
+    - name: Archive federation keys
+      command: >
+        docker compose exec -T server
+        tar czf - /app/priv/keys
+      args:
+        chdir: "{{ deploy_dir }}"
+      register: keys_tar
+
+    - name: Save keys archive
+      copy:
+        content: "{{ keys_tar.stdout }}"
+        dest: "{{ backup_dir }}/{{ backup_name }}-keys.tar.gz"
+        mode: "0600"
+
+    - name: Remove old backups
+      find:
+        paths: "{{ backup_dir }}"
+        age: "{{ retain_days }}d"
+      register: old_backups
+
+    - name: Delete old backups
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ old_backups.files }}"
+
+    - name: List backups
+      find:
+        paths: "{{ backup_dir }}"
+      register: backups
+
+    - name: Show backup summary
+      debug:
+        msg: "Backup complete: {{ backup_name }} ({{ backups.files | length }} total backups)"

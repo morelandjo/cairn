@@ -1,0 +1,164 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "HTTP Request Rate",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "rate(phoenix_endpoint_stop_duration_milliseconds_count[5m])",
+          "legendFormat": "{{method}} {{route}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 }
+    },
+    {
+      "title": "HTTP Latency (p95)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(phoenix_endpoint_stop_duration_milliseconds_bucket[5m]))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.50, rate(phoenix_endpoint_stop_duration_milliseconds_bucket[5m]))",
+          "legendFormat": "p50"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms" } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
+    },
+    {
+      "title": "WebSocket Connections",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "murmuring_websocket_connections_total",
+          "legendFormat": "Connections"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 }
+    },
+    {
+      "title": "Messages Sent (rate)",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "rate(murmuring_messages_sent_total[5m])",
+          "legendFormat": "msg/s"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 }
+    },
+    {
+      "title": "Active Federation Nodes",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "murmuring_federation_nodes_active",
+          "legendFormat": "Nodes"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 }
+    },
+    {
+      "title": "Voice Channel Joins",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "rate(murmuring_voice_joins_total[5m]) * 60",
+          "legendFormat": "joins/min"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 8 }
+    },
+    {
+      "title": "BEAM Memory Usage",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "beam_vm_memory_total_bytes",
+          "legendFormat": "Total"
+        },
+        {
+          "expr": "beam_vm_memory_processes_bytes",
+          "legendFormat": "Processes"
+        },
+        {
+          "expr": "beam_vm_memory_ets_bytes",
+          "legendFormat": "ETS"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 }
+    },
+    {
+      "title": "Database Query Latency",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(ecto_repo_query_total_time_milliseconds_bucket[5m]))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.50, rate(ecto_repo_query_total_time_milliseconds_bucket[5m]))",
+          "legendFormat": "p50"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms" } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
+    },
+    {
+      "title": "Oban Job Queue",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "rate(oban_job_stop_duration_milliseconds_count{state=\"success\"}[5m])",
+          "legendFormat": "success ({{queue}})"
+        },
+        {
+          "expr": "rate(oban_job_stop_duration_milliseconds_count{state=\"failure\"}[5m])",
+          "legendFormat": "failure ({{queue}})"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 }
+    },
+    {
+      "title": "Login Attempts",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "rate(murmuring_auth_login_total{result=\"success\"}[5m])",
+          "legendFormat": "success"
+        },
+        {
+          "expr": "rate(murmuring_auth_login_total{result=\"failure\"}[5m])",
+          "legendFormat": "failure"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["murmuring"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "Murmuring Overview",
+  "uid": "murmuring-overview"
+}

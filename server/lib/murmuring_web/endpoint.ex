@@ -11,6 +11,8 @@ defmodule MurmuringWeb.Endpoint do
     same_site: "Lax"
   ]
 
+  socket "/socket", MurmuringWeb.UserSocket, websocket: true
+
   socket "/live", Phoenix.LiveView.Socket,
     websocket: [connect_info: [session: @session_options]],
     longpoll: [connect_info: [session: @session_options]]
@@ -27,6 +29,14 @@ defmodule MurmuringWeb.Endpoint do
     only: MurmuringWeb.static_paths(),
     raise_on_missing_only: code_reloading?
 
+  # Serve the web client SPA assets (hashed filenames → immutable cache)
+  plug Plug.Static,
+    at: "/app",
+    from: {:murmuring, "priv/static/app"},
+    gzip: not code_reloading?,
+    cache_control_for_etags: "public, max-age=31536000, immutable",
+    only: ~w(assets)
+
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
@@ -38,7 +48,7 @@ defmodule MurmuringWeb.Endpoint do
     param_key: "request_logger",
     cookie_key: "request_logger"
 
-  plug Plug.RequestId
+  plug MurmuringWeb.Plugs.CorrelationId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
   plug Plug.Parsers,
@@ -49,5 +59,7 @@ defmodule MurmuringWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
+  plug MurmuringWeb.Plugs.RequireSsl
+  plug MurmuringWeb.Plugs.SecurityHeaders
   plug MurmuringWeb.Router
 end

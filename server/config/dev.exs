@@ -65,3 +65,6 @@ config :phoenix, :plug_init_mode, :runtime
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# JWT secret for development
+config :murmuring, :jwt_secret, "dev_jwt_secret_change_me"

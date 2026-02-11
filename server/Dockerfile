@@ -1,0 +1,59 @@
+# Stage 1: Build
+FROM elixir:1.19-otp-28-alpine AS builder
+
+RUN apk add --no-cache build-base git vips-dev
+
+WORKDIR /app
+
+ENV MIX_ENV=prod
+
+# Install hex + rebar
+RUN mix local.hex --force && mix local.rebar --force
+
+# Copy dependency files first for caching
+COPY mix.exs mix.lock ./
+RUN mix deps.get --only $MIX_ENV
+RUN mix deps.compile
+
+# Copy application code
+COPY config config
+COPY lib lib
+COPY priv priv
+
+# Compile the app
+RUN mix compile
+
+# Build release
+RUN mix release
+
+# Stage 2: Runtime
+FROM alpine:3.21 AS runtime
+
+RUN apk add --no-cache \
+  libstdc++ \
+  openssl \
+  ncurses-libs \
+  vips \
+  curl \
+  && addgroup -S murmuring \
+  && adduser -S murmuring -G murmuring
+
+WORKDIR /app
+
+COPY --from=builder --chown=murmuring:murmuring /app/_build/prod/rel/murmuring ./
+
+# Create directories for runtime data
+RUN mkdir -p /app/priv/uploads /app/priv/keys /app/priv/exports \
+  && chown -R murmuring:murmuring /app
+
+USER murmuring
+
+ENV PHX_SERVER=true
+ENV PORT=4000
+
+EXPOSE 4000
+
+HEALTHCHECK --interval=15s --timeout=5s --retries=3 \
+  CMD curl -sf http://localhost:4000/health || exit 1
+
+CMD ["bin/murmuring", "start"]

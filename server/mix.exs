@@ -58,7 +58,18 @@ defmodule Murmuring.MixProject do
       {:bandit, "~> 1.5"},
       {:logger_json, "~> 6.0"},
       {:redix, "~> 1.5"},
-      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
+      {:argon2_elixir, "~> 4.1"},
+      {:joken, "~> 2.6"},
+      {:nimble_totp, "~> 1.0"},
+      {:wax_, "~> 0.6"},
+      {:ex_aws, "~> 2.5"},
+      {:ex_aws_s3, "~> 2.5"},
+      {:image, "~> 0.54"},
+      {:uniq, "~> 0.6"},
+      {:oban, "~> 2.18"},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
+      {:prom_ex, "~> 1.10"}
     ]
   end
 

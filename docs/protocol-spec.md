@@ -69,6 +69,11 @@ JSON examples in this document use relaxed formatting for readability. Actual im
 | **MLS (Messaging Layer Security)** | A protocol for group key agreement defined in [RFC 9420](https://www.rfc-editor.org/rfc/rfc9420). Murmuring uses MLS for end-to-end encrypted group channels. MLS provides forward secrecy and post-compromise security with efficient O(log n) group operations. |
 | **X3DH (Extended Triple Diffie-Hellman)** | A key agreement protocol used to establish a shared secret between two parties who may not be online simultaneously. Used in Murmuring for DM session initiation. |
 | **Double Ratchet** | A key management algorithm that provides forward secrecy and break-in recovery for ongoing message sessions. Used for DM encryption after the X3DH handshake. |
+| **DID (Decentralized Identifier)** | A self-certifying identifier in the form `did:murmuring:<base58(SHA-256(genesis_op))>`. Derived from a user's genesis operation and stable across key rotations. Enables portable identity across instances. |
+| **Operation Chain** | A hash-linked, signed sequence of DID operations (create, rotate_signing_key, rotate_rotation_key, update_handle, deactivate). Each operation references the SHA-256 hash of the previous operation. Signed by the rotation key. Tamper-evident and independently verifiable. |
+| **Signing Key** | An Ed25519 key pair used for daily operations: E2EE, message signing, MLS credentials. This is the existing identity key. Can be rotated without changing the DID. |
+| **Rotation Key** | An Ed25519 key pair used exclusively for DID operations (key rotation, handle changes, deactivation). Generated at registration. Stored in encrypted key backup. Recovery codes can rotate this key as a last resort. |
+| **Federated Auth Token** | A time-limited, node-signed token that allows a user to authenticate with a remote instance without creating a local account. Format: `base64url(payload).base64url(node_ed25519_signature)`. |
 | **Federation** | The process by which two or more independent nodes exchange messages and synchronize state. Federation is always opt-in per node. |
 | **Defederation** | The process by which a node severs its federation relationship with another node, ceasing all message exchange. |
 | **KeyPackage** | An MLS-specific structure containing a user's public key material, used by other group members to add that user to an MLS group. KeyPackages are single-use. |
@@ -108,7 +113,11 @@ All Murmuring ActivityPub documents MUST include both the standard Activity Stre
       "protocolVersion": "murmuring:protocolVersion",
       "privacyManifest": "murmuring:privacyManifest",
       "emoji": "murmuring:emoji",
-      "signature": "murmuring:signature"
+      "signature": "murmuring:signature",
+      "did": "murmuring:did",
+      "homeInstance": "murmuring:homeInstance",
+      "displayName": "murmuring:displayName",
+      "channelId": "murmuring:channelId"
     }
   ]
 }
@@ -228,6 +237,10 @@ Represents a message within a channel. Extends the ActivityStreams `Note` type. 
 | `hlcTimestamp` | Object | MUST | Hybrid Logical Clock timestamp (see Section 5) |
 | `signature` | String | MUST | Base64url-encoded Ed25519 signature over the canonical message fields |
 | `protocolVersion` | String | MUST | Protocol version (e.g., `"0.1.0"`) |
+| `murmuring:channelId` | String | SHOULD | Channel UUID for routing on the receiving node |
+| `murmuring:did` | String | SHOULD | Author's `did:murmuring:...` identifier for cross-instance identity verification |
+| `murmuring:homeInstance` | String | SHOULD | Author's home instance domain |
+| `murmuring:displayName` | String | MAY | Author's display name at time of sending |
 
 **Example (public channel message):**
 
@@ -400,6 +413,7 @@ All Murmuring objects are transmitted between nodes wrapped in standard Activity
 | Approve join | `Accept` | Original `Follow` activity |
 | Reject join | `Reject` | Original `Follow` activity |
 | Leave channel | `Undo` | Original `Follow` activity |
+| DM hint (cross-instance) | `Invite` | `murmuring:DmHint` |
 
 **Example (Create activity wrapping a message):**
 
@@ -434,6 +448,46 @@ All Murmuring objects are transmitted between nodes wrapped in standard Activity
 }
 ```
 
+#### DM Hint Activity (Cross-Instance DM)
+
+When a user initiates a cross-instance DM, their home instance delivers a lightweight `Invite` activity to the recipient's home instance. This hint contains only metadata (no message content) and serves as a DM request notification.
+
+```json
+{
+  "@context": [
+    "https://www.w3.org/ns/activitystreams",
+    "https://murmuring.dev/ns/v1"
+  ],
+  "type": "Invite",
+  "actor": "https://instance-a.example.com/users/alice",
+  "object": {
+    "type": "murmuring:DmHint",
+    "murmuring:channelId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "murmuring:senderDid": "did:murmuring:alice123...",
+    "murmuring:senderUsername": "alice",
+    "murmuring:senderDisplayName": "Alice",
+    "murmuring:recipientDid": "did:murmuring:bob456..."
+  },
+  "target": "https://instance-b.example.com/users/bob"
+}
+```
+
+| Property | Type | Requirement | Description |
+|----------|------|-------------|-------------|
+| `type` | string | MUST | `"murmuring:DmHint"` |
+| `murmuring:channelId` | UUID | MUST | Channel ID on the initiator's instance |
+| `murmuring:senderDid` | string | MUST | Sender's `did:murmuring:...` identifier |
+| `murmuring:senderUsername` | string | MUST | Sender's username |
+| `murmuring:senderDisplayName` | string | MAY | Sender's display name |
+| `murmuring:recipientDid` | string | MUST | Recipient's `did:murmuring:...` identifier |
+
+The receiving instance MUST:
+1. Resolve the `recipientDid` to a local user
+2. Create a DM request notification for the recipient
+3. Return `:ok` on success, or an appropriate error if the recipient is not found
+
+DM **messages** are NEVER delivered via federation. Only the hint (request) crosses instances. The recipient, upon accepting, connects to the initiator's instance via federated auth token + WebSocket.
+
 ---
 
 ## 4. Federation Handshake
@@ -449,6 +503,95 @@ Each Murmuring node MUST generate the following cryptographic material on first 
 2. **TLS certificate** -- Used for HTTPS and mutual TLS (mTLS). Nodes SHOULD use certificates issued by a publicly trusted Certificate Authority (e.g., Let's Encrypt). Self-signed certificates MAY be used but require manual trust establishment.
 
 The node's **identity** is the combination of its domain name and its Ed25519 public key. Changing either of these values constitutes a new node identity from the perspective of federated peers.
+
+### 4.1.1 User Identity (`did:murmuring`)
+
+Each user has a portable cryptographic identity represented as a Decentralized Identifier (DID). The DID is self-certifying — its value is derived from cryptographic material, not assigned by any authority.
+
+**Two key pairs per user:**
+
+- **Signing key** (Ed25519) — used for E2EE, message signing, MLS credentials, and daily operations. This is the user's existing `identity_public_key`.
+- **Rotation key** (Ed25519) — used ONLY for DID operations (key rotation, handle changes, deactivation). Generated at registration. Stored in the encrypted key backup.
+
+**DID derivation:**
+
+1. Create the genesis operation:
+   ```json
+   {
+     "type": "create",
+     "signingKey": "<multibase Ed25519 public key>",
+     "rotationKey": "<multibase Ed25519 public key>",
+     "handle": "<username>",
+     "service": "<home_domain>",
+     "prev": null
+   }
+   ```
+2. Sign the genesis operation with the rotation key.
+3. Compute `DID = did:murmuring:<base58(SHA-256(canonical_json(signed_genesis_op)))>`.
+4. The DID never changes, regardless of key rotations.
+
+**Operation chain:**
+
+DID state is managed through a hash-linked sequence of signed operations:
+
+```
+Op 0 (genesis): {type: "create", signingKey, rotationKey, handle, service, prev: null}
+Op 1:           {type: "rotate_signing_key", key: "<new>", prev: SHA-256(Op 0)}
+Op 2:           {type: "update_handle", handle: "<new>", prev: SHA-256(Op 1)}
+Op 3:           {type: "rotate_rotation_key", key: "<new>", prev: SHA-256(Op 2)}
+```
+
+Each operation is signed by the **current rotation key** at the time of signing. The chain is tamper-evident: modifying any operation invalidates all subsequent hashes.
+
+**DID document** (constructed by replaying the operation chain):
+
+```json
+{
+  "@context": ["https://www.w3.org/ns/did/v1"],
+  "id": "did:murmuring:7xK9...",
+  "verificationMethod": [{
+    "id": "did:murmuring:7xK9...#signing",
+    "type": "Ed25519VerificationKey2020",
+    "publicKeyMultibase": "z6Mk..."
+  }],
+  "authentication": ["did:murmuring:7xK9...#signing"],
+  "service": [{
+    "type": "MurmuringPDS",
+    "serviceEndpoint": "https://home.instance.com"
+  }]
+}
+```
+
+**DID resolution endpoint:**
+
+```
+GET /.well-known/did/<did>
+```
+
+Returns the DID document. The receiving node can independently verify the document by replaying the operation chain.
+
+**Federated authentication token:**
+
+When a user wants to join a server on a remote instance, their home instance issues a federated auth token:
+
+```json
+{
+  "type": "federated_auth",
+  "did": "did:murmuring:7xK9...",
+  "username": "alice",
+  "display_name": "Alice",
+  "home_instance": "instance-a.com",
+  "target_instance": "instance-b.com",
+  "public_key": "<base64 Ed25519 pubkey>",
+  "iat": 1739280000,
+  "exp": 1739283600,
+  "nonce": "<random 16 bytes hex>"
+}
+```
+
+Wire format: `base64url(payload).base64url(node_ed25519_signature)`. Signed by the **home node's** Ed25519 key. The remote instance verifies the signature against the home node's public key from `federated_nodes`, then verifies the user's DID operation chain.
+
+**DM guard:** Messages from DM channels (`type: "dm"`) or channels without a `server_id` MUST NOT be federated. DMs always stay on the home instance.
 
 ### 4.2 Well-Known Federation Endpoint
 
@@ -546,6 +689,32 @@ GET /.well-known/webfinger?resource=acct:alice@node-a.example.com
 ```
 
 The `self` link with type `application/activity+json` MUST be present and MUST point to the user's ActivityPub actor document. Nodes MUST respond with `404 Not Found` for unknown users. Nodes MUST NOT enumerate users (i.e., the endpoint MUST NOT accept wildcard queries).
+
+WebFinger also supports `did:murmuring:...` resources. When the `resource` parameter is a DID, the node MUST resolve it to the corresponding actor URI:
+
+**Request:**
+
+```
+GET /.well-known/webfinger?resource=did:murmuring:7xK9abc123...
+```
+
+**Response:**
+
+```json
+{
+  "subject": "did:murmuring:7xK9abc123...",
+  "aliases": [
+    "https://node-a.example.com/users/alice"
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/activity+json",
+      "href": "https://node-a.example.com/users/alice"
+    }
+  ]
+}
+```
 
 ### 4.4 Mutual TLS (mTLS)
 
@@ -931,6 +1100,14 @@ When initiating a DM, the client fetches the recipient's key bundle:
 ```
 GET /api/v1/users/:user_id/keys
 ```
+
+For **cross-instance DMs**, the initiator's instance fetches the recipient's key bundle from the recipient's home instance via federation:
+
+```
+GET /api/v1/federation/users/:did/keys
+```
+
+This endpoint is authenticated via HTTP Signatures (node-to-node) and returns the same key bundle format. The `:did` parameter is the recipient's `did:murmuring:...` identifier.
 
 **Response:**
 
@@ -1780,6 +1957,7 @@ This appendix provides a quick reference for all endpoints and their wire format
 | GET | `/.well-known/murmuring-federation` | `application/json` | No |
 | GET | `/.well-known/webfinger` | `application/jrd+json` | No |
 | GET | `/.well-known/privacy-manifest` | `application/json` | No |
+| GET | `/.well-known/did/:did` | `application/json` | No |
 
 #### ActivityPub Endpoints
 
@@ -1803,6 +1981,32 @@ This appendix provides a quick reference for all endpoints and their wire format
 | GET | `/api/v1/users/me/key-backup` | `application/octet-stream` | JWT |
 | DELETE | `/api/v1/users/me/key-backup` | -- | JWT |
 
+#### Identity Endpoints
+
+| Method | Path | Content-Type | Auth Required |
+|--------|------|-------------|---------------|
+| POST | `/api/v1/users/me/did/rotate-signing-key` | `application/json` | JWT |
+| POST | `/api/v1/federation/auth-token` | `application/json` | JWT |
+
+#### Federated Access Endpoints
+
+| Method | Path | Content-Type | Auth Required |
+|--------|------|-------------|---------------|
+| POST | `/api/v1/federated/join/:server_id` | `application/json` | Federated Token |
+| GET | `/api/v1/federated/servers/:id/channels` | `application/json` | Federated Token |
+| POST | `/api/v1/federated/invites/:code/use` | `application/json` | Federated Token |
+
+#### Cross-Instance DM Endpoints
+
+| Method | Path | Content-Type | Auth Required |
+|--------|------|-------------|---------------|
+| GET | `/api/v1/federation/users/:did/keys` | `application/json` | HTTP Signature |
+| POST | `/api/v1/dm/federated` | `application/json` | JWT |
+| GET | `/api/v1/dm/requests` | `application/json` | JWT |
+| GET | `/api/v1/dm/requests/sent` | `application/json` | JWT |
+| POST | `/api/v1/dm/requests/:id/respond` | `application/json` | JWT |
+| POST | `/api/v1/dm/requests/:id/block` | `application/json` | JWT |
+
 #### MLS Delivery Endpoints
 
 | Method | Path | Content-Type | Auth Required |
@@ -1819,6 +2023,8 @@ This appendix provides a quick reference for all endpoints and their wire format
 | Version | Date | Changes |
 |---------|------|---------|
 | `0.1.0` | 2026-02-09 | Initial draft specification |
+| `0.1.1` | 2026-02-11 | Added `did:murmuring` portable identity (Section 4.1.1), federated auth tokens, DID operation chain, DM guard, ActivityPub DID extension fields (`murmuring:did`, `murmuring:homeInstance`, `murmuring:channelId`, `murmuring:displayName`), federated access endpoints, WebFinger DID resolution |
+| `0.1.2` | 2026-02-11 | Cross-instance encrypted DMs: `Invite`/`murmuring:DmHint` activity type (Section 3.7), federated key bundle endpoint (`GET /api/v1/federation/users/:did/keys`), DM request endpoints, consent-first DM flow, anti-spam (rate limits, DID block list) |
 
 ---
 

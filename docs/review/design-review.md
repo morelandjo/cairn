@@ -46,7 +46,7 @@ The most critical structural problem was the deferral of MLS group encryption to
 |---|-------|----------|------------|-------|
 | 4 | **No bot/webhook/integration system** — Platform has no way for external services to interact with it | Significant | Add incoming webhooks + bot user accounts with scoped permissions | 4 |
 | 5 | **No invite system** — No mechanism for users to invite others to a server | Significant | Invite links with codes, expiration, max uses | 1 |
-| 6 | **No account portability** — Users cannot migrate between nodes | Significant | Data export + identity key export for node migration | 3, 4 |
+| 6 | **No account portability** — Users cannot migrate between nodes | Significant | RESOLVED: `did:murmuring` portable cryptographic identity with self-certifying DID, hash-chained operation log, federated auth tokens, and cross-instance server joining (Phase 9). Users register once on their home instance and join servers on any federated instance without re-registering. | 9 |
 | 7 | **HTTP Signatures spec deprecated** — Design references draft-cavage which is superseded | Significant | Use RFC 9421 (HTTP Message Signatures) instead | 3 |
 | 8 | **No monitoring/observability** — No logging, health checks, or metrics specified | Moderate | Structured JSON logging, `/health` endpoint, Phoenix Telemetry in Phase 0/1. Prometheus + Grafana in Phase 6. | 0, 1, 6 |
 | 9 | **No message formatting spec** — No specification for how messages are formatted/rendered | Moderate | Markdown subset (bold, italic, strikethrough, code, links, mentions, blockquotes) defined in protocol spec | 0, 1 |
@@ -90,18 +90,24 @@ The most critical structural problem was the deferral of MLS group encryption to
 ## Cross-Phase Dependencies
 
 ```
-Phase 0 ──→ Phase 1 ──→ Phase 2 ──→ Phase 3
+Phase 0 ──→ Phase 1 ──→ Phase 2 ──→ Phase 3/3.5
                 │            │           │
                 │            │           ├──→ Phase 4
                 │            │           │
                 │            ├───────────┼──→ Phase 5
                 │                        │
-                └────────────────────────┴──→ Phase 6
+                └────────────────────────┼──→ Phase 6 ──→ Phase 7
+                                         │
+                                         ├──→ Phase 8
+                                         │
+                                         └──→ Phase 9
 
 Key dependencies:
   Phase 1 → Phase 2: Identity keys (Ed25519) become MLS credentials
   Phase 2 → Phase 5: MLS group keys used for E2E voice encryption
   Phase 3 → Phase 4: Federation required for federated moderation
+  Phase 3.5 → Phase 9: Federation infra required for portable identity
+  Phase 9: Ed25519 identity keys → DID, federation handshake → federated auth tokens
   Phase 0 → All:     Protocol spec is the foundation for everything
 ```
 
@@ -111,20 +117,20 @@ Key dependencies:
 
 Use this to track which issues have been addressed during implementation:
 
-- [ ] #1 — Private channel encryption gap (Phase 2)
-- [ ] #2 — Account recovery (Phase 1: codes, Phase 2: key backup)
-- [ ] #3 — CSAM/legal compliance (Phase 3)
-- [ ] #4 — Bot/webhook system (Phase 4)
-- [ ] #5 — Invite system (Phase 1)
-- [ ] #6 — Account portability (Phase 3/4)
-- [ ] #7 — RFC 9421 HTTP Signatures (Phase 3)
-- [ ] #8 — Monitoring/observability (Phase 0/1/6)
-- [ ] #9 — Message formatting spec (Phase 0/1)
-- [ ] #10 — Notification preferences (Phase 4)
-- [ ] #11 — WebSocket rate limiting (Phase 1)
-- [ ] #12 — Content delivery strategy (Phase 1)
-- [ ] #13 — Redis SPOF (Phase 1)
-- [ ] #14 — Protocol versioning (Phase 0/3)
-- [ ] #15 — Data export/GDPR (Phase 4)
-- [ ] #16 — Server/channel discovery (Phase 4)
-- [ ] #17 — Distribution/install strategy (Phase 1: web client serving, Phase 6: install script, client distribution)
+- [x] #1 — Private channel encryption gap (Phase 2)
+- [x] #2 — Account recovery (Phase 1: codes, Phase 2: key backup)
+- [x] #3 — CSAM/legal compliance (Phase 3)
+- [x] #4 — Bot/webhook system (Phase 4)
+- [x] #5 — Invite system (Phase 1)
+- [x] #6 — Account portability (Phase 9: `did:murmuring` portable identity)
+- [x] #7 — RFC 9421 HTTP Signatures (Phase 3.5)
+- [x] #8 — Monitoring/observability (Phase 0/1/8)
+- [x] #9 — Message formatting spec (Phase 0/1)
+- [x] #10 — Notification preferences (Phase 4)
+- [x] #11 — WebSocket rate limiting (Phase 1)
+- [x] #12 — Content delivery strategy (Phase 1)
+- [x] #13 — Redis SPOF (Phase 1)
+- [x] #14 — Protocol versioning (Phase 0/3)
+- [x] #15 — Data export/GDPR (Phase 4)
+- [x] #16 — Server/channel discovery (Phase 4)
+- [x] #17 — Distribution/install strategy (Phase 8: install script, SPA serving, desktop CI, mobile EAS)

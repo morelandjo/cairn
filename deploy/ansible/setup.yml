@@ -1,0 +1,145 @@
+---
+# Murmuring Server Setup Playbook
+# Target: Fresh Debian/Ubuntu VPS
+# Usage: ansible-playbook -i inventory.ini setup.yml
+
+- name: Set up Murmuring server
+  hosts: murmuring
+  become: true
+
+  vars:
+    deploy_dir: /opt/murmuring
+    swap_size: 2G
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install prerequisites
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - ufw
+          - fail2ban
+        state: present
+
+    - name: Add Docker GPG key
+      shell: |
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg -o /etc/apt/keyrings/docker.asc
+        chmod a+r /etc/apt/keyrings/docker.asc
+      args:
+        creates: /etc/apt/keyrings/docker.asc
+
+    - name: Add Docker repository
+      shell: |
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/{{ ansible_distribution | lower }} $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+      args:
+        creates: /etc/apt/sources.list.d/docker.list
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+    - name: Ensure Docker is running
+      systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create murmuring user
+      user:
+        name: murmuring
+        groups: docker
+        shell: /bin/bash
+        create_home: true
+
+    - name: Create deploy directory
+      file:
+        path: "{{ deploy_dir }}"
+        state: directory
+        owner: murmuring
+        group: murmuring
+        mode: "0750"
+
+    - name: Create data directories
+      file:
+        path: "{{ deploy_dir }}/{{ item }}"
+        state: directory
+        owner: murmuring
+        group: murmuring
+        mode: "0750"
+      loop:
+        - backups
+        - keys
+
+    - name: Configure swap
+      shell: |
+        if [ ! -f /swapfile ]; then
+          fallocate -l {{ swap_size }} /swapfile
+          chmod 600 /swapfile
+          mkswap /swapfile
+          swapon /swapfile
+          echo '/swapfile none swap sw 0 0' >> /etc/fstab
+        fi
+      args:
+        creates: /swapfile
+
+    - name: Configure UFW firewall
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - "22"
+        - "80"
+        - "443"
+        - "3478"
+
+    - name: Allow TURN UDP ports
+      ufw:
+        rule: allow
+        port: "3478"
+        proto: udp
+
+    - name: Allow TURN relay UDP ports
+      ufw:
+        rule: allow
+        port: "49152:49200"
+        proto: udp
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+        policy: deny
+
+    - name: Configure fail2ban
+      copy:
+        content: |
+          [DEFAULT]
+          bantime = 1h
+          findtime = 10m
+          maxretry = 5
+
+          [sshd]
+          enabled = true
+        dest: /etc/fail2ban/jail.local
+      notify: restart fail2ban
+
+  handlers:
+    - name: restart fail2ban
+      systemd:
+        name: fail2ban
+        state: restarted

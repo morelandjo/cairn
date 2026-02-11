@@ -1,0 +1,73 @@
+---
+# Murmuring Deploy Playbook
+# Usage: ansible-playbook -i inventory.ini deploy.yml
+
+- name: Deploy Murmuring
+  hosts: murmuring
+  become: true
+  become_user: murmuring
+
+  vars:
+    deploy_dir: /opt/murmuring
+    compose_file: docker-compose.prod.yml
+
+  tasks:
+    - name: Copy docker-compose file
+      copy:
+        src: ../docker-compose.prod.yml
+        dest: "{{ deploy_dir }}/docker-compose.yml"
+        owner: murmuring
+        group: murmuring
+        mode: "0640"
+
+    - name: Copy .env file (if not exists)
+      copy:
+        src: ../.env
+        dest: "{{ deploy_dir }}/.env"
+        owner: murmuring
+        group: murmuring
+        mode: "0600"
+        force: false
+
+    - name: Pull latest images
+      command: docker compose pull
+      args:
+        chdir: "{{ deploy_dir }}"
+
+    - name: Start services
+      command: docker compose up -d
+      args:
+        chdir: "{{ deploy_dir }}"
+
+    - name: Wait for PostgreSQL to be healthy
+      command: docker compose exec -T postgres pg_isready -U murmuring
+      args:
+        chdir: "{{ deploy_dir }}"
+      register: pg_ready
+      retries: 30
+      delay: 2
+      until: pg_ready.rc == 0
+
+    - name: Run database migrations
+      command: docker compose exec -T server bin/murmuring eval "Murmuring.Release.migrate()"
+      args:
+        chdir: "{{ deploy_dir }}"
+
+    - name: Verify health endpoint
+      uri:
+        url: "http://localhost:4000/health"
+        return_content: true
+      register: health
+      retries: 10
+      delay: 3
+      until: health.status == 200
+
+    - name: Show service status
+      command: docker compose ps
+      args:
+        chdir: "{{ deploy_dir }}"
+      register: status
+
+    - name: Print status
+      debug:
+        var: status.stdout_lines

@@ -1,30 +1,41 @@
 import Fastify from "fastify";
+import { config } from "./config.js";
+import { WorkerPool } from "./workers.js";
+import { RoomManager } from "./rooms.js";
+import { authPlugin } from "./auth.js";
+import { registerRoutes } from "./routes.js";
 
-const PORT = Number(process.env["SFU_PORT"]) || 3478;
-const HOST = process.env["SFU_HOST"] || "0.0.0.0";
+export { config } from "./config.js";
+export { WorkerPool } from "./workers.js";
+export { RoomManager } from "./rooms.js";
 
-export function buildApp() {
+export async function buildApp(opts?: { skipWorkers?: boolean }) {
   const app = Fastify({ logger: true });
 
-  app.get("/health", async () => {
-    return {
-      status: "healthy",
-      version: "0.1.0",
-      services: {
-        mediasoup: { status: "up" },
-      },
-    };
+  const workerPool = new WorkerPool();
+  if (!opts?.skipWorkers) {
+    await workerPool.init();
+  }
+
+  const roomManager = new RoomManager(workerPool);
+
+  await app.register(authPlugin);
+  registerRoutes(app, roomManager, workerPool);
+
+  // Attach to app for cleanup
+  app.addHook("onClose", async () => {
+    await workerPool.close();
   });
 
   return app;
 }
 
 async function main() {
-  const app = buildApp();
+  const app = await buildApp();
 
   try {
-    await app.listen({ port: PORT, host: HOST });
-    console.log(`SFU listening on ${HOST}:${PORT}`);
+    await app.listen({ port: config.port, host: config.host });
+    console.log(`SFU listening on ${config.host}:${config.port}`);
   } catch (err) {
     app.log.error(err);
     process.exit(1);

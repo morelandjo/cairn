@@ -14,7 +14,8 @@ defmodule MurmuringWeb.HealthController do
       status: if(all_healthy, do: "healthy", else: "degraded"),
       version: "0.1.0",
       postgres: Atom.to_string(postgres_status),
-      redis: Atom.to_string(redis_status)
+      redis: Atom.to_string(redis_status),
+      force_ssl: Application.get_env(:murmuring, :force_ssl, true)
     })
   end
 

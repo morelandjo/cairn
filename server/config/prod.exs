@@ -1,14 +1,8 @@
 import Config
 
-# Force using SSL in production. This also sets the "strict-security-transport" header,
-# known as HSTS. If you have a health check endpoint, you may want to exclude it below.
-# Note `:force_ssl` is required to be set at compile-time.
-config :murmuring, MurmuringWeb.Endpoint,
-  force_ssl: [rewrite_on: [:x_forwarded_proto]],
-  exclude: [
-    # paths: ["/health"],
-    hosts: ["localhost", "127.0.0.1"]
-  ]
+# SSL redirect is handled at runtime by MurmuringWeb.Plugs.RequireSsl,
+# which reads `config :murmuring, :force_ssl` (set via FORCE_SSL env var).
+# This allows operators to disable SSL for LAN/tunnel deployments.
 
 # Configure Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Req
@@ -18,6 +12,13 @@ config :swoosh, local: false
 
 # Do not print debug messages in production
 config :logger, level: :info
+
+# Serve web client SPA from priv/static/app/ in production
+config :murmuring, :serve_spa, true
+
+# Default: SSL enforcement enabled (HSTS via SecurityHeaders plug, redirect via RequireSsl plug).
+# Override at runtime with FORCE_SSL=false for LAN/tunnel deployments (federation must be disabled).
+config :murmuring, :force_ssl, true
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.

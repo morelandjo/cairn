@@ -15,12 +15,13 @@
   },
   "dependencies": {
     "fastify": "^5.7.0",
+    "fastify-plugin": "^5.1.0",
     "mediasoup": "^3.19.0"
   },
   "devDependencies": {
-    "typescript": "~5.9.3",
-    "vitest": "^3.0.0",
+    "@types/node": "^24.0.0",
     "tsx": "^4.19.0",
-    "@types/node": "^24.0.0"
+    "typescript": "~5.9.3",
+    "vitest": "^3.0.0"
   }
 }

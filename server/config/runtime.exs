@@ -23,6 +23,87 @@ end
 config :murmuring, MurmuringWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
+# JWT secret (required in prod, optional in dev/test)
+if jwt_secret = System.get_env("JWT_SECRET") do
+  config :murmuring, :jwt_secret, jwt_secret
+end
+
+# Storage backend selection
+case System.get_env("STORAGE_BACKEND") do
+  "s3" ->
+    config :murmuring, :storage_backend, Murmuring.Storage.S3Backend
+
+    config :murmuring, Murmuring.Storage.S3Backend,
+      bucket: System.get_env("S3_BUCKET") || "murmuring-uploads",
+      endpoint: System.get_env("S3_ENDPOINT"),
+      region: System.get_env("AWS_REGION", "us-east-1")
+
+    config :ex_aws,
+      access_key_id: System.get_env("AWS_ACCESS_KEY_ID"),
+      secret_access_key: System.get_env("AWS_SECRET_ACCESS_KEY")
+
+  _ ->
+    :ok
+end
+
+# Meilisearch configuration from environment
+if meili_url = System.get_env("MEILI_URL") do
+  config :murmuring, :meilisearch,
+    url: meili_url,
+    master_key: System.get_env("MEILI_MASTER_KEY")
+end
+
+# SSL enforcement (runtime-configurable via FORCE_SSL env var)
+# Only override if the env var is explicitly set; otherwise use the compile-time default.
+force_ssl_env = System.get_env("FORCE_SSL")
+
+if force_ssl_env != nil do
+  config :murmuring, :force_ssl, force_ssl_env != "false"
+end
+
+# Federation configuration from environment
+federation_enabled = System.get_env("FEDERATION_ENABLED") in ~w(true 1)
+
+if federation_enabled do
+  # Federation requires SSL — override if operator tried to disable it
+  if force_ssl_env == "false" do
+    IO.puts(:stderr, """
+    [warning] FORCE_SSL=false is incompatible with federation. \
+    SSL enforcement has been re-enabled. To disable SSL, also disable federation.\
+    """)
+  end
+
+  config :murmuring, :force_ssl, true
+
+  config :murmuring, :federation,
+    enabled: true,
+    domain: System.get_env("MURMURING_DOMAIN") || "localhost",
+    node_key_path: System.get_env("NODE_KEY_PATH")
+end
+
+# Allow MURMURING_DOMAIN to be set even without federation (used for TURN, endpoint host, etc.)
+if domain = System.get_env("MURMURING_DOMAIN") do
+  config :murmuring, :domain, domain
+end
+
+# SFU configuration from environment
+if sfu_url = System.get_env("SFU_URL") do
+  config :murmuring, :sfu_url, sfu_url
+end
+
+if sfu_secret = System.get_env("SFU_AUTH_SECRET") do
+  config :murmuring, :sfu_auth_secret, sfu_secret
+end
+
+# TURN configuration from environment
+if turn_secret = System.get_env("TURN_SECRET") do
+  config :murmuring, :turn_secret, turn_secret
+end
+
+if turn_urls = System.get_env("TURN_URLS") do
+  config :murmuring, :turn_urls, String.split(turn_urls, ",", trim: true)
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -53,12 +134,20 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "example.com"
+  host = System.get_env("PHX_HOST") || System.get_env("MURMURING_DOMAIN") || "example.com"
+  prod_force_ssl = Application.get_env(:murmuring, :force_ssl, true)
 
   config :murmuring, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
+  url_config =
+    if prod_force_ssl do
+      [host: host, port: 443, scheme: "https"]
+    else
+      [host: host, port: String.to_integer(System.get_env("PORT", "4000")), scheme: "http"]
+    end
+
   config :murmuring, MurmuringWeb.Endpoint,
-    url: [host: host, port: 443, scheme: "https"],
+    url: url_config,
     http: [
       # Enable IPv6 and bind on all interfaces.
       # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.

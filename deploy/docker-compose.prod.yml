@@ -1,0 +1,143 @@
+services:
+  server:
+    image: ${MURMURING_IMAGE:-murmuring/server:latest}
+    build:
+      context: ../server
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-4000}:4000"
+    environment:
+      DATABASE_URL: "ecto://murmuring:${POSTGRES_PASSWORD}@postgres:5432/murmuring"
+      SECRET_KEY_BASE: "${SECRET_KEY_BASE}"
+      JWT_SECRET: "${JWT_SECRET}"
+      PHX_HOST: "${MURMURING_DOMAIN}"
+      PHX_SERVER: "true"
+      PORT: "4000"
+      REDIS_URL: "redis://redis:6379/0"
+      MEILI_URL: "http://meilisearch:7700"
+      MEILI_MASTER_KEY: "${MEILI_MASTER_KEY}"
+      SFU_URL: "http://sfu:4001"
+      SFU_AUTH_SECRET: "${SFU_AUTH_SECRET}"
+      TURN_SECRET: "${TURN_SECRET}"
+      TURN_URLS: "${TURN_URLS:-turn:${MURMURING_DOMAIN}:3478}"
+      FEDERATION_ENABLED: "${FEDERATION_ENABLED:-false}"
+      MURMURING_DOMAIN: "${MURMURING_DOMAIN}"
+      NODE_KEY_PATH: "/app/priv/keys/node_ed25519.key"
+      STORAGE_BACKEND: "${STORAGE_BACKEND:-local}"
+      S3_BUCKET: "${S3_BUCKET:-}"
+      S3_ENDPOINT: "${S3_ENDPOINT:-}"
+      AWS_REGION: "${AWS_REGION:-us-east-1}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
+    volumes:
+      - uploads:/app/priv/uploads
+      - keys:/app/priv/keys
+      - exports:/app/priv/exports
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+
+  sfu:
+    image: ${SFU_IMAGE:-murmuring/sfu:latest}
+    build:
+      context: ../sfu
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      PORT: "4001"
+      AUTH_SECRET: "${SFU_AUTH_SECRET}"
+      RTC_MIN_PORT: "40000"
+      RTC_MAX_PORT: "40100"
+      ANNOUNCED_IP: "${MURMURING_DOMAIN}"
+    network_mode: host
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "1.0"
+
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: murmuring
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: murmuring
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U murmuring"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    command: redis-server --appendonly yes --maxmemory 64mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.13
+    restart: unless-stopped
+    environment:
+      MEILI_MASTER_KEY: "${MEILI_MASTER_KEY}"
+      MEILI_ENV: production
+    volumes:
+      - meilidata:/meili_data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:7700/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  coturn:
+    image: coturn/coturn:4
+    restart: unless-stopped
+    network_mode: host
+    command: >
+      turnserver
+      --realm=${MURMURING_DOMAIN}
+      --use-auth-secret
+      --static-auth-secret=${TURN_SECRET}
+      --listening-port=3478
+      --min-port=49152
+      --max-port=49200
+      --log-file=stdout
+      --fingerprint
+      --no-tls
+      --no-dtls
+
+volumes:
+  pgdata:
+  redisdata:
+  meilidata:
+  uploads:
+  keys:
+  exports:
