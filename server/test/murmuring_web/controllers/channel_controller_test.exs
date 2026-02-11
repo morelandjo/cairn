@@ -78,6 +78,70 @@ defmodule MurmuringWeb.ChannelControllerTest do
     end
   end
 
+  describe "history_accessible setting" do
+    test "creates private channel with history_accessible", %{conn: conn, server: server} do
+      conn =
+        post(conn, "/api/v1/channels", %{
+          name: "history-channel",
+          type: "private",
+          server_id: server.id,
+          history_accessible: true
+        })
+
+      assert %{"channel" => channel} = json_response(conn, 201)
+      assert channel["type"] == "private"
+      assert channel["history_accessible"] == true
+    end
+
+    test "private channel defaults to history_accessible false", %{conn: conn, server: server} do
+      conn =
+        post(conn, "/api/v1/channels", %{
+          name: "private-default",
+          type: "private",
+          server_id: server.id
+        })
+
+      assert %{"channel" => channel} = json_response(conn, 201)
+      assert channel["history_accessible"] == false
+    end
+
+    test "rejects history_accessible on public channels", %{conn: conn, server: server} do
+      conn =
+        post(conn, "/api/v1/channels", %{
+          name: "public-history",
+          type: "public",
+          server_id: server.id,
+          history_accessible: true
+        })
+
+      assert %{"errors" => %{"history_accessible" => _}} = json_response(conn, 422)
+    end
+
+    test "history_accessible is immutable on update", %{conn: _conn, server: server} do
+      {:ok, channel} =
+        Chat.create_channel(%{
+          name: "immutable-test",
+          type: "private",
+          server_id: server.id,
+          history_accessible: false
+        })
+
+      # update_channel should not change history_accessible
+      {:ok, updated} = Chat.update_channel(channel, %{history_accessible: true, name: "renamed"})
+      assert updated.name == "renamed"
+      assert updated.history_accessible == false
+    end
+
+    test "returns history_accessible in channel JSON", %{conn: conn, server: server} do
+      {:ok, channel} =
+        Chat.create_channel(%{name: "json-test", type: "public", server_id: server.id})
+
+      conn = get(conn, "/api/v1/channels/#{channel.id}")
+      assert %{"channel" => ch} = json_response(conn, 200)
+      assert Map.has_key?(ch, "history_accessible")
+    end
+  end
+
   describe "GET /api/v1/channels/:id/members" do
     test "lists channel members", %{conn: conn, user: user, server: server} do
       {:ok, channel} =

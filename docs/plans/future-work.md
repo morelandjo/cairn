@@ -68,11 +68,6 @@ Items identified across all documentation as planned, not yet implemented, or de
 **Options:** Client-side rule evaluation, report-only moderation, consent-based scanning.
 **Blocks:** All-private channels initiative (Phase C).
 
-### 11. Message History for New Members in Encrypted Channels
-**Source:** all-private-channels-roadmap.md blocker #2
-**Problem:** MLS forward secrecy means new members cannot decrypt messages from before they joined. Breaks onboarding, announcement archives, pinned content.
-**Options:** Sender re-encryption on join, shared history key escrow, server-side encrypted archive, accept the limitation.
-**Blocks:** All-private channels initiative (Phase C).
 
 ### 12. MLS Batched Commits for Large Channels
 **Source:** all-private-channels-roadmap.md blocker #7

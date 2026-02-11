@@ -9,6 +9,7 @@ export interface Channel {
   name: string;
   type: string;
   description: string | null;
+  history_accessible?: boolean;
   inserted_at: string;
 }
 
@@ -58,7 +59,12 @@ export function listChannels(
 
 export function createChannel(
   client: ApiClient,
-  params: { name: string; type?: string; description?: string },
+  params: {
+    name: string;
+    type?: string;
+    description?: string;
+    history_accessible?: boolean;
+  },
 ): Promise<{ channel: Channel }> {
   return client.fetch<{ channel: Channel }>("/api/v1/channels", {
     method: "POST",

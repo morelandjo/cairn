@@ -6,12 +6,7 @@ defmodule MurmuringWeb.ChannelController do
   def index(conn, _params) do
     channels = Chat.list_channels()
 
-    json(conn, %{
-      channels:
-        Enum.map(channels, fn c ->
-          %{id: c.id, name: c.name, type: c.type, description: c.description, topic: c.topic}
-        end)
-    })
+    json(conn, %{channels: Enum.map(channels, &channel_json/1)})
   end
 
   def create(conn, params) do
@@ -25,16 +20,7 @@ defmodule MurmuringWeb.ChannelController do
 
       conn
       |> put_status(:created)
-      |> json(%{
-        channel: %{
-          id: channel.id,
-          name: channel.name,
-          type: channel.type,
-          description: channel.description,
-          topic: channel.topic,
-          server_id: channel.server_id
-        }
-      })
+      |> json(%{channel: channel_json(channel)})
     else
       false ->
         conn
@@ -60,15 +46,7 @@ defmodule MurmuringWeb.ChannelController do
         conn |> put_status(:not_found) |> json(%{error: "channel not found"})
 
       channel ->
-        json(conn, %{
-          channel: %{
-            id: channel.id,
-            name: channel.name,
-            type: channel.type,
-            description: channel.description,
-            topic: channel.topic
-          }
-        })
+        json(conn, %{channel: channel_json(channel)})
     end
   end
 
@@ -263,6 +241,18 @@ defmodule MurmuringWeb.ChannelController do
     else
       true
     end
+  end
+
+  defp channel_json(c) do
+    %{
+      id: c.id,
+      name: c.name,
+      type: c.type,
+      description: c.description,
+      topic: c.topic,
+      server_id: c.server_id,
+      history_accessible: c.history_accessible
+    }
   end
 
   defp format_errors(changeset) do

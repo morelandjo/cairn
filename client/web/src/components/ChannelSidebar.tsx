@@ -23,6 +23,7 @@ export default function ChannelSidebar() {
   const [showCreate, setShowCreate] = useState(false);
   const [newChannelName, setNewChannelName] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
+  const [historyAccessible, setHistoryAccessible] = useState(false);
 
   // Sync URL param with store
   useEffect(() => {
@@ -51,9 +52,11 @@ export default function ChannelSidebar() {
         isPrivate ? "private" : "public",
         undefined,
         currentServerId ?? undefined,
+        isPrivate ? historyAccessible : undefined,
       );
       setNewChannelName("");
       setIsPrivate(false);
+      setHistoryAccessible(false);
       setShowCreate(false);
       if (currentServerId) {
         navigate(`/servers/${currentServerId}/channels/${channel.id}`);
@@ -154,10 +157,23 @@ export default function ChannelSidebar() {
               <input
                 type="checkbox"
                 checked={isPrivate}
-                onChange={(e) => setIsPrivate(e.target.checked)}
+                onChange={(e) => {
+                  setIsPrivate(e.target.checked);
+                  if (!e.target.checked) setHistoryAccessible(false);
+                }}
               />
               <span>Private (E2E Encrypted)</span>
             </label>
+            {isPrivate && (
+              <label className="private-toggle history-toggle">
+                <input
+                  type="checkbox"
+                  checked={historyAccessible}
+                  onChange={(e) => setHistoryAccessible(e.target.checked)}
+                />
+                <span>New members can see message history</span>
+              </label>
+            )}
             <div className="create-channel-buttons">
               <button onClick={handleCreateChannel}>Create</button>
               <button onClick={() => setShowCreate(false)}>Cancel</button>

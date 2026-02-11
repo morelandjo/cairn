@@ -86,22 +86,7 @@ defmodule MurmuringWeb.ServerController do
     user_id = conn.assigns.current_user.id
     channels = Chat.list_user_server_channels(server_id, user_id)
 
-    json(conn, %{
-      channels:
-        Enum.map(channels, fn c ->
-          %{
-            id: c.id,
-            name: c.name,
-            type: c.type,
-            description: c.description,
-            topic: c.topic,
-            server_id: c.server_id,
-            position: c.position,
-            category_id: c.category_id,
-            slow_mode_seconds: c.slow_mode_seconds
-          }
-        end)
-    })
+    json(conn, %{channels: Enum.map(channels, &serialize_channel/1)})
   end
 
   # POST /api/v1/servers/:server_id/channels
@@ -119,16 +104,7 @@ defmodule MurmuringWeb.ServerController do
 
           conn
           |> put_status(:created)
-          |> json(%{
-            channel: %{
-              id: channel.id,
-              name: channel.name,
-              type: channel.type,
-              description: channel.description,
-              topic: channel.topic,
-              server_id: channel.server_id
-            }
-          })
+          |> json(%{channel: serialize_channel(channel)})
 
         {:error, changeset} ->
           conn |> put_status(:unprocessable_entity) |> json(%{errors: format_errors(changeset)})
@@ -455,6 +431,21 @@ defmodule MurmuringWeb.ServerController do
           conn |> put_status(:not_found) |> json(%{error: "member not found"})
       end
     end
+  end
+
+  defp serialize_channel(c) do
+    %{
+      id: c.id,
+      name: c.name,
+      type: c.type,
+      description: c.description,
+      topic: c.topic,
+      server_id: c.server_id,
+      position: c.position,
+      category_id: c.category_id,
+      slow_mode_seconds: c.slow_mode_seconds,
+      history_accessible: c.history_accessible
+    }
   end
 
   defp serialize_server(server) do

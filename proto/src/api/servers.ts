@@ -96,7 +96,12 @@ export function getServerChannels(
 export function createServerChannel(
   client: ApiClient,
   serverId: string,
-  params: { name: string; type?: string; description?: string },
+  params: {
+    name: string;
+    type?: string;
+    description?: string;
+    history_accessible?: boolean;
+  },
 ): Promise<{ channel: Channel }> {
   return client.fetch<{ channel: Channel }>(
     `/api/v1/servers/${serverId}/channels`,

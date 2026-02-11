@@ -27,7 +27,7 @@ interface ChannelState {
   replyingTo: Message | null;
 
   fetchChannels: (serverId?: string) => Promise<void>;
-  createChannel: (name: string, type?: string, description?: string, serverId?: string) => Promise<Channel>;
+  createChannel: (name: string, type?: string, description?: string, serverId?: string, historyAccessible?: boolean) => Promise<Channel>;
   selectChannel: (channelId: string) => Promise<void>;
   fetchMessages: (channelId: string, before?: string) => Promise<void>;
   sendMessage: (content: string) => void;
@@ -119,10 +119,11 @@ export const useChannelStore = create<ChannelState>((set, get) => {
       }
     },
 
-    createChannel: async (name, type, description, serverId) => {
+    createChannel: async (name, type, description, serverId, historyAccessible) => {
+      const params = { name, type, description, history_accessible: historyAccessible };
       const data = serverId
-        ? await serversApi.createServerChannel(serverId, { name, type, description })
-        : await channelsApi.createChannel({ name, type, description });
+        ? await serversApi.createServerChannel(serverId, params)
+        : await channelsApi.createChannel(params);
       set((state) => ({ channels: [...state.channels, data.channel] }));
       return data.channel;
     },
