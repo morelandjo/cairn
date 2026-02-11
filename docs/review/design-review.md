@@ -81,9 +81,8 @@ The most critical structural problem was the deferral of MLS group encryption to
 
 1. **Ship Phase 1 as the MVP.** A working server with public channels, E2E DMs, and a web client has standalone value.
 2. **Phase 2 is the hardest phase.** MLS + WASM is the highest technical risk. Prototype early, fail fast.
-3. **Consider dropping React Native** in favor of a progressive web app (PWA) for mobile. This reduces the client surface area significantly while still providing mobile access.
-4. **Protocol spec is a gating dependency.** Don't start Phase 1 implementation until the protocol spec from Phase 0 is at least draft-complete.
-5. **Automate federation testing.** The two-node Docker Compose setup should have scripted test scenarios that run in CI.
+3. **Protocol spec is a gating dependency.** Don't start Phase 1 implementation until the protocol spec from Phase 0 is at least draft-complete.
+4. **Automate federation testing.** The two-node Docker Compose setup should have scripted test scenarios that run in CI.
 
 ---
 

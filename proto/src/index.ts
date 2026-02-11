@@ -27,6 +27,8 @@ export type {
   DIDOperation,
   DIDDocument,
   FederatedUser,
+  DmRequest,
+  FederatedKeyBundle,
 } from "./types.js";
 
 export {
@@ -95,4 +97,5 @@ export {
   pushTokensApi,
   identityApi,
   federationApi,
+  dmApi,
 } from "./api/index.js";

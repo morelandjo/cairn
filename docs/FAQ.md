@@ -120,3 +120,38 @@ This is the right choice for a **personal or small group server** where everyone
 - Only use HTTP on networks you fully trust (home LAN, Tailscale mesh, etc.). On untrusted networks, credentials and messages could be intercepted.
 
 See the [Server Guide — TLS Modes](SERVER.md#tls-modes) for details
+
+## 9. What if someone steals the entire database?
+
+If a bad actor gets a full dump of the PostgreSQL database, here's what they get and what they don't.
+
+**What they CAN read (plaintext or lightly obfuscated):**
+
+- **User accounts** — usernames, email addresses, password hashes (Argon2, so cracking is expensive but theoretically possible for weak passwords)
+- **Membership** — who is in which server, which channels, what roles they have
+- **Server/channel structure** — server names, channel names, categories, role names, permission settings
+- **Public channel messages** — content posted in channels marked as public is stored in plaintext (the user chose to make it public)
+- **Meilisearch index data** — a copy of public channel content (only public channels are indexed)
+- **Message metadata** — timestamps, author IDs, channel IDs, message IDs, edit history for all messages (public, private, and DMs)
+- **File metadata** — filenames, sizes, MIME types, upload timestamps, which channel they were posted in
+- **Federation state** — which instances are federated, node public keys, federated user records (DIDs, actor URIs, display names)
+- **DID operation logs** — the full hash-chained operation history (but this is public by design — anyone can verify it)
+- **Audit logs** — records of logins, moderation actions, role changes, federation events
+- **Oban job queue** — pending background jobs (federation deliveries, push notification metadata)
+- **Session tokens in Redis** — if they also compromise Redis, active session tokens (JWTs are short-lived, but refresh tokens could allow session hijack until rotated)
+
+**What they CANNOT read (encrypted, keys not on the server):**
+
+- **Private channel messages** — stored as MLS ciphertext. The server never had the decryption keys; they live in clients' MLS group state. The attacker gets meaningless binary blobs.
+- **DM messages** — stored as Double Ratchet ciphertext. Same story — the server only ever stored opaque encrypted payloads.
+- **Voice/video content** — not stored at all. Voice frames are transient, encrypted in flight with AES-128-GCM, and never hit the database.
+- **Key backups** — encrypted with the user's passphrase via Argon2id (256 MB memory, 3 iterations) + XChaCha20-Poly1305. Without the passphrase, the backup is a blob. The high Argon2id memory parameter makes brute-forcing impractical even with dedicated hardware.
+- **MLS group state** — the server stores MLS key packages, welcome messages, and commits as opaque binary blobs. It cannot reconstruct group keys from these.
+- **User signing keys and rotation keys** — these live on client devices (or in the encrypted key backup). They are never sent to the server in plaintext.
+- **Encrypted file contents** — files uploaded in private channels are encrypted client-side. The decryption key is embedded in the MLS-encrypted message. The server has the encrypted file and the encrypted message, but cannot connect the key to the file.
+
+**The practical summary:**
+
+A database dump reveals *who talked to whom, when, and in which channels* — but for private channels and DMs, the actual message content is indistinguishable from random bytes. Public channel content is readable because the user chose to post publicly. The attacker learns the social graph and metadata, but not the substance of private conversations.
+
+This is by design. The [Untrusted Server Model](DESIGN.md#4-the-untrusted-server-model) means the server never possesses the keys needed to decrypt private content, so stealing the database gives the attacker exactly what the server itself could see — and no more.

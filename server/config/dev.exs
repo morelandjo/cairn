@@ -68,3 +68,6 @@ config :swoosh, :api_client, false
 
 # JWT secret for development
 config :murmuring, :jwt_secret, "dev_jwt_secret_change_me"
+
+# ALTCHA proof-of-work HMAC key for development
+config :murmuring, :altcha_hmac_key, "dev_altcha_hmac_key_not_for_production"

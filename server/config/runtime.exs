@@ -104,6 +104,11 @@ if turn_urls = System.get_env("TURN_URLS") do
   config :murmuring, :turn_urls, String.split(turn_urls, ",", trim: true)
 end
 
+# ALTCHA proof-of-work HMAC key (required in prod)
+if altcha_key = System.get_env("ALTCHA_HMAC_KEY") do
+  config :murmuring, :altcha_hmac_key, altcha_key
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

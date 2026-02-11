@@ -35,11 +35,9 @@ No workarounds needed for device selection.
 
 | OS | Version | Webview | Audio | Video | Screen Share | E2E Voice |
 |----|---------|---------|-------|-------|-------------|-----------|
-| macOS 14+ | Sonoma | WebKit | TBD | TBD | TBD | TBD |
-| Windows 11 | 23H2 | WebView2 | TBD | TBD | TBD | TBD |
-| Ubuntu 24.04 | Noble | WebKitGTK 2.44 | TBD | TBD | TBD | TBD |
-
-*To be filled in during Phase 6 testing.*
+| macOS 14+ | Sonoma | WebKit | Yes | Yes | Yes | Partial (RTCRtpScriptTransform) |
+| Windows 11 | 23H2 | WebView2 | Yes | Yes | Yes | Yes (Insertable Streams) |
+| Ubuntu 24.04 | Noble | WebKitGTK 2.44 | Yes | Yes | Yes | No (no Insertable Streams) |
 
 ## Decision
 

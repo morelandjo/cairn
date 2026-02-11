@@ -19,6 +19,8 @@ export function register(params: {
   username: string;
   password: string;
   display_name?: string;
+  altcha?: string;
+  website?: string;
 }) {
   return authApi.register(client, params);
 }

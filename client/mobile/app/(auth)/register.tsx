@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { useRouter, Link } from "expo-router";
 import { useAuthStore } from "@/stores/authStore";
+import { authApi } from "@murmuring/proto";
+import { client } from "@/api/client";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -24,7 +26,12 @@ export default function RegisterScreen() {
     if (!username.trim() || !password) return;
     setError(null);
     try {
-      await register(username.trim(), password, displayName.trim() || undefined);
+      const challenge = await authApi.getChallenge(client);
+      const altcha = await authApi.solveChallenge(challenge);
+      await register(username.trim(), password, displayName.trim() || undefined, {
+        altcha,
+        website: "",
+      });
     } catch {
       // error is set in store
     }

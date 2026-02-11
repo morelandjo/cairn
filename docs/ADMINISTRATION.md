@@ -472,6 +472,22 @@ Rate limiting can be disabled entirely (not recommended for production):
 config :murmuring, :http_rate_limiting, false
 ```
 
+### Registration Bot Protection
+
+Registration is protected by two additional layers beyond rate limiting:
+
+**ALTCHA Proof-of-Work** — Before registering, the client fetches a cryptographic challenge from `GET /api/v1/auth/challenge` and must brute-force a SHA-256 hash to solve it (~1-2 seconds of CPU time). The solved payload is submitted with the registration request. This makes bulk automated registration computationally expensive. Challenges are HMAC-signed to prevent forgery.
+
+The HMAC key is configured via the `ALTCHA_HMAC_KEY` environment variable (generate with `openssl rand -base64 32`). PoW verification can be disabled in development/test:
+
+```elixir
+config :murmuring, :require_pow, false
+```
+
+**Honeypot Field** — The registration form includes a hidden `website` field that is invisible to real users but auto-filled by naive bots. Any request with a non-empty `website` field is rejected.
+
+Both mechanisms are privacy-preserving: no third-party services, no user tracking, no cookies.
+
 ### SSL Enforcement
 
 SSL enforcement is controlled by the `FORCE_SSL` environment variable (default: `true`). When enabled, the `RequireSsl` plug redirects HTTP requests to HTTPS, and the `SecurityHeaders` plug adds HSTS headers.

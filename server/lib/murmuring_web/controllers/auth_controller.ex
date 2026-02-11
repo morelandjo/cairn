@@ -5,8 +5,22 @@ defmodule MurmuringWeb.AuthController do
   alias Murmuring.Auth
   alias Murmuring.Auth.PasswordValidator
 
+  def challenge(conn, _params) do
+    hmac_key = Application.fetch_env!(:murmuring, :altcha_hmac_key)
+
+    challenge =
+      Altcha.create_challenge(%Altcha.ChallengeOptions{
+        hmac_key: hmac_key,
+        max_number: 100_000
+      })
+
+    json(conn, challenge)
+  end
+
   def register(conn, %{"username" => username, "password" => password} = params) do
-    with :ok <- PasswordValidator.validate(password, username),
+    with :ok <- check_honeypot(params),
+         :ok <- verify_pow(params),
+         :ok <- PasswordValidator.validate(password, username),
          {:ok, {user, recovery_codes}} <- Accounts.register_user(params) do
       {:ok, tokens} = Auth.generate_tokens(user)
 
@@ -109,6 +123,32 @@ defmodule MurmuringWeb.AuthController do
       Map.put(base, :did, user.did)
     else
       base
+    end
+  end
+
+  defp check_honeypot(%{"website" => value}) when byte_size(value) > 0 do
+    {:error, "invalid request"}
+  end
+
+  defp check_honeypot(_params), do: :ok
+
+  defp verify_pow(params) do
+    if Application.get_env(:murmuring, :require_pow, true) do
+      hmac_key = Application.fetch_env!(:murmuring, :altcha_hmac_key)
+
+      case params["altcha"] do
+        nil ->
+          {:error, "proof of work required"}
+
+        payload ->
+          if Altcha.verify_solution(payload, hmac_key, false) do
+            :ok
+          else
+            {:error, "invalid proof of work"}
+          end
+      end
+    else
+      :ok
     end
   end
 

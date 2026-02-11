@@ -19,7 +19,7 @@ interface AuthState {
   error: string | null;
 
   login: (username: string, password: string) => Promise<{ requiresTotp?: boolean; userId?: string }>;
-  register: (username: string, password: string, displayName?: string) => Promise<void>;
+  register: (username: string, password: string, displayName?: string, extra?: { altcha?: string; website?: string }) => Promise<void>;
   logout: () => void;
   refreshTokens: () => Promise<void>;
   loadSession: () => Promise<void>;
@@ -94,13 +94,14 @@ export const useAuthStore = create<AuthState>((set, get) => {
       }
     },
 
-    register: async (username, password, displayName) => {
+    register: async (username, password, displayName, extra) => {
       set({ isLoading: true, error: null });
       try {
         const data = await authApi.register({
           username,
           password,
           display_name: displayName,
+          ...extra,
         });
         set({
           user: data.user,

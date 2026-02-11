@@ -36,10 +36,12 @@ Murmuring is a privacy-first federated communication platform. This document ide
 
 ### Authentication Endpoints
 - **Surface:** `POST /api/v1/auth/register`, `/auth/login`, `/auth/refresh`, `/auth/recover`
-- **Threats:** Credential stuffing, brute force, account enumeration, token theft
+- **Threats:** Credential stuffing, brute force, account enumeration, token theft, automated registration spam
 - **Mitigations:**
   - Argon2id password hashing (memory-hard, timing-safe)
   - Rate limiting: 5 login attempts/min/IP, 3 registrations/hour/IP
+  - ALTCHA proof-of-work on registration: client must solve a SHA-256 challenge (~1-2s of computation), making bulk account creation computationally expensive. Challenge issued via `GET /api/v1/auth/challenge`, solution submitted with registration payload. HMAC-signed to prevent forgery. Privacy-preserving — no third-party calls or user tracking.
+  - Honeypot field: hidden `website` field in registration form; bots that auto-fill it are rejected. Invisible to real users.
   - Constant-time error responses (no enumeration)
   - Refresh token rotation on each use
   - TOTP/WebAuthn 2FA
@@ -110,7 +112,7 @@ Murmuring is a privacy-first federated communication platform. This document ide
   - Duplicate request prevention (unique constraint on sender + recipient DID)
 
 ### Admin Endpoints
-- **Surface:** `/api/v1/admin/*` — federation management, future operator tools
+- **Surface:** `/api/v1/admin/*` — federation management, operator tools
 - **Threats:** Privilege escalation, unauthorized access
 - **Mitigations:**
   - Admin auth plug (separate from user auth)
@@ -142,7 +144,7 @@ Murmuring is a privacy-first federated communication platform. This document ide
 ### Automated Attacks (Bots/Scripts)
 - **Goal:** Account creation spam, credential stuffing, API abuse
 - **Capabilities:** Automated HTTP requests at scale
-- **Mitigations:** Rate limiting at all endpoints, registration limits, CAPTCHA (future), IP-based throttling
+- **Mitigations:** Rate limiting at all endpoints, registration limits, ALTCHA proof-of-work challenge, honeypot field, IP-based throttling
 
 ## Assumptions
 

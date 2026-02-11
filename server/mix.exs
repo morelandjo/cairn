@@ -69,7 +69,8 @@ defmodule Murmuring.MixProject do
       {:oban, "~> 2.18"},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
-      {:prom_ex, "~> 1.10"}
+      {:prom_ex, "~> 1.10"},
+      {:altcha, "~> 0.2"}
     ]
   end
 

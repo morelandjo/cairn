@@ -227,4 +227,3 @@
 - Insertable Streams (Encoded Transforms) are well-supported in Chromium browsers but lagging in Firefox. The graceful fallback (task 5.14) is essential.
 - E2E encrypted voice means the SFU is a dumb relay — it cannot mix audio, detect silence, or do server-side noise reduction. All that must happen client-side.
 - Screen sharing + E2E encryption is supported — screen frames are encrypted just like camera frames.
-- Global push-to-talk hotkeys only work in the desktop client (Tauri, Phase 6). Web client push-to-talk only works when the tab is focused.

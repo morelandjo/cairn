@@ -59,3 +59,7 @@ config :murmuring, :force_ssl, false
 
 # Disable PromEx in tests (pollers conflict with SQL Sandbox)
 config :murmuring, :start_prom_ex, false
+
+# ALTCHA proof-of-work config for tests
+config :murmuring, :altcha_hmac_key, "test_altcha_hmac_key"
+config :murmuring, :require_pow, false

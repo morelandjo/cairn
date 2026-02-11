@@ -63,6 +63,7 @@ defmodule MurmuringWeb.Router do
   scope "/api/v1", MurmuringWeb do
     pipe_through :api
 
+    get "/auth/challenge", AuthController, :challenge
     post "/auth/register", AuthController, :register
     post "/auth/login", AuthController, :login
     post "/auth/refresh", AuthController, :refresh

@@ -16,9 +16,10 @@ export default function MemberList() {
   const offline = members.filter((m) => !onlineUsers.has(m.id));
 
   function renderMember(m: (typeof members)[0]) {
-    const isFederated = "home_instance" in m && !!(m as Record<string, unknown>).home_instance;
-    const homeInstance = isFederated ? (m as Record<string, unknown>).home_instance as string : null;
-    const memberDid = (m as Record<string, unknown>).did as string | undefined;
+    const extra = m as unknown as Record<string, unknown>;
+    const isFederated = "home_instance" in m && !!extra.home_instance;
+    const homeInstance = isFederated ? extra.home_instance as string : null;
+    const memberDid = extra.did as string | undefined;
 
     return (
       <div key={m.id} className={`member-item ${onlineUsers.has(m.id) ? "online" : "offline"}`}>

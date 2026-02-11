@@ -34,6 +34,7 @@ export type {
   TotpAuthResponse,
   RefreshResponse,
   MeResponse,
+  AltchaChallenge,
 } from "./auth.js";
 
 export type {

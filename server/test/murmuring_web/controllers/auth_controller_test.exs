@@ -191,6 +191,134 @@ defmodule MurmuringWeb.AuthControllerTest do
     end
   end
 
+  describe "GET /api/v1/auth/challenge" do
+    test "returns a valid ALTCHA challenge", %{conn: conn} do
+      conn = get(conn, "/api/v1/auth/challenge")
+
+      assert %{
+               "algorithm" => "SHA-256",
+               "challenge" => challenge,
+               "maxnumber" => maxnumber,
+               "salt" => salt,
+               "signature" => signature
+             } = json_response(conn, 200)
+
+      assert is_binary(challenge)
+      assert is_integer(maxnumber)
+      assert is_binary(salt)
+      assert is_binary(signature)
+    end
+  end
+
+  describe "honeypot and PoW" do
+    test "rejects registration when honeypot field is filled", %{conn: conn} do
+      conn =
+        post(conn, "/api/v1/auth/register", %{
+          username: "honeypotuser",
+          password: @valid_password,
+          website: "http://spam.example.com"
+        })
+
+      assert %{"error" => "invalid request"} = json_response(conn, 422)
+    end
+
+    test "allows registration when honeypot field is empty", %{conn: conn} do
+      conn =
+        post(conn, "/api/v1/auth/register", %{
+          username: "cleanuser",
+          password: @valid_password,
+          website: ""
+        })
+
+      assert %{"user" => %{"username" => "cleanuser"}} = json_response(conn, 201)
+    end
+
+    test "rejects registration when PoW is required but missing", %{conn: conn} do
+      original = Application.get_env(:murmuring, :require_pow)
+      Application.put_env(:murmuring, :require_pow, true)
+
+      conn =
+        post(conn, "/api/v1/auth/register", %{
+          username: "powuser",
+          password: @valid_password
+        })
+
+      assert %{"error" => "proof of work required"} = json_response(conn, 422)
+
+      Application.put_env(:murmuring, :require_pow, original || false)
+    end
+
+    test "accepts registration with valid PoW solution", %{conn: conn} do
+      original = Application.get_env(:murmuring, :require_pow)
+      Application.put_env(:murmuring, :require_pow, true)
+
+      hmac_key = Application.fetch_env!(:murmuring, :altcha_hmac_key)
+
+      challenge =
+        Altcha.create_challenge(%Altcha.ChallengeOptions{
+          hmac_key: hmac_key,
+          max_number: 1_000
+        })
+
+      solution =
+        Altcha.solve_challenge(
+          challenge.challenge,
+          challenge.salt,
+          challenge.algorithm,
+          challenge.maxnumber
+        )
+
+      payload =
+        Base.encode64(
+          Jason.encode!(%{
+            algorithm: "SHA-256",
+            challenge: challenge.challenge,
+            number: solution.number,
+            salt: challenge.salt,
+            signature: challenge.signature
+          })
+        )
+
+      conn =
+        post(conn, "/api/v1/auth/register", %{
+          username: "powvaliduser",
+          password: @valid_password,
+          altcha: payload
+        })
+
+      assert %{"user" => %{"username" => "powvaliduser"}} = json_response(conn, 201)
+
+      Application.put_env(:murmuring, :require_pow, original || false)
+    end
+
+    test "rejects registration with invalid PoW solution", %{conn: conn} do
+      original = Application.get_env(:murmuring, :require_pow)
+      Application.put_env(:murmuring, :require_pow, true)
+
+      payload =
+        Base.encode64(
+          Jason.encode!(%{
+            algorithm: "SHA-256",
+            challenge: "bogus",
+            number: 42,
+            salt: "fakesalt",
+            signature: "badsig"
+          })
+        )
+
+      conn =
+        post(conn, "/api/v1/auth/register", %{
+          username: "powbaduser",
+          password: @valid_password,
+          altcha: payload
+        })
+
+      assert %{"error" => "invalid proof of work"} = json_response(conn, 422)
+
+      Application.put_env(:murmuring, :require_pow, original || false)
+    end
+  end
+
   defp register_user(username) do
     {:ok, {user, recovery_codes}} =
       Accounts.register_user(%{
