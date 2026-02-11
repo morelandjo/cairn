@@ -499,7 +499,7 @@ You can send direct messages to users on other Murmuring instances:
 - Only the DM hint (sender DID, channel ID) crosses instances — a lightweight notification
 - Rate limits prevent spam: max 10 requests/hour, max 5 pending per recipient
 
-Server administrators control federation settings including which remote instances are allowed. See the [Administration Guide](ADMINISTRATION.md#federation-admin) for details.
+Your portable identity means you can join any federated instance you choose — your home server admin cannot restrict where you go. Server administrators can only control which *inbound* remote instances their server accepts activities from (e.g. blocking a malicious instance from delivering spam). This does not prevent their users from visiting or joining servers on that instance. See the [Administration Guide](ADMINISTRATION.md#federation-admin) for details on instance-level federation management.
 
 ---
 

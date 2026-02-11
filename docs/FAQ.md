@@ -1,6 +1,20 @@
 # Frequently Asked Questions
 
-## 1. Do I need to register a user every time I want to add a new server?
+## 1. What is federation?
+
+Think of it like the United Federation of Planets in Star Trek. Each planet (Murmuring instance) is independently governed — it has its own captain, its own crew, its own rules. But because they're all part of the Federation, a crew member from Earth can visit Deep Space Nine, talk to people on Vulcan, and send subspace messages across the quadrant — all without needing to apply for citizenship on every planet they visit.
+
+That's how Murmuring federation works:
+
+- **Each instance is a planet.** You run your own server, you make the rules, you control your data. Nobody else can tell you what to do on your instance.
+- **Your identity is your communicator badge.** When you register on your home instance, you get a cryptographic identity (`did:murmuring`) that proves who you are everywhere. It's like a Starfleet ID — any allied planet can verify it.
+- **Visiting other instances is like visiting other planets.** You can join servers on remote instances without creating a new account. Your home instance vouches for you (issues a signed token), and the remote instance lets you in.
+- **Messages stay encrypted in transit.** Just like subspace communications, your messages are end-to-end encrypted. The servers carrying them can't read the contents — they just route them.
+- **You can go solo.** Don't want to join the Federation? Disable it and run a fully self-contained private server. You're the Romulan Empire — totally independent, everything works internally, you just don't talk to the outside.
+
+The technical details: federation uses ActivityPub for activity delivery, HTTP Signatures (RFC 9421) for authentication between instances, and hash-chained DID operation logs for tamper-proof portable identity. But you don't need to know any of that — just enable it in the installer and it works.
+
+## 2. Do I need to register a user every time I want to add a new server?
 
 **No.** Your Murmuring identity is portable across instances:
 
@@ -10,7 +24,7 @@
 
 Your identity is a self-certifying decentralized identifier (DID) derived from your cryptographic keys. It stays the same even if you rotate your keys or change your username. In the client, remote servers appear grouped by instance in the sidebar, and your messages show your `username@home-instance` to other users.
 
-## 2. What happens if my signing key is compromised?
+## 3. What happens if my signing key is compromised?
 
 Murmuring uses two separate key pairs: a **signing key** for daily use (E2EE, message signing) and a **rotation key** used only for identity operations. If your signing key is compromised:
 
@@ -21,7 +35,7 @@ Murmuring uses two separate key pairs: a **signing key** for daily use (E2EE, me
 
 If your rotation key is also compromised, use your **recovery codes** to rotate the rotation key itself. This is the last line of defense.
 
-## 3. How does federation work with portable identity?
+## 4. How does federation work with portable identity?
 
 When you join a server on a remote instance:
 
@@ -31,9 +45,9 @@ When you join a server on a remote instance:
 4. Your client establishes a WebSocket connection directly to the remote instance
 5. You participate in real-time, just like a local user
 
-Cross-instance DMs are supported — see [Q5](#5-can-i-dm-users-on-other-instances) for details. The DM channel lives on the initiator's instance; the recipient connects via federated auth.
+Cross-instance DMs are supported — see [Q6](#6-can-i-dm-users-on-other-instances) for details. The DM channel lives on the initiator's instance; the recipient connects via federated auth.
 
-## 4. What if my home instance is compromised or deleted?
+## 5. What if my home instance is compromised or deleted?
 
 **Compromised (attacker gains server access):**
 
@@ -49,7 +63,7 @@ Cross-instance DMs are supported — see [Q5](#5-can-i-dm-users-on-other-instanc
 - Your **remote server memberships continue to work** as long as the remote instances have your federated user record cached. However, you cannot obtain new federated auth tokens without a home instance, so you cannot join additional remote servers.
 - **To recover fully**, you would register on a new home instance and use your existing key material to create a new DID. Your old remote memberships would need to be re-established. Full instance migration (transferring your DID to a new home instance via an operation chain entry) is a planned future enhancement.
 
-## 5. Can I DM users on other instances?
+## 6. Can I DM users on other instances?
 
 **Yes.** Murmuring supports cross-instance encrypted DMs using an "initiator hosts" model:
 
@@ -72,7 +86,7 @@ Cross-instance DMs are supported — see [Q5](#5-can-i-dm-users-on-other-instanc
 - Max 5 pending requests per recipient
 - Recipients can reject and **block** a sender's DID to prevent future requests
 
-## 6. What happens if I disable federation?
+## 7. What happens if I disable federation?
 
 Disabling federation gives you a **fully self-contained private server** — think of it like running your own private Discord. Everything works within your instance, but nothing connects to the outside world.
 
@@ -92,7 +106,7 @@ Disabling federation gives you a **fully self-contained private server** — thi
 
 This is the right choice for a **personal or small group server** where everyone has an account on the same instance and there's no need to interact with the broader Murmuring network. You can always enable federation later if your needs change — it's a configuration toggle, not a one-way decision.
 
-## 7. Can I run Murmuring without a domain name?
+## 8. Can I run Murmuring without a domain name?
 
 **Yes**, when federation is disabled. Murmuring supports three deployment modes:
 
