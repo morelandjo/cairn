@@ -4,6 +4,15 @@ set -euo pipefail
 # Murmuring Install Script
 # Usage: curl -sSL https://get.murmuring.dev/install | bash
 # Or: ./install.sh [--config /path/to/config.yml] [--env /path/to/.env] [--json]
+#
+# This script provisions a bare Linux server and deploys Murmuring end-to-end:
+#   1. Installs Docker + Compose (if missing)
+#   2. Creates a dedicated murmuring system user
+#   3. Configures firewall (UFW) and fail2ban
+#   4. Sets up swap (for small VPS / Raspberry Pi)
+#   5. Walks through interactive configuration
+#   6. Deploys all services via Docker Compose
+#   7. Runs database migrations and verifies health
 
 VERSION="0.1.0"
 DEPLOY_DIR="/opt/murmuring"
@@ -73,35 +82,172 @@ generate_secret() {
   openssl rand -base64 48 | tr -d '\n'
 }
 
-# ── Prerequisites Check ──
+# ── System Provisioning ──
 
-check_prerequisites() {
-  log "Checking prerequisites..."
+check_root() {
+  if [ "$(id -u)" -ne 0 ]; then
+    error "This script must be run as root (use sudo)."
+    exit 1
+  fi
+}
 
-  # OS
+detect_distro() {
   if [[ ! -f /etc/os-release ]]; then
     error "Unsupported OS. Murmuring requires Linux (Debian, Ubuntu, or Fedora)."
     exit 1
   fi
+  # shellcheck source=/dev/null
+  source /etc/os-release
+  DISTRO_ID="${ID}"
+  DISTRO_LIKE="${ID_LIKE:-}"
+  DISTRO_CODENAME="${VERSION_CODENAME:-}"
 
-  # Docker
-  if ! command -v docker &>/dev/null; then
-    error "Docker is not installed. Install it first: https://docs.docker.com/engine/install/"
-    exit 1
+  case "$DISTRO_ID" in
+    debian|ubuntu) PKG_MANAGER="apt" ;;
+    fedora)        PKG_MANAGER="dnf" ;;
+    *)
+      # Check ID_LIKE for derivatives (e.g. Linux Mint, Pop!_OS)
+      if [[ "$DISTRO_LIKE" == *"debian"* ]] || [[ "$DISTRO_LIKE" == *"ubuntu"* ]]; then
+        PKG_MANAGER="apt"
+      elif [[ "$DISTRO_LIKE" == *"fedora"* ]]; then
+        PKG_MANAGER="dnf"
+      else
+        error "Unsupported distro: $DISTRO_ID. Supported: Debian, Ubuntu, Fedora (and derivatives)."
+        exit 1
+      fi
+      ;;
+  esac
+}
+
+install_base_packages() {
+  log "Installing base packages..."
+  if [ "$PKG_MANAGER" = "apt" ]; then
+    apt-get update -qq
+    apt-get install -y -qq curl ca-certificates gnupg lsb-release openssl >/dev/null
+  else
+    dnf install -y -q curl ca-certificates gnupg openssl >/dev/null
+  fi
+}
+
+install_docker() {
+  if command -v docker &>/dev/null && docker compose version &>/dev/null; then
+    log "Docker already installed ($(docker --version | grep -oP '\d+\.\d+\.\d+'))"
+    return
   fi
 
-  # Docker Compose (v2 plugin)
-  if ! docker compose version &>/dev/null; then
-    error "Docker Compose v2 is not installed. Install docker-compose-plugin."
-    exit 1
+  log "Installing Docker..."
+  if [ "$PKG_MANAGER" = "apt" ]; then
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL "https://download.docker.com/linux/${DISTRO_ID}/gpg" -o /etc/apt/keyrings/docker.asc
+    chmod a+r /etc/apt/keyrings/docker.asc
+
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${DISTRO_ID} ${DISTRO_CODENAME} stable" \
+      > /etc/apt/sources.list.d/docker.list
+
+    apt-get update -qq
+    apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-compose-plugin >/dev/null
+  else
+    dnf install -y -q dnf-plugins-core >/dev/null
+    dnf config-manager --add-repo "https://download.docker.com/linux/fedora/docker-ce.repo"
+    dnf install -y -q docker-ce docker-ce-cli containerd.io docker-compose-plugin >/dev/null
   fi
 
-  # Ports
-  for port in 4000 5432 6379 7700 3478; do
-    if ss -tlnp | grep -q ":${port} "; then
-      warn "Port ${port} is already in use. This may cause conflicts."
+  systemctl enable --now docker
+  log "Docker installed ($(docker --version | grep -oP '\d+\.\d+\.\d+'))"
+}
+
+create_user() {
+  if id murmuring &>/dev/null; then
+    log "System user 'murmuring' already exists"
+    # Ensure they're in the docker group
+    usermod -aG docker murmuring 2>/dev/null || true
+    return
+  fi
+
+  log "Creating system user 'murmuring'..."
+  useradd --system --create-home --shell /bin/bash --groups docker murmuring
+}
+
+setup_firewall() {
+  if ! command -v ufw &>/dev/null; then
+    log "Installing UFW firewall..."
+    if [ "$PKG_MANAGER" = "apt" ]; then
+      apt-get install -y -qq ufw >/dev/null
+    else
+      dnf install -y -q ufw >/dev/null
     fi
-  done
+  fi
+
+  # Don't reconfigure if already active
+  if ufw status | grep -q "Status: active"; then
+    log "UFW firewall already active"
+    return
+  fi
+
+  log "Configuring firewall..."
+  ufw --force reset >/dev/null 2>&1
+  ufw default deny incoming >/dev/null
+  ufw default allow outgoing >/dev/null
+  ufw allow 22/tcp >/dev/null       # SSH
+  ufw allow 80/tcp >/dev/null       # HTTP
+  ufw allow 443/tcp >/dev/null      # HTTPS
+  ufw allow 3478/tcp >/dev/null     # TURN TCP
+  ufw allow 3478/udp >/dev/null     # TURN UDP
+  ufw allow 49152:49200/udp >/dev/null  # TURN relay
+  ufw --force enable >/dev/null
+  log "Firewall configured (SSH, HTTP, HTTPS, TURN)"
+}
+
+setup_fail2ban() {
+  if ! command -v fail2ban-client &>/dev/null; then
+    log "Installing fail2ban..."
+    if [ "$PKG_MANAGER" = "apt" ]; then
+      apt-get install -y -qq fail2ban >/dev/null
+    else
+      dnf install -y -q fail2ban >/dev/null
+    fi
+  fi
+
+  if [ ! -f /etc/fail2ban/jail.local ]; then
+    log "Configuring fail2ban..."
+    cat > /etc/fail2ban/jail.local <<'JAIL'
+[DEFAULT]
+bantime = 1h
+findtime = 10m
+maxretry = 5
+
+[sshd]
+enabled = true
+JAIL
+    systemctl enable --now fail2ban
+    systemctl restart fail2ban
+  else
+    log "fail2ban already configured"
+  fi
+}
+
+setup_swap() {
+  if [ -f /swapfile ] || swapon --show | grep -q .; then
+    log "Swap already configured"
+    return
+  fi
+
+  total_mb=$(free -m | awk '/^Mem:/{print $2}')
+  if [ "$total_mb" -lt 2048 ]; then
+    log "Setting up 2GB swap (recommended for small servers)..."
+    fallocate -l 2G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile >/dev/null
+    swapon /swapfile
+    echo '/swapfile none swap sw 0 0' >> /etc/fstab
+    log "Swap enabled (2GB)"
+  fi
+}
+
+# ── Prerequisites Check ──
+
+check_prerequisites() {
+  log "Checking system resources..."
 
   # Disk space (minimum 2GB)
   available_gb=$(df -BG / | tail -1 | awk '{print $4}' | tr -d 'G')
@@ -116,7 +262,14 @@ check_prerequisites() {
     warn "Low memory: ${total_mb}MB. Recommended: 1GB+."
   fi
 
-  log "Prerequisites OK (Docker $(docker --version | grep -oP '\d+\.\d+\.\d+'), ${available_gb}GB disk, ${total_mb}MB RAM)"
+  # Port conflicts
+  for port in 4000 5432 6379 7700 3478; do
+    if ss -tlnp 2>/dev/null | grep -q ":${port} "; then
+      warn "Port ${port} is already in use. This may cause conflicts."
+    fi
+  done
+
+  log "System OK (${available_gb}GB disk, ${total_mb}MB RAM)"
 }
 
 # ── Interactive Wizard ──
@@ -225,69 +378,112 @@ EOF
   chmod 600 "$env_path"
 }
 
+install_murmuring_ctl() {
+  if [ -f /usr/local/bin/murmuring-ctl ]; then
+    return
+  fi
+  local ctl_url="https://raw.githubusercontent.com/murmuring/murmuring/main/deploy/murmuring-ctl"
+  log "Installing murmuring-ctl..."
+  curl -sSL "$ctl_url" -o /usr/local/bin/murmuring-ctl
+  chmod +x /usr/local/bin/murmuring-ctl
+}
+
 # ── Main ──
 
 main() {
+  check_root
+  detect_distro
+
+  echo ""
+  echo -e "${GREEN}Murmuring Installer v${VERSION}${NC}"
+  echo ""
+
+  # Phase 1: System provisioning
+  log "Preparing system..."
+  install_base_packages
   check_prerequisites
+  install_docker
+  create_user
+  setup_swap
+  setup_firewall
+  setup_fail2ban
 
-  # Create deploy directory
-  mkdir -p "$DEPLOY_DIR"
+  echo ""
+  log "System provisioning complete."
 
+  # Phase 2: Create deploy directory
+  mkdir -p "$DEPLOY_DIR"/{backups,keys}
+  chown -R murmuring:murmuring "$DEPLOY_DIR"
+  chmod 750 "$DEPLOY_DIR"
+
+  # Phase 3: Configuration
   if [ -n "$ENV_FILE" ]; then
     log "Using provided .env file: $ENV_FILE"
     cp "$ENV_FILE" "$DEPLOY_DIR/.env"
     chmod 600 "$DEPLOY_DIR/.env"
+    chown murmuring:murmuring "$DEPLOY_DIR/.env"
   elif [ -f "$DEPLOY_DIR/.env" ]; then
     warn "Existing .env found at $DEPLOY_DIR/.env — keeping it."
   else
     run_wizard
     write_env "$DEPLOY_DIR/.env"
+    chown murmuring:murmuring "$DEPLOY_DIR/.env"
     log "Configuration written to $DEPLOY_DIR/.env"
   fi
 
-  # Download docker-compose
+  # Phase 4: Download compose file
   log "Downloading docker-compose.yml..."
   if [ -n "$CONFIG_FILE" ]; then
     cp "$CONFIG_FILE" "$DEPLOY_DIR/docker-compose.yml"
   else
     curl -sSL "$COMPOSE_URL" -o "$DEPLOY_DIR/docker-compose.yml"
   fi
+  chown murmuring:murmuring "$DEPLOY_DIR/docker-compose.yml"
 
-  # Pull images
+  # Phase 5: Install murmuring-ctl
+  install_murmuring_ctl
+
+  # Phase 6: Pull images and start services (as murmuring user)
   log "Pulling Docker images (this may take a few minutes)..."
   cd "$DEPLOY_DIR"
-  docker compose pull
+  sudo -u murmuring docker compose pull
 
-  # Start services
   log "Starting services..."
-  docker compose up -d
+  sudo -u murmuring docker compose up -d
 
-  # Wait for health
+  # Phase 7: Wait for health
   log "Waiting for services to be healthy..."
-  for i in $(seq 1 30); do
-    if curl -sf http://localhost:${SERVER_PORT:-4000}/health &>/dev/null; then
+  local port
+  port=$(grep -oP 'SERVER_PORT=\K\d+' "$DEPLOY_DIR/.env" 2>/dev/null || echo "4000")
+  for _ in $(seq 1 30); do
+    if curl -sf "http://localhost:${port}/health" &>/dev/null; then
       break
     fi
     sleep 2
   done
 
-  # Run migrations
+  # Phase 8: Migrations
   log "Running database migrations..."
-  docker compose exec -T server bin/murmuring eval "Murmuring.Release.migrate()" 2>/dev/null || true
+  sudo -u murmuring docker compose exec -T server bin/murmuring eval "Murmuring.Release.migrate()" 2>/dev/null || true
 
-  # Final check
-  if curl -sf http://localhost:${SERVER_PORT:-4000}/health &>/dev/null; then
+  # Final health check
+  if curl -sf "http://localhost:${port}/health" &>/dev/null; then
+    local domain
+    domain=$(grep -oP 'MURMURING_DOMAIN=\K.*' "$DEPLOY_DIR/.env" 2>/dev/null || echo "localhost")
+    local force_ssl
+    force_ssl=$(grep -oP 'FORCE_SSL=\K.*' "$DEPLOY_DIR/.env" 2>/dev/null || echo "true")
+
     echo ""
     log "Murmuring is running!"
     echo ""
-    echo -e "  ${GREEN}URL:${NC}     http://${MURMURING_DOMAIN:-localhost}:${SERVER_PORT:-4000}"
+    echo -e "  ${GREEN}URL:${NC}     http://${domain}:${port}"
     echo -e "  ${GREEN}Config:${NC}  $DEPLOY_DIR/.env"
     echo -e "  ${GREEN}Logs:${NC}    cd $DEPLOY_DIR && docker compose logs -f"
     echo -e "  ${GREEN}Manage:${NC}  murmuring-ctl status"
     echo ""
     echo -e "  ${YELLOW}Next steps:${NC}"
-    if [[ "${FORCE_SSL:-true}" == "true" ]]; then
-      echo "  1. Set up a reverse proxy (nginx/Caddy) with TLS for $MURMURING_DOMAIN"
+    if [[ "$force_ssl" == "true" ]]; then
+      echo "  1. Set up a reverse proxy (nginx/Caddy) with TLS for ${domain}"
     else
       echo -e "  1. ${YELLOW}Warning: SSL is disabled. Only use this on trusted networks.${NC}"
     fi

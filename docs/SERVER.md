@@ -52,23 +52,21 @@ The **Personal** tier is designed for close friend groups, families, and small g
 
 ## Installation
 
-### Option A: Automated Install Script
+### Option A: Automated Install Script (Recommended)
 
-The install script provisions a complete deployment at `/opt/murmuring`.
+The install script takes a bare Linux server (Debian, Ubuntu, or Fedora) and sets up everything from scratch — no prerequisites needed other than `curl` and root access.
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/murmuring/murmuring/main/deploy/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/murmuring/murmuring/main/deploy/install.sh | sudo bash
 ```
 
-The wizard will:
+The script will:
 
-1. Check prerequisites (Docker, Compose, free ports, disk space, RAM)
-2. Prompt for your domain name or IP address and server port (default: 4000)
-3. Auto-generate six cryptographic secrets (or let you provide your own)
-4. Ask whether to enable federation, SSL enforcement, and S3 storage
-5. Write configuration to `/opt/murmuring/.env`
-6. Download `docker-compose.yml` and pull images
-7. Start services, run database migrations, and verify health
+1. **Provision the system** — install Docker + Compose, create a `murmuring` system user, configure UFW firewall rules (SSH, HTTP, HTTPS, TURN), set up fail2ban (SSH brute-force protection), and add swap on small servers
+2. **Walk you through configuration** — prompt for domain/IP, server port, secrets (auto-generate or provide your own), federation, SSL enforcement, and S3 storage
+3. **Deploy Murmuring** — write `.env`, download `docker-compose.yml`, pull Docker images, start all services, run database migrations, and verify health
+
+Everything is idempotent — if Docker is already installed, or the firewall is already configured, those steps are skipped. Safe to re-run.
 
 On success:
 
@@ -137,7 +135,7 @@ curl http://localhost:4000/health
 
 ### Option C: Ansible Deployment
 
-Four playbooks are provided in `deploy/ansible/`:
+For operators managing multiple servers or preferring infrastructure-as-code, four playbooks are provided in `deploy/ansible/`. These do the same work as the install script but in a repeatable, version-controlled way suitable for fleet management.
 
 | Playbook | Purpose |
 |----------|---------|
@@ -327,46 +325,45 @@ The `docker-compose.prod.yml` defines resource limits for each service:
 
 ---
 
-## Federation Setup
+## Federation
 
-To enable federation between Murmuring instances:
+If you chose to enable federation during the install wizard (or set `FEDERATION_ENABLED=true` in your `.env`), federation is already active — no extra steps required. The server automatically:
 
-1. Set environment variables:
+- Generates an Ed25519 node identity key on first start (stored at `NODE_KEY_PATH`)
+- Serves the well-known discovery endpoints (`/.well-known/murmuring`, `/.well-known/webfinger`, `/.well-known/did/:did`)
+- Signs outbound requests with HTTP Signatures (RFC 9421)
+- Delivers activities asynchronously via ActivityPub with exponential backoff
+- Verifies inbound `did:murmuring` operation chains for anti-impersonation
 
-```env
-FEDERATION_ENABLED=true
-MURMURING_DOMAIN=your.domain.com
-```
+### Enabling federation on an existing instance
 
-2. Restart the server:
+If you initially installed without federation and want to enable it later:
 
 ```bash
+murmuring-ctl config FEDERATION_ENABLED true
+murmuring-ctl config MURMURING_DOMAIN your.domain.com
 murmuring-ctl restart
 ```
 
-On first start with federation enabled, the server generates an Ed25519 node identity key at the configured `NODE_KEY_PATH`.
+Federation requires TLS — if `FORCE_SSL` was set to `false`, the server will automatically re-enable SSL enforcement.
 
-3. Ensure your domain serves the well-known endpoints:
-
-```
-GET https://your.domain.com/.well-known/murmuring
-GET https://your.domain.com/.well-known/nodeinfo
-GET https://your.domain.com/.well-known/did/:did
-```
-
-These are served automatically by the Murmuring server. The DID endpoint resolves `did:murmuring:...` identifiers to DID documents for portable identity verification.
-
-4. Federation uses HTTP Signatures (RFC 9421) for request authentication and ActivityPub for activity delivery. Outbound deliveries are processed asynchronously via Oban with exponential backoff.
-
-5. Portable identity: Users on federated instances can join your servers without creating a local account. Their home instance issues a signed federated auth token, and your server verifies it against the home node's public key. Remote users are stored in a `federated_users` cache table, and their DID operation chains are verified for anti-impersonation.
-
-6. To connect to another instance, use the admin API or CLI:
+### Verifying federation
 
 ```bash
+# Check that well-known endpoints are reachable
+curl https://your.domain.com/.well-known/murmuring
+
+# List known federation nodes
 murmuring-ctl federation list
 ```
 
-See the [Administration Guide](ADMINISTRATION.md#federation-admin) for key rotation and node management.
+### How it works
+
+- **Node identity:** Each instance has an Ed25519 key pair for signing HTTP requests and issuing federated auth tokens.
+- **Portable identity:** Users have `did:murmuring` self-certifying identifiers. Users on remote instances can join your servers without creating a local account — their home instance issues a signed token, and your server verifies it.
+- **Cross-instance DMs:** Users can DM users on other instances. The DM channel lives on the initiator's instance only — messages are never replicated via federation.
+
+See the [Administration Guide](ADMINISTRATION.md#federation-admin) for key rotation, node blocking, and activity monitoring.
 
 ---
 
