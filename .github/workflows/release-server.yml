@@ -49,7 +49,8 @@ jobs:
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
-          platforms: linux/amd64,linux/arm64
+          # arm64 disabled: mediasoup C++ worker takes hours under QEMU emulation
+          platforms: linux/amd64
           push: true
           tags: |
             ghcr.io/morelandjo/cairn-${{ matrix.component }}:${{ steps.version.outputs.version }}

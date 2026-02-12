@@ -36,7 +36,8 @@ declare module "mediasoup-client/lib/types" {
     readonly id: string;
     readonly closed: boolean;
     close(): void;
-    on(event: string, listener: (...args: unknown[]) => void): void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    on(event: string, listener: (...args: any[]) => void): void;
     produce(opts: {
       track: MediaStreamTrack;
       appData?: Record<string, unknown>;

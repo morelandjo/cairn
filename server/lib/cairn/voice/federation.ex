@@ -7,6 +7,7 @@ defmodule Cairn.Voice.Federation do
   is verified via federation credentials.
   """
 
+  alias Cairn.Federation
   alias Cairn.Federation.HttpSignatures
   alias Cairn.Federation.NodeIdentity
 
