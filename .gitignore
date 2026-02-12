@@ -54,3 +54,9 @@ cover/
 htmlcov/
 .nyc_output/
 coverage/
+
+# Internal docs and plan files
+docs/
+extracted-plan.txt
+federated-platform-plan.docx
+.claude/
