@@ -24,7 +24,7 @@
   ],
   "scripts": {
     "build": "npm run build:wasm && npm run build:esm && npm run build:cjs && npm run postbuild",
-    "postbuild": "mkdir -p dist/mls-wasm/pkg && cp mls-wasm/pkg/mls_wasm.js mls-wasm/pkg/mls_wasm.d.ts mls-wasm/pkg/mls_wasm_bg.wasm dist/mls-wasm/pkg/",
+    "postbuild": "node -e \"const fs=require('fs'),p=require('path');fs.mkdirSync(p.join('dist','mls-wasm','pkg'),{recursive:true});for(const f of['mls_wasm.js','mls_wasm.d.ts','mls_wasm_bg.wasm'])fs.copyFileSync(p.join('mls-wasm','pkg',f),p.join('dist','mls-wasm','pkg',f))\"",
     "build:wasm": "cargo build --manifest-path mls-wasm/Cargo.toml --target wasm32-unknown-unknown --release && wasm-bindgen mls-wasm/target/wasm32-unknown-unknown/release/mls_wasm.wasm --out-dir mls-wasm/pkg --target web --typescript",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",

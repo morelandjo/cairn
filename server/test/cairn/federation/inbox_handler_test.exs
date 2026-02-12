@@ -57,7 +57,8 @@ defmodule Cairn.Federation.InboxHandlerTest do
         "actor" => "https://inbox-test.example.com/users/bob",
         "object" => %{
           "type" => "Note",
-          "id" => "https://inbox-test.example.com/channels/#{channel.id}/messages/#{Ecto.UUID.generate()}",
+          "id" =>
+            "https://inbox-test.example.com/channels/#{channel.id}/messages/#{Ecto.UUID.generate()}",
           "content" => "Hello from remote",
           "cairn:channelId" => channel.id,
           "cairn:did" => "did:cairn:testdid123",
@@ -75,13 +76,17 @@ defmodule Cairn.Federation.InboxHandlerTest do
       assert msg.content == "Hello from remote"
     end
 
-    test "creates message from federated actor without DID (fallback)", %{node: node, channel: channel} do
+    test "creates message from federated actor without DID (fallback)", %{
+      node: node,
+      channel: channel
+    } do
       activity = %{
         "type" => "Create",
         "actor" => "https://inbox-test.example.com/users/charlie",
         "object" => %{
           "type" => "Note",
-          "id" => "https://inbox-test.example.com/channels/#{channel.id}/messages/#{Ecto.UUID.generate()}",
+          "id" =>
+            "https://inbox-test.example.com/channels/#{channel.id}/messages/#{Ecto.UUID.generate()}",
           "content" => "No DID message",
           "cairn:channelId" => channel.id
         }
@@ -112,7 +117,8 @@ defmodule Cairn.Federation.InboxHandlerTest do
         "actor" => "https://inbox-test.example.com/users/bob",
         "object" => %{
           "type" => "Note",
-          "id" => "https://inbox-test.example.com/channels/#{fake_channel_id}/messages/#{Ecto.UUID.generate()}",
+          "id" =>
+            "https://inbox-test.example.com/channels/#{fake_channel_id}/messages/#{Ecto.UUID.generate()}",
           "content" => "To nowhere",
           "cairn:channelId" => fake_channel_id
         }

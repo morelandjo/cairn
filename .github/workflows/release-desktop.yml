@@ -62,6 +62,7 @@ jobs:
           npm run build
 
       - name: Build web client
+        shell: bash
         run: |
           cd client/web
           npm ci

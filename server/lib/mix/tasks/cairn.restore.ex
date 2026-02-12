@@ -34,11 +34,16 @@ defmodule Mix.Tasks.Cairn.Restore do
       db_config = Application.get_env(:cairn, Cairn.Repo, [])
 
       pg_args = [
-        "-h", Keyword.get(db_config, :hostname, "localhost"),
-        "-p", to_string(Keyword.get(db_config, :port, 5432)),
-        "-U", Keyword.get(db_config, :username, "cairn"),
-        "-d", Keyword.get(db_config, :database, "cairn"),
-        "--clean", "--if-exists",
+        "-h",
+        Keyword.get(db_config, :hostname, "localhost"),
+        "-p",
+        to_string(Keyword.get(db_config, :port, 5432)),
+        "-U",
+        Keyword.get(db_config, :username, "cairn"),
+        "-d",
+        Keyword.get(db_config, :database, "cairn"),
+        "--clean",
+        "--if-exists",
         dump_path
       ]
 

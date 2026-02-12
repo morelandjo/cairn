@@ -85,9 +85,7 @@ defmodule Cairn.Notifications do
   end
 
   def unregister_push_token(user_id, token) do
-    case Repo.one(
-           from(pt in PushToken, where: pt.user_id == ^user_id and pt.token == ^token)
-         ) do
+    case Repo.one(from(pt in PushToken, where: pt.user_id == ^user_id and pt.token == ^token)) do
       nil -> {:error, :not_found}
       push_token -> Repo.delete(push_token) && :ok
     end

@@ -92,7 +92,8 @@ defmodule CairnWeb.DmControllerTest do
     test "enforces rate limit", %{conn: conn, user: user} do
       # Create 10 requests (the max)
       for i <- 1..10 do
-        did = "did:cairn:ratelimit#{i}#{:crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)}"
+        did =
+          "did:cairn:ratelimit#{i}#{:crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)}"
 
         {:ok, fu} =
           Federation.get_or_create_federated_user(%{

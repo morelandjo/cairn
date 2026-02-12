@@ -96,12 +96,13 @@ defmodule Cairn.Federation.InboxHandler do
             Phoenix.PubSub.broadcast(
               Cairn.PubSub,
               "federated:channel:#{message.channel_id}",
-              {:federated_msg, %{
-                type: "edit_msg",
-                id: updated.id,
-                content: updated.content,
-                edited_at: updated.edited_at
-              }}
+              {:federated_msg,
+               %{
+                 type: "edit_msg",
+                 id: updated.id,
+                 content: updated.content,
+                 edited_at: updated.edited_at
+               }}
             )
 
             :ok
@@ -132,10 +133,11 @@ defmodule Cairn.Federation.InboxHandler do
                 Phoenix.PubSub.broadcast(
                   Cairn.PubSub,
                   "federated:channel:#{message.channel_id}",
-                  {:federated_msg, %{
-                    type: "delete_msg",
-                    id: message.id
-                  }}
+                  {:federated_msg,
+                   %{
+                     type: "delete_msg",
+                     id: message.id
+                   }}
                 )
 
                 :ok
@@ -179,13 +181,14 @@ defmodule Cairn.Federation.InboxHandler do
               Phoenix.PubSub.broadcast(
                 Cairn.PubSub,
                 "user:#{user.id}",
-                {:dm_request, %{
-                  sender_did: sender_did,
-                  sender_username: sender_username,
-                  sender_display_name: sender_display_name,
-                  channel_id: channel_id,
-                  actor: activity["actor"]
-                }}
+                {:dm_request,
+                 %{
+                   sender_did: sender_did,
+                   sender_username: sender_username,
+                   sender_display_name: sender_display_name,
+                   channel_id: channel_id,
+                   actor: activity["actor"]
+                 }}
               )
 
               Logger.info("DM hint delivered to local user #{user.id} from #{sender_did}")
@@ -308,17 +311,18 @@ defmodule Cairn.Federation.InboxHandler do
     Phoenix.PubSub.broadcast(
       Cairn.PubSub,
       "federated:channel:#{channel_id}",
-      {:federated_msg, %{
-        id: message.id,
-        content: message.content,
-        federated_author_id: federated_user.id,
-        author_username: federated_user.username,
-        author_display_name: federated_user.display_name,
-        home_instance: federated_user.home_instance,
-        is_federated: true,
-        channel_id: channel_id,
-        inserted_at: message.inserted_at
-      }}
+      {:federated_msg,
+       %{
+         id: message.id,
+         content: message.content,
+         federated_author_id: federated_user.id,
+         author_username: federated_user.username,
+         author_display_name: federated_user.display_name,
+         home_instance: federated_user.home_instance,
+         is_federated: true,
+         channel_id: channel_id,
+         inserted_at: message.inserted_at
+       }}
     )
   end
 

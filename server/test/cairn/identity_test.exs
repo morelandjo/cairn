@@ -165,7 +165,11 @@ defmodule Cairn.IdentityTest do
       {:ok, [genesis, rotation]} = Identity.get_operation_chain(ctx.did)
 
       # Tamper with prev_hash — chain link verification catches this
-      tampered_rotation = %{rotation | prev_hash: "0000", payload: Map.put(rotation.payload, "prev", "0000")}
+      tampered_rotation = %{
+        rotation
+        | prev_hash: "0000",
+          payload: Map.put(rotation.payload, "prev", "0000")
+      }
 
       assert {:error, {:chain_break, 1}} =
                Identity.verify_operation_chain([genesis, tampered_rotation])

@@ -43,11 +43,12 @@ defmodule CairnWeb.UserChannelTest do
       Phoenix.PubSub.broadcast(
         Cairn.PubSub,
         "user:#{user.id}",
-        {:dm_request, %{
-          sender_did: "did:cairn:alice123",
-          sender_username: "alice",
-          channel_id: Ecto.UUID.generate()
-        }}
+        {:dm_request,
+         %{
+           sender_did: "did:cairn:alice123",
+           sender_username: "alice",
+           channel_id: Ecto.UUID.generate()
+         }}
       )
 
       assert_push "dm_request", %{
@@ -63,11 +64,12 @@ defmodule CairnWeb.UserChannelTest do
       Phoenix.PubSub.broadcast(
         Cairn.PubSub,
         "user:#{user.id}",
-        {:dm_request_response, %{
-          request_id: Ecto.UUID.generate(),
-          status: "accepted",
-          channel_id: Ecto.UUID.generate()
-        }}
+        {:dm_request_response,
+         %{
+           request_id: Ecto.UUID.generate(),
+           status: "accepted",
+           channel_id: Ecto.UUID.generate()
+         }}
       )
 
       assert_push "dm_request_response", %{

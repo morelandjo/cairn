@@ -20,8 +20,7 @@ if System.get_env("PHX_SERVER") do
   config :cairn, CairnWeb.Endpoint, server: true
 end
 
-config :cairn, CairnWeb.Endpoint,
-  http: [port: String.to_integer(System.get_env("PORT", "4000"))]
+config :cairn, CairnWeb.Endpoint, http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
 # JWT secret (required in prod, optional in dev/test)
 if jwt_secret = System.get_env("JWT_SECRET") do

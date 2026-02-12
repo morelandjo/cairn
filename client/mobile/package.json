@@ -12,6 +12,7 @@
   "dependencies": {
     "@cairn/proto": "file:../../proto",
     "expo": "~52.0.0",
+    "expo-asset": "^12.0.12",
     "expo-local-authentication": "~15.0.0",
     "expo-notifications": "~0.29.0",
     "expo-router": "~4.0.0",

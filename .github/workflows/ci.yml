@@ -165,8 +165,8 @@ jobs:
 
       - name: Build proto dependency (for client/web)
         if: matrix.project == 'client/web'
+        working-directory: proto
         run: |
-          cd ../proto
           npm ci
           npm run build
 
@@ -318,8 +318,8 @@ jobs:
         run: command -v wasm-bindgen || cargo install wasm-bindgen-cli
 
       - name: Build proto dependency
+        working-directory: proto
         run: |
-          cd ../../proto
           npm ci
           npm run build
 

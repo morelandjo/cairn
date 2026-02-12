@@ -27,7 +27,10 @@ defmodule Cairn.Repo.Migrations.AddFederatedDmSupport do
     # DM request tracking for consent/anti-spam
     create table(:dm_requests, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :channel_id, references(:channels, type: :binary_id, on_delete: :delete_all), null: false
+
+      add :channel_id, references(:channels, type: :binary_id, on_delete: :delete_all),
+        null: false
+
       add :sender_id, references(:users, type: :binary_id, on_delete: :delete_all), null: false
       add :recipient_did, :string, null: false
       add :recipient_instance, :string, null: false

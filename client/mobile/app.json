@@ -19,6 +19,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "dev.cairn.app",
       "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": true,
         "NSMicrophoneUsageDescription": "Cairn needs microphone access for voice channels",
         "NSFaceIDUsageDescription": "Use Face ID to unlock Cairn",
         "UIBackgroundModes": [

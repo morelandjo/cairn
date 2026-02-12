@@ -141,11 +141,12 @@ defmodule CairnWeb.DmController do
                 Phoenix.PubSub.broadcast(
                   Cairn.PubSub,
                   "user:#{request.sender_id}",
-                  {:dm_request_response, %{
-                    request_id: updated.id,
-                    status: new_status,
-                    channel_id: updated.channel_id
-                  }}
+                  {:dm_request_response,
+                   %{
+                     request_id: updated.id,
+                     status: new_status,
+                     channel_id: updated.channel_id
+                   }}
                 )
 
                 json(conn, %{

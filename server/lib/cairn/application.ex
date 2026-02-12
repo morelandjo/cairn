@@ -42,17 +42,17 @@ defmodule Cairn.Application do
       ] ++
         prom_ex_children ++
         [
-        Cairn.Repo,
-        {Oban, Application.fetch_env!(:cairn, Oban)},
-        {Redix, {redis_url, [name: :cairn_redis]}},
-        Cairn.Auth.PasswordValidator,
-        Cairn.RateLimiter,
-        CairnWeb.Plugs.RateLimiter,
-        {DNSCluster, query: Application.get_env(:cairn, :dns_cluster_query) || :ignore},
-        {Phoenix.PubSub, name: Cairn.PubSub},
-        CairnWeb.Presence,
-        CairnWeb.Endpoint
-      ] ++ federation_children
+          Cairn.Repo,
+          {Oban, Application.fetch_env!(:cairn, Oban)},
+          {Redix, {redis_url, [name: :cairn_redis]}},
+          Cairn.Auth.PasswordValidator,
+          Cairn.RateLimiter,
+          CairnWeb.Plugs.RateLimiter,
+          {DNSCluster, query: Application.get_env(:cairn, :dns_cluster_query) || :ignore},
+          {Phoenix.PubSub, name: Cairn.PubSub},
+          CairnWeb.Presence,
+          CairnWeb.Endpoint
+        ] ++ federation_children
 
     opts = [strategy: :one_for_one, name: Cairn.Supervisor]
     Supervisor.start_link(children, opts)

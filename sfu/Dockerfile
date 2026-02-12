@@ -1,7 +1,7 @@
 # Stage 1: Build
 FROM node:24-alpine AS builder
 
-RUN apk add --no-cache python3 make g++ linux-headers
+RUN apk add --no-cache python3 py3-pip make g++ linux-headers
 
 WORKDIR /app
 
