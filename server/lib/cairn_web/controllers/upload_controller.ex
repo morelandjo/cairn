@@ -1,9 +1,9 @@
-defmodule MurmuringWeb.UploadController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.UploadController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Repo
-  alias Murmuring.Storage
-  alias Murmuring.Storage.{FileRecord, Thumbnail}
+  alias Cairn.Repo
+  alias Cairn.Storage
+  alias Cairn.Storage.{FileRecord, Thumbnail}
 
   import Ecto.Query
 

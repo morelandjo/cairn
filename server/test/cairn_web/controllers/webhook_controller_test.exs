@@ -1,8 +1,8 @@
-defmodule MurmuringWeb.WebhookControllerTest do
-  use MurmuringWeb.ConnCase, async: true
+defmodule CairnWeb.WebhookControllerTest do
+  use CairnWeb.ConnCase, async: true
 
-  alias Murmuring.{Accounts, Auth, Bots, Servers}
-  alias Murmuring.Chat
+  alias Cairn.{Accounts, Auth, Bots, Servers}
+  alias Cairn.Chat
 
   @valid_password "secure_password_123"
 

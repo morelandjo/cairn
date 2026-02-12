@@ -1,4 +1,4 @@
-defmodule Murmuring.Accounts.User do
+defmodule Cairn.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -19,10 +19,10 @@ defmodule Murmuring.Accounts.User do
 
     field :password, :string, virtual: true, redact: true
 
-    has_many :recovery_codes, Murmuring.Accounts.RecoveryCode
-    has_many :channel_members, Murmuring.Chat.ChannelMember
-    has_many :refresh_tokens, Murmuring.Auth.RefreshToken
-    has_many :did_operations, Murmuring.Identity.Operation
+    has_many :recovery_codes, Cairn.Accounts.RecoveryCode
+    has_many :channel_members, Cairn.Chat.ChannelMember
+    has_many :refresh_tokens, Cairn.Auth.RefreshToken
+    has_many :did_operations, Cairn.Identity.Operation
 
     timestamps()
   end

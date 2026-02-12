@@ -6,8 +6,8 @@
  */
 
 import { create } from "zustand";
-import { MlsClient } from "@murmuring/proto";
-import type { MlsCredential } from "@murmuring/proto";
+import { MlsClient } from "@cairn/proto";
+import type { MlsCredential } from "@cairn/proto";
 import * as mlsApi from "../api/mls.ts";
 import * as channelsApi from "../api/channels.ts";
 

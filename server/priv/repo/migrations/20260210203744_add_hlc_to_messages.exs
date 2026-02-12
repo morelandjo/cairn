@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.AddHlcToMessages do
+defmodule Cairn.Repo.Migrations.AddHlcToMessages do
   use Ecto.Migration
 
   def change do

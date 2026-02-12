@@ -1,4 +1,4 @@
-defmodule MurmuringWeb.ConnCase do
+defmodule CairnWeb.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -11,7 +11,7 @@ defmodule MurmuringWeb.ConnCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use MurmuringWeb.ConnCase, async: true`, although
+  by setting `use CairnWeb.ConnCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -20,19 +20,19 @@ defmodule MurmuringWeb.ConnCase do
   using do
     quote do
       # The default endpoint for testing
-      @endpoint MurmuringWeb.Endpoint
+      @endpoint CairnWeb.Endpoint
 
-      use MurmuringWeb, :verified_routes
+      use CairnWeb, :verified_routes
 
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
-      import MurmuringWeb.ConnCase
+      import CairnWeb.ConnCase
     end
   end
 
   setup tags do
-    Murmuring.DataCase.setup_sandbox(tags)
+    Cairn.DataCase.setup_sandbox(tags)
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end

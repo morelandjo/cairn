@@ -1,13 +1,13 @@
-defmodule Murmuring.StorageTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.StorageTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.Storage.LocalBackend
+  alias Cairn.Storage.LocalBackend
 
   @test_data "hello, world!"
   @test_key "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e"
 
   setup do
-    root = Application.get_env(:murmuring, Murmuring.Storage.LocalBackend)[:root]
+    root = Application.get_env(:cairn, Cairn.Storage.LocalBackend)[:root]
 
     on_exit(fn ->
       File.rm_rf!(root)
@@ -23,7 +23,7 @@ defmodule Murmuring.StorageTest do
 
     test "creates sharded directory structure" do
       :ok = LocalBackend.put(@test_key, @test_data, "text/plain")
-      root = Application.get_env(:murmuring, Murmuring.Storage.LocalBackend)[:root]
+      root = Application.get_env(:cairn, Cairn.Storage.LocalBackend)[:root]
       shard = String.slice(@test_key, 0, 2)
       assert File.exists?(Path.join([root, shard, @test_key]))
     end

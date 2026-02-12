@@ -1,13 +1,13 @@
 /**
- * Federation API endpoints — delegates to @murmuring/proto.
+ * Federation API endpoints — delegates to @cairn/proto.
  *
  * requestFederatedToken() is called on the home instance.
  * For remote instance calls (join, channels, invite), create a separate
  * ApiClient configured with the remote instance's base URL and federated token.
  */
 
-import { federationApi } from "@murmuring/proto";
-import { ApiClient } from "@murmuring/proto";
+import { federationApi } from "@cairn/proto";
+import { ApiClient } from "@cairn/proto";
 import { client } from "./client.ts";
 
 /**

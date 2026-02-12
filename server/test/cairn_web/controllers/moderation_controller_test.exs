@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.ModerationControllerTest do
-  use MurmuringWeb.ConnCase, async: true
+defmodule CairnWeb.ModerationControllerTest do
+  use CairnWeb.ConnCase, async: true
 
-  alias Murmuring.{Accounts, Auth, Servers}
+  alias Cairn.{Accounts, Auth, Servers}
 
   @valid_password "secure_password_123"
 

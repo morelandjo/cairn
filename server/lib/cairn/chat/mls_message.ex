@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.MlsMessage do
+defmodule Cairn.Chat.MlsMessage do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -13,9 +13,9 @@ defmodule Murmuring.Chat.MlsMessage do
     field :epoch, :integer
     field :processed, :boolean, default: false
 
-    belongs_to :channel, Murmuring.Chat.Channel
-    belongs_to :sender, Murmuring.Accounts.User
-    belongs_to :recipient, Murmuring.Accounts.User
+    belongs_to :channel, Cairn.Chat.Channel
+    belongs_to :sender, Cairn.Accounts.User
+    belongs_to :recipient, Cairn.Accounts.User
 
     timestamps()
   end

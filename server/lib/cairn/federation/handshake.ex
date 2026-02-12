@@ -1,24 +1,24 @@
-defmodule Murmuring.Federation.Handshake do
+defmodule Cairn.Federation.Handshake do
   @moduledoc """
   Federation handshake protocol: Follow/Accept between nodes.
 
-  1. Initiator fetches remote's /.well-known/murmuring-federation
+  1. Initiator fetches remote's /.well-known/cairn-federation
   2. Validates protocol compatibility
   3. Sends Follow activity
   4. Remote responds with Accept
   """
 
   require Logger
-  alias Murmuring.Federation
-  alias Murmuring.Federation.DeliveryWorker
-  alias Murmuring.Federation.ActivityPub
+  alias Cairn.Federation
+  alias Cairn.Federation.DeliveryWorker
+  alias Cairn.Federation.ActivityPub
 
   @doc """
   Initiate federation with a remote node by domain.
   Fetches their well-known, registers the node, sends Follow.
   """
   def initiate(remote_domain) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
     local_domain = Keyword.get(config, :domain, "localhost")
 
     with {:ok, well_known} <- fetch_well_known(remote_domain),
@@ -31,7 +31,7 @@ defmodule Murmuring.Federation.Handshake do
 
   @doc "Handle an incoming Follow activity — auto-accept and activate the node."
   def handle_follow(activity, federated_node) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
     local_domain = Keyword.get(config, :domain, "localhost")
 
     # Activate the node
@@ -60,7 +60,7 @@ defmodule Murmuring.Federation.Handshake do
   # ── Private ──
 
   defp fetch_well_known(domain) do
-    url = "https://#{domain}/.well-known/murmuring-federation"
+    url = "https://#{domain}/.well-known/cairn-federation"
 
     case Req.get(url, receive_timeout: 10_000) do
       {:ok, %Req.Response{status: 200, body: body}} when is_map(body) ->

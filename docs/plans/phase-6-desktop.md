@@ -34,7 +34,7 @@
   - Re-export API modules from `proto/src/index.ts`
 
 - [ ] **6a.3** Refactor `client/web/src/api/*.ts` to thin wrappers:
-  - Each file imports and re-exports from `@murmuring/proto/api`
+  - Each file imports and re-exports from `@cairn/proto/api`
   - Socket/voice-socket files stay in web (Phoenix/browser-specific)
 
 - [ ] **6a.4** Shared API client tests:
@@ -45,7 +45,7 @@
 
 - [ ] **6b.1** Tauri v2 project setup (`client/desktop/`):
   - `Cargo.toml` — tauri v2, tauri-plugin-* dependencies
-  - `tauri.conf.json` — window config (1280×800, min 800×600), bundle targets (.dmg, .msi, .AppImage, .deb), identifier `dev.murmuring.desktop`
+  - `tauri.conf.json` — window config (1280×800, min 800×600), bundle targets (.dmg, .msi, .AppImage, .deb), identifier `dev.cairn.desktop`
   - `src/main.rs` — entry point, plugin registration
   - `src/lib.rs` — Tauri command definitions
   - `capabilities/default.json` — Tauri v2 permissions
@@ -113,9 +113,9 @@
   - `client/web/src/components/UpdateBanner.tsx` — "Update available" banner, "Restart to update" button
 
 - [ ] **6f.2** Deep linking (`tauri-plugin-deep-link`):
-  - `client/desktop/src/deep_link.rs` — `murmuring://` protocol handler
-  - `murmuring://invite/<code>` → join server
-  - `murmuring://channel/<id>` → navigate to channel
+  - `client/desktop/src/deep_link.rs` — `cairn://` protocol handler
+  - `cairn://invite/<code>` → join server
+  - `cairn://channel/<id>` → navigate to channel
 
 - [ ] **6f.3** WebRTC webview testing:
   - Test audio/video in WebView2 (Windows), WebKit (macOS), WebKitGTK (Linux)

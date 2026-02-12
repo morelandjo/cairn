@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.SearchController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.SearchController do
+  use CairnWeb, :controller
 
-  alias Murmuring.{Chat, Search, Servers}
+  alias Cairn.{Chat, Search, Servers}
 
   # GET /api/v1/servers/:server_id/search?q=...&channel_id=...
   def search(conn, %{"server_id" => server_id, "q" => query} = params) do

@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.CreateKeyBackups do
+defmodule Cairn.Repo.Migrations.CreateKeyBackups do
   use Ecto.Migration
 
   def change do

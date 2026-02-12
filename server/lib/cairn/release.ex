@@ -1,10 +1,10 @@
-defmodule Murmuring.Release do
+defmodule Cairn.Release do
   @moduledoc """
   Release tasks for running outside of Mix (in production releases).
-  Used via: bin/murmuring eval "Murmuring.Release.migrate()"
+  Used via: bin/cairn eval "Cairn.Release.migrate()"
   """
 
-  @app :murmuring
+  @app :cairn
 
   def migrate do
     load_app()

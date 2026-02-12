@@ -1,8 +1,8 @@
-defmodule Murmuring.Federation.DmHintTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.Federation.DmHintTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.{Accounts, Federation}
-  alias Murmuring.Federation.InboxHandler
+  alias Cairn.{Accounts, Federation}
+  alias Cairn.Federation.InboxHandler
 
   @valid_password "secure_password_123"
 
@@ -15,7 +15,7 @@ defmodule Murmuring.Federation.DmHintTest do
 
     {:ok, user} =
       Accounts.update_user_did(user, %{
-        did: "did:murmuring:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}",
+        did: "did:cairn:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}",
         rotation_public_key: :crypto.strong_rand_bytes(32)
       })
 
@@ -38,12 +38,12 @@ defmodule Murmuring.Federation.DmHintTest do
         "type" => "Invite",
         "actor" => "https://sender-instance.com/users/alice",
         "object" => %{
-          "type" => "murmuring:DmHint",
-          "murmuring:channelId" => Ecto.UUID.generate(),
-          "murmuring:senderDid" => "did:murmuring:alice123",
-          "murmuring:senderUsername" => "alice",
-          "murmuring:senderDisplayName" => "Alice",
-          "murmuring:recipientDid" => user.did
+          "type" => "cairn:DmHint",
+          "cairn:channelId" => Ecto.UUID.generate(),
+          "cairn:senderDid" => "did:cairn:alice123",
+          "cairn:senderUsername" => "alice",
+          "cairn:senderDisplayName" => "Alice",
+          "cairn:recipientDid" => user.did
         },
         "target" => "https://localhost/users/#{user.username}"
       }
@@ -56,12 +56,12 @@ defmodule Murmuring.Federation.DmHintTest do
         "type" => "Invite",
         "actor" => "https://sender-instance.com/users/alice",
         "object" => %{
-          "type" => "murmuring:DmHint",
-          "murmuring:channelId" => Ecto.UUID.generate(),
-          "murmuring:senderDid" => "did:murmuring:alice123",
-          "murmuring:senderUsername" => "alice",
-          "murmuring:senderDisplayName" => "Alice",
-          "murmuring:recipientDid" => "did:murmuring:nonexistent"
+          "type" => "cairn:DmHint",
+          "cairn:channelId" => Ecto.UUID.generate(),
+          "cairn:senderDid" => "did:cairn:alice123",
+          "cairn:senderUsername" => "alice",
+          "cairn:senderDisplayName" => "Alice",
+          "cairn:recipientDid" => "did:cairn:nonexistent"
         },
         "target" => "https://localhost/users/unknown"
       }
@@ -74,7 +74,7 @@ defmodule Murmuring.Federation.DmHintTest do
         "type" => "Invite",
         "actor" => "https://sender-instance.com/users/alice",
         "object" => %{
-          "type" => "murmuring:DmHint"
+          "type" => "cairn:DmHint"
           # Missing required fields
         },
         "target" => "https://localhost/users/unknown"

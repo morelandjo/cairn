@@ -1,14 +1,14 @@
 ---
-# Murmuring Server Setup Playbook
+# Cairn Server Setup Playbook
 # Target: Fresh Debian/Ubuntu VPS
 # Usage: ansible-playbook -i inventory.ini setup.yml
 
-- name: Set up Murmuring server
-  hosts: murmuring
+- name: Set up Cairn server
+  hosts: cairn
   become: true
 
   vars:
-    deploy_dir: /opt/murmuring
+    deploy_dir: /opt/cairn
     swap_size: 2G
 
   tasks:
@@ -59,9 +59,9 @@
         state: started
         enabled: true
 
-    - name: Create murmuring user
+    - name: Create cairn user
       user:
-        name: murmuring
+        name: cairn
         groups: docker
         shell: /bin/bash
         create_home: true
@@ -70,16 +70,16 @@
       file:
         path: "{{ deploy_dir }}"
         state: directory
-        owner: murmuring
-        group: murmuring
+        owner: cairn
+        group: cairn
         mode: "0750"
 
     - name: Create data directories
       file:
         path: "{{ deploy_dir }}/{{ item }}"
         state: directory
-        owner: murmuring
-        group: murmuring
+        owner: cairn
+        group: cairn
         mode: "0750"
       loop:
         - backups

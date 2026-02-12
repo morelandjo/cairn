@@ -1,8 +1,8 @@
-defmodule MurmuringWeb.EmojiController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.EmojiController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Chat
-  alias Murmuring.Servers.Permissions
+  alias Cairn.Chat
+  alias Cairn.Servers.Permissions
 
   # GET /api/v1/servers/:server_id/emojis
   def index(conn, %{"server_id" => server_id}) do

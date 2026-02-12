@@ -1,5 +1,5 @@
 /**
- * Murmuring E2EE crypto module.
+ * Cairn E2EE crypto module.
  *
  * Provides key generation, X3DH key exchange, Double Ratchet message
  * encryption, and IndexedDB-based key persistence.

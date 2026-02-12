@@ -1,8 +1,8 @@
-defmodule Murmuring.Moderation.AutoModTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.Moderation.AutoModTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.{Accounts, Moderation, Servers}
-  alias Murmuring.Moderation.AutoMod
+  alias Cairn.{Accounts, Moderation, Servers}
+  alias Cairn.Moderation.AutoMod
 
   @valid_password "secure_password_123"
 

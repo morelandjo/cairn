@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.AddMlsDeliveryAndPrivateChannels do
+defmodule Cairn.Repo.Migrations.AddMlsDeliveryAndPrivateChannels do
   use Ecto.Migration
 
   def change do

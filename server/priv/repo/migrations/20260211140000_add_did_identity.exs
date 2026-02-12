@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.AddDidIdentity do
+defmodule Cairn.Repo.Migrations.AddDidIdentity do
   use Ecto.Migration
 
   def change do

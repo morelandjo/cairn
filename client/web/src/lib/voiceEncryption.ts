@@ -8,7 +8,7 @@ import {
   createEncryptTransform,
   createDecryptTransform,
   supportsInsertableStreams,
-} from "@murmuring/proto";
+} from "@cairn/proto";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 

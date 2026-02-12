@@ -1,9 +1,9 @@
-# Murmuring Design Document
+# Cairn Design Document
 
 > **Audience:** Developers, security researchers, technically curious users
 > **Status:** Phases 0–9 complete · AGPL-3.0 · ~25 min read
 >
-> This document explains *how and why* Murmuring is built the way it is. For
+> This document explains *how and why* Cairn is built the way it is. For
 > wire formats and crypto details see the [Protocol Specification](./protocol-spec.md).
 > For attack surfaces and trust boundaries see the [Threat Model](./security/threat-model.md).
 > For running a server see [SERVER.md](./SERVER.md). For client usage see [CLIENT.md](./CLIENT.md).
@@ -18,12 +18,12 @@
 4. [The Untrusted Server Model](#4-the-untrusted-server-model)
 5. [Encryption Architecture](#5-encryption-architecture)
 6. [Federation](#6-federation)
-7. [Portable Identity — did:murmuring](#7-portable-identity--didmurmuring)
+7. [Portable Identity — did:cairn](#7-portable-identity--didcairn)
 8. [Voice and Video](#8-voice-and-video)
 9. [Data Model](#9-data-model)
 10. [Client Architecture](#10-client-architecture)
 11. [Operational Architecture](#11-operational-architecture)
-12. [How Murmuring Compares](#12-how-murmuring-compares)
+12. [How Cairn Compares](#12-how-cairn-compares)
 13. [Known Limitations and Future Work](#13-known-limitations-and-future-work)
 14. [Appendix: Document Map](#appendix-document-map)
 
@@ -31,7 +31,7 @@
 
 ## 1. Introduction
 
-Murmuring is a privacy-first federated communication platform. Think Discord's
+Cairn is a privacy-first federated communication platform. Think Discord's
 guild-and-channel model — servers, roles, categories, voice, bots — but
 federated like email and end-to-end encrypted by default. No single company
 controls the network. No server operator can read your private messages.
@@ -40,7 +40,7 @@ The project started from a question: *What if the server didn't need to be
 trusted?* Every design decision flows from that constraint. Encryption happens
 in the client. The server stores and forwards ciphertext it cannot decrypt.
 Federation lets independent instances interoperate while retaining sovereignty.
-A self-certifying identity (`did:murmuring`) means your account belongs to you,
+A self-certifying identity (`did:cairn`) means your account belongs to you,
 not to whoever runs the server.
 
 This document is the map between those principles and the code that implements
@@ -53,7 +53,7 @@ need that level of detail, follow the cross-references.
 
 ## 2. Design Philosophy
 
-Five principles guide every design decision in Murmuring. They are ordered by
+Five principles guide every design decision in Cairn. They are ordered by
 priority — when two principles conflict, the higher one wins.
 
 ### 2.1 Untrusted Server
@@ -66,9 +66,9 @@ The protocol makes the question irrelevant for message content.
 
 ### 2.2 No Centralization
 
-There is no "Murmuring Inc." running a blessed instance. Anyone can run a
+There is no "Cairn Inc." running a blessed instance. Anyone can run a
 server. Instances federate with each other voluntarily. If an instance
-disappears, its users' identities survive (see [§7](#7-portable-identity--didmurmuring)).
+disappears, its users' identities survive (see [§7](#7-portable-identity--didcairn)).
 If an instance behaves badly, other instances can defederate from it. The
 network has no single point of failure or control.
 
@@ -97,7 +97,7 @@ Defederation is a first-class operation: one API call severs the link cleanly.
 ### 2.5 Metadata Minimization
 
 Even when the server must see metadata to function (membership lists, channel
-types, timestamps), Murmuring minimizes what crosses federation boundaries.
+types, timestamps), Cairn minimizes what crosses federation boundaries.
 Federated messages are stripped of internal IDs, IP addresses, and
 server-specific context before delivery. Hybrid Logical Clocks provide causal
 ordering without leaking wall-clock precision.
@@ -106,7 +106,7 @@ ordering without leaking wall-clock precision.
 
 ## 3. Architecture Overview
 
-Murmuring is a monorepo with six backend services, four client targets, and a
+Cairn is a monorepo with six backend services, four client targets, and a
 shared protocol package.
 
 ```
@@ -154,7 +154,7 @@ Phoenix server via a shared-secret Bearer token.
 roles, DID operations, federation state, and audit logs.
 
 **Redis** — Ephemeral state: session tokens, rate limiter counters, transient
-caches. Named `:murmuring_redis` in the supervision tree.
+caches. Named `:cairn_redis` in the supervision tree.
 
 **Meilisearch** — Full-text search engine. Indexes only public channel messages.
 Private and DM content never reaches Meilisearch.
@@ -174,23 +174,23 @@ boundary — crypto operations never leave this package.
 The Phoenix server starts its OTP supervision tree in this order (`:one_for_one`
 strategy):
 
-1. `MurmuringWeb.Telemetry` — telemetry reporters
-2. `Murmuring.PromEx` — Prometheus metrics (conditionally started)
-3. `Murmuring.Repo` — Ecto database connection pool
+1. `CairnWeb.Telemetry` — telemetry reporters
+2. `Cairn.PromEx` — Prometheus metrics (conditionally started)
+3. `Cairn.Repo` — Ecto database connection pool
 4. `Oban` — background job processor
-5. `Redix` — Redis connection (named `:murmuring_redis`)
-6. `Murmuring.Auth.PasswordValidator` — password strength GenServer
-7. `Murmuring.RateLimiter` — API rate limiter state
-8. `MurmuringWeb.Plugs.RateLimiter` — HTTP rate limiter plug
+5. `Redix` — Redis connection (named `:cairn_redis`)
+6. `Cairn.Auth.PasswordValidator` — password strength GenServer
+7. `Cairn.RateLimiter` — API rate limiter state
+8. `CairnWeb.Plugs.RateLimiter` — HTTP rate limiter plug
 9. `DNSCluster` — DNS-based node clustering
 10. `Phoenix.PubSub` — pub/sub for real-time broadcasts
-11. `MurmuringWeb.Presence` — online/typing presence tracking
-12. `MurmuringWeb.Endpoint` — HTTP/WebSocket endpoint
+11. `CairnWeb.Presence` — online/typing presence tracking
+12. `CairnWeb.Endpoint` — HTTP/WebSocket endpoint
 
 When federation is enabled, two additional children are appended:
 
-13. `Murmuring.Federation.NodeIdentity` — Ed25519 keypair GenServer
-14. `Murmuring.Federation.HLC` — Hybrid Logical Clock
+13. `Cairn.Federation.NodeIdentity` — Ed25519 keypair GenServer
+14. `Cairn.Federation.HLC` — Hybrid Logical Clock
 
 The `:one_for_one` strategy means a crashed child restarts independently without
 affecting siblings. This matters for federation: if `NodeIdentity` crashes and
@@ -201,7 +201,7 @@ serving requests.
 
 ## 4. The Untrusted Server Model
 
-The core design bet of Murmuring is that users should not need to trust server
+The core design bet of Cairn is that users should not need to trust server
 operators with their private content. This section makes the trust boundary
 explicit.
 
@@ -260,7 +260,7 @@ user's passphrase.
 **Discord** has full access to all message content, files, and voice streams.
 **Matrix** encrypts rooms with Megolm but the homeserver sees room metadata and
 can be configured to log decrypted content. **Signal** encrypts everything but
-doesn't support servers/guilds or federation. Murmuring sits at the intersection:
+doesn't support servers/guilds or federation. Cairn sits at the intersection:
 guild-style organization, federation, and an encryption model where the server
 is genuinely excluded from content access.
 
@@ -268,7 +268,7 @@ is genuinely excluded from content access.
 
 ## 5. Encryption Architecture
 
-Murmuring uses three distinct encryption protocols, each chosen for its
+Cairn uses three distinct encryption protocols, each chosen for its
 properties in a specific context. For wire formats and byte layouts, see the
 [Protocol Specification §6](./protocol-spec.md#6-end-to-end-encryption).
 
@@ -311,7 +311,7 @@ only between the two participants' clients and the hosting instance (see
 ### 5.3 Groups: MLS (RFC 9420)
 
 Group channels (including private channels in servers) use the Messaging Layer
-Security protocol. Murmuring uses the `openmls` library compiled to WASM
+Security protocol. Cairn uses the `openmls` library compiled to WASM
 (see [ADR: MLS Library Choice](./decisions/mls-library.md)).
 
 **Why MLS over Sender Keys?** Signal's Sender Keys (used by WhatsApp and
@@ -321,7 +321,7 @@ reduces this to O(log n). For a 1,000-member channel, that's the difference
 between 1,000 operations and 10.
 
 **Ciphersuite:** `MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519` — the same
-curve used for Murmuring identity keys, avoiding a second key type.
+curve used for Cairn identity keys, avoiding a second key type.
 
 **Lifecycle:** A user creates an MLS group when they create a private channel.
 Adding a member generates a Welcome message (encrypted to the new member's key
@@ -380,14 +380,14 @@ knows if decryption succeeded.
 
 ## 6. Federation
 
-Federation lets independent Murmuring instances exchange messages across
+Federation lets independent Cairn instances exchange messages across
 organizational boundaries. For wire-level details, see the
 [Protocol Specification §4](./protocol-spec.md#4-federation-handshake).
 
 ### 6.1 Node Identity
 
 Every instance has an Ed25519 key pair generated on first boot and stored on
-disk. The public key is published at `/.well-known/murmuring-federation` along
+disk. The public key is published at `/.well-known/cairn-federation` along
 with the instance domain and protocol version. This key signs all outgoing
 federation HTTP requests and all federated authentication tokens.
 
@@ -405,7 +405,7 @@ Federation between two instances starts with a Follow/Accept handshake:
 4. If acceptable, Instance B sends an Accept activity back to A
 5. Both instances record the federation relationship
 
-Privacy manifests (published at `/.well-known/murmuring-privacy`) declare each
+Privacy manifests (published at `/.well-known/cairn-privacy`) declare each
 instance's data retention, logging, and sharing practices. An instance can
 require that federation peers meet minimum privacy standards before accepting
 the handshake.
@@ -459,7 +459,7 @@ federation outbox.
 
 ---
 
-## 7. Portable Identity — did:murmuring
+## 7. Portable Identity — did:cairn
 
 ### 7.1 The Problem
 
@@ -468,7 +468,7 @@ account and your username, history, and connections disappear. In traditional
 federated systems (email, Mastodon), your identity is bound to your instance —
 `alice@mastodon.social` stops working if mastodon.social goes down.
 
-Murmuring needed an identity system that is:
+Cairn needed an identity system that is:
 - Self-certifying (no authority can revoke it)
 - Instance-independent (survives server shutdown)
 - Key-rotatable (compromised keys don't mean a new identity)
@@ -476,11 +476,11 @@ Murmuring needed an identity system that is:
 
 ### 7.2 How It Works
 
-A `did:murmuring` identifier is derived from the SHA-256 hash of the genesis
+A `did:cairn` identifier is derived from the SHA-256 hash of the genesis
 operation, encoded in base58:
 
 ```
-did:murmuring:7Kf3x...  ← base58(SHA-256(genesis_op))
+did:cairn:7Kf3x...  ← base58(SHA-256(genesis_op))
 ```
 
 The genesis operation contains the user's initial signing key and rotation key.
@@ -547,7 +547,7 @@ Three architectures were considered for multi-party voice:
 | MCU (mixing) | O(n) connections | No (must decode) | High |
 | SFU (forwarding) | O(n) connections | Yes (forwards opaque) | Low |
 
-SFU is the clear winner for Murmuring's threat model. It scales linearly,
+SFU is the clear winner for Cairn's threat model. It scales linearly,
 doesn't need to decode media (preserving E2E encryption), and requires minimal
 server CPU. The trade-off is slightly higher bandwidth than MCU (each
 participant receives n-1 streams instead of one mixed stream), but modern
@@ -579,7 +579,7 @@ roles, or permissions.
 
 Voice encryption derives from the MLS group:
 
-1. Channel's MLS epoch secret → HKDF with context `"murmuring-voice-v1"` →
+1. Channel's MLS epoch secret → HKDF with context `"cairn-voice-v1"` →
    128-bit AES key
 2. Each audio/video frame is encrypted:
    `[IV: 12 bytes][AES-128-GCM ciphertext][authentication tag: 16 bytes]`
@@ -712,9 +712,9 @@ management uses Zustand stores. Real-time communication uses Phoenix WebSocket
 channels. Voice uses mediasoup-client.
 
 In production, the SPA is served directly by Phoenix (configured via
-`config :murmuring, :serve_spa, true`). A catch-all route serves `index.html`
+`config :cairn, :serve_spa, true`). A catch-all route serves `index.html`
 for client-side routing. Server configuration is injected via
-`window.__MURMURING_CONFIG__` at serve time.
+`window.__CAIRN_CONFIG__` at serve time.
 
 ### 10.3 Desktop
 
@@ -726,7 +726,7 @@ built output in a native window. Platform-specific features include:
 - **System tray** — background operation with notification badges
 - **Keyboard shortcuts** — OS-native shortcut registration
 - **Auto-update** — built-in update mechanism
-- **Deep linking** — `murmuring://` protocol handler
+- **Deep linking** — `cairn://` protocol handler
 
 Tauri APIs are accessed via dynamic imports to avoid bundling Tauri-specific
 code in web builds. The `keyStorage.ts` module provides a unified interface that
@@ -823,14 +823,14 @@ request across log files.
 
 ### 11.4 Deployment
 
-Murmuring offers multiple deployment paths:
+Cairn offers multiple deployment paths:
 
 - **Install script** — single-command automated setup for fresh servers
 - **Docker Compose** — `docker-compose.prod.yml` with all six services, volumes,
   and health checks
 - **Ansible** — four playbooks (`setup.yml`, `deploy.yml`, `backup.yml`,
   `update.yml`) for managed deployments
-- **murmuring-ctl** — CLI tool for common operations (start, stop, update,
+- **cairn-ctl** — CLI tool for common operations (start, stop, update,
   backup, restore, status)
 
 Minimum hardware for a personal instance (up to 10 users): 1 vCPU, 1 GB RAM,
@@ -838,14 +838,14 @@ Minimum hardware for a personal instance (up to 10 users): 1 vCPU, 1 GB RAM,
 
 ---
 
-## 12. How Murmuring Compares
+## 12. How Cairn Compares
 
-|  | Murmuring | Discord | Matrix | Signal |
+|  | Cairn | Discord | Matrix | Signal |
 |---|---|---|---|---|
 | **Federation** | Yes (ActivityPub) | No | Yes (Matrix protocol) | No |
 | **E2E Encryption** | Default for DMs/private | No | Opt-in (Megolm) | Default |
 | **Self-hosting** | Yes (single command) | No | Yes | Partial (server only) |
-| **Portable identity** | Yes (did:murmuring) | No | No (instance-bound) | No (phone-bound) |
+| **Portable identity** | Yes (did:cairn) | No | No (instance-bound) | No (phone-bound) |
 | **Open source** | AGPL-3.0 | No | Apache-2.0 | AGPL-3.0 |
 | **Guild/server model** | Yes | Yes | Spaces (limited) | No |
 | **Voice/video** | SFU + E2E | SFU (no E2E) | Jitsi/Element Call | P2P |
@@ -855,18 +855,18 @@ Minimum hardware for a personal instance (up to 10 users): 1 vCPU, 1 GB RAM,
 
 ### Why Not Matrix?
 
-Matrix is the closest existing system to Murmuring's goals. The key differences:
+Matrix is the closest existing system to Cairn's goals. The key differences:
 
 - **MLS vs. Megolm.** Megolm requires O(n) work per membership change. MLS's
   tree structure is O(log n). At scale, this matters.
 - **Self-certifying identity.** Matrix identities are instance-bound
-  (`@user:server`). If the server goes away, so does the identity. Murmuring's
+  (`@user:server`). If the server goes away, so does the identity. Cairn's
   DID survives instance loss.
-- **Guild model.** Matrix Spaces are bolted on after the fact. Murmuring's
+- **Guild model.** Matrix Spaces are bolted on after the fact. Cairn's
   server/channel/role/category hierarchy is a first-class concept with
   integrated permissions.
 - **Untrusted server.** Matrix homeservers can be configured to log decrypted
-  content. Murmuring's server never has the keys.
+  content. Cairn's server never has the keys.
 
 ### Why Not Signal?
 
@@ -880,7 +880,7 @@ Signal has excellent encryption but a different scope:
 
 ### Honest Trade-offs
 
-Murmuring's design has real costs:
+Cairn's design has real costs:
 
 - **Complexity.** Three encryption protocols, a DID system, and federation add
   significant implementation and conceptual complexity.
@@ -916,7 +916,7 @@ tension. Potential approaches include client-side scanning (raises other privacy
 concerns) or hash-matching against known material databases at the client level.
 No solution has been implemented.
 
-**Scale testing.** Murmuring has not been tested beyond small-to-medium
+**Scale testing.** Cairn has not been tested beyond small-to-medium
 deployments. MLS group operations, federation delivery at scale, and SFU
 performance with hundreds of concurrent voice participants need load testing.
 

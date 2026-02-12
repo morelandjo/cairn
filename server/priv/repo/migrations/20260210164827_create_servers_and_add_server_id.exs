@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.CreateServersAndAddServerId do
+defmodule Cairn.Repo.Migrations.CreateServersAndAddServerId do
   use Ecto.Migration
 
   def change do

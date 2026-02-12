@@ -1,4 +1,4 @@
-defmodule Murmuring.Keys.KeyBackup do
+defmodule Cairn.Keys.KeyBackup do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -11,7 +11,7 @@ defmodule Murmuring.Keys.KeyBackup do
     field :data, :binary
     field :size_bytes, :integer
 
-    belongs_to :user, Murmuring.Accounts.User
+    belongs_to :user, Cairn.Accounts.User
 
     timestamps()
   end

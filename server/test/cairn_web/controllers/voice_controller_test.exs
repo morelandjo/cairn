@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.VoiceControllerTest do
-  use MurmuringWeb.ConnCase, async: true
+defmodule CairnWeb.VoiceControllerTest do
+  use CairnWeb.ConnCase, async: true
 
-  alias Murmuring.{Accounts, Auth}
+  alias Cairn.{Accounts, Auth}
 
   @valid_password "secure_password_123"
 
@@ -28,10 +28,10 @@ defmodule MurmuringWeb.VoiceControllerTest do
     end
 
     test "returns TURN credentials when configured", %{conn: conn} do
-      Application.put_env(:murmuring, :turn_urls, ["turn:turn.example.com:3478"])
+      Application.put_env(:cairn, :turn_urls, ["turn:turn.example.com:3478"])
 
       on_exit(fn ->
-        Application.put_env(:murmuring, :turn_urls, [])
+        Application.put_env(:cairn, :turn_urls, [])
       end)
 
       conn = get(conn, "/api/v1/voice/turn-credentials")
@@ -51,10 +51,10 @@ defmodule MurmuringWeb.VoiceControllerTest do
     end
 
     test "includes TURN when configured", %{conn: conn} do
-      Application.put_env(:murmuring, :turn_urls, ["turn:turn.example.com:3478"])
+      Application.put_env(:cairn, :turn_urls, ["turn:turn.example.com:3478"])
 
       on_exit(fn ->
-        Application.put_env(:murmuring, :turn_urls, [])
+        Application.put_env(:cairn, :turn_urls, [])
       end)
 
       conn = get(conn, "/api/v1/voice/ice-servers")

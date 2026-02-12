@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.DmHintWorker do
+defmodule Cairn.Federation.DmHintWorker do
   @moduledoc """
   Oban worker to deliver DM hint (Invite activity) to a remote instance.
   The hint notifies the recipient's home instance that a DM request has been
@@ -10,9 +10,9 @@ defmodule Murmuring.Federation.DmHintWorker do
     max_attempts: 10
 
   require Logger
-  alias Murmuring.Federation
-  alias Murmuring.Federation.NodeIdentity
-  alias Murmuring.Federation.HttpSignatures
+  alias Cairn.Federation
+  alias Cairn.Federation.NodeIdentity
+  alias Cairn.Federation.HttpSignatures
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: args}) do

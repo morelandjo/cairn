@@ -1,8 +1,8 @@
-defmodule Murmuring.Servers.ChannelPermissionsTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.Servers.ChannelPermissionsTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.{Accounts, Chat, Servers}
-  alias Murmuring.Servers.Permissions
+  alias Cairn.{Accounts, Chat, Servers}
+  alias Cairn.Servers.Permissions
 
   @valid_password "secure_password_123"
 

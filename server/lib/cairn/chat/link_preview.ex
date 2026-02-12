@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.LinkPreview do
+defmodule Cairn.Chat.LinkPreview do
   use Ecto.Schema
   import Ecto.Changeset
 

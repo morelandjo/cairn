@@ -1,8 +1,8 @@
-defmodule Murmuring.IdentityTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.IdentityTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.Identity
-  alias Murmuring.Accounts
+  alias Cairn.Identity
+  alias Cairn.Accounts
 
   @valid_password "secure_password_123"
 
@@ -47,7 +47,7 @@ defmodule Murmuring.IdentityTest do
     test "creates a DID from genesis operation", ctx do
       {:ok, did} = Identity.create_did(ctx.user, ctx.rotation_priv, service: "test.example.com")
 
-      assert String.starts_with?(did, "did:murmuring:")
+      assert String.starts_with?(did, "did:cairn:")
       assert String.length(did) > 20
     end
 
@@ -189,7 +189,7 @@ defmodule Murmuring.IdentityTest do
       assert doc["authentication"] == ["#{did}#signing"]
 
       [svc] = doc["service"]
-      assert svc["type"] == "MurmuringPDS"
+      assert svc["type"] == "CairnPDS"
       assert svc["serviceEndpoint"] == "https://test.example.com"
     end
 
@@ -210,7 +210,7 @@ defmodule Murmuring.IdentityTest do
     end
 
     test "nonexistent DID returns error" do
-      assert {:error, :did_not_found} = Identity.resolve_did("did:murmuring:nonexistent")
+      assert {:error, :did_not_found} = Identity.resolve_did("did:cairn:nonexistent")
     end
   end
 

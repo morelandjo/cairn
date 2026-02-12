@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.BackfillDefaultServer do
+defmodule Cairn.Repo.Migrations.BackfillDefaultServer do
   use Ecto.Migration
 
   defp uuid_to_bin(uuid_string) do

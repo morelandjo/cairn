@@ -1,4 +1,4 @@
-defmodule Murmuring.Storage.Thumbnail do
+defmodule Cairn.Storage.Thumbnail do
   @moduledoc """
   Thumbnail generation for uploaded images using the Image library (libvips).
 

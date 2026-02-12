@@ -1,12 +1,12 @@
 /**
- * Servers API endpoints — delegates to @murmuring/proto.
+ * Servers API endpoints — delegates to @cairn/proto.
  */
 
-import { serversApi } from "@murmuring/proto";
+import { serversApi } from "@cairn/proto";
 import { client } from "./client";
 import type { Channel } from "./channels";
 
-export type { Server, ServerMember, ServerRole } from "@murmuring/proto/api";
+export type { Server, ServerMember, ServerRole } from "@cairn/proto/api";
 export type { Channel };
 
 export function listServers() {

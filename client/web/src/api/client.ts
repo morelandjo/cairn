@@ -1,9 +1,9 @@
 /**
- * HTTP client — thin wrapper around @murmuring/proto ApiClient.
+ * HTTP client — thin wrapper around @cairn/proto ApiClient.
  * Maintains backward-compatible configureClient() and apiFetch() interfaces.
  */
 
-import { ApiClient } from "@murmuring/proto";
+import { ApiClient } from "@cairn/proto";
 
 export const client = new ApiClient();
 

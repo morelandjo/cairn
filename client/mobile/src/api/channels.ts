@@ -1,8 +1,8 @@
 /**
- * Channels API endpoints — delegates to @murmuring/proto.
+ * Channels API endpoints — delegates to @cairn/proto.
  */
 
-import { channelsApi } from "@murmuring/proto";
+import { channelsApi } from "@cairn/proto";
 import { client } from "./client";
 
 export type {
@@ -11,7 +11,7 @@ export type {
   ReplyToSummary,
   Message,
   Member,
-} from "@murmuring/proto/api";
+} from "@cairn/proto/api";
 
 export function listChannels() {
   return channelsApi.listChannels(client);

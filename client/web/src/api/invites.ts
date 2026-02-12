@@ -1,11 +1,11 @@
 /**
- * Invite management — delegates to @murmuring/proto.
+ * Invite management — delegates to @cairn/proto.
  */
 
-import { invitesApi } from "@murmuring/proto";
+import { invitesApi } from "@cairn/proto";
 import { client } from "./client.ts";
 
-export type { Invite, InviteInfo } from "@murmuring/proto/api";
+export type { Invite, InviteInfo } from "@cairn/proto/api";
 
 export function createInvite(params: {
   channel_id: string;

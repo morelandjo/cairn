@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicedoc/tauri/v2/schemas/config.schema.json",
-  "productName": "Murmuring",
+  "productName": "Cairn",
   "version": "0.1.0",
-  "identifier": "dev.murmuring.desktop",
+  "identifier": "dev.cairn.desktop",
   "build": {
     "devUrl": "http://localhost:5173",
     "frontendDist": "../../client/web/dist"
@@ -11,7 +11,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "Murmuring",
+        "title": "Cairn",
         "width": 1280,
         "height": 800,
         "minWidth": 800,
@@ -62,7 +62,7 @@
     },
     "deep-link": {
       "desktop": {
-        "schemes": ["murmuring"]
+        "schemes": ["cairn"]
       }
     }
   }

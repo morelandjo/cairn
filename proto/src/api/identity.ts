@@ -45,7 +45,7 @@ export function getDIDDocument(
   client: ApiClient,
   did: string,
 ): Promise<DIDDocument> {
-  const suffix = did.replace("did:murmuring:", "");
+  const suffix = did.replace("did:cairn:", "");
   return client.fetch<DIDDocument>(`/.well-known/did/${suffix}`);
 }
 
@@ -57,7 +57,7 @@ export function getDIDOperations(
   client: ApiClient,
   did: string,
 ): Promise<DIDOperationsResponse> {
-  const suffix = did.replace("did:murmuring:", "");
+  const suffix = did.replace("did:cairn:", "");
   return client.fetch<DIDOperationsResponse>(
     `/.well-known/did/${suffix}/operations`,
   );

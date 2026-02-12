@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.CreatePushTokens do
+defmodule Cairn.Repo.Migrations.CreatePushTokens do
   use Ecto.Migration
 
   def change do

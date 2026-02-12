@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.InboxController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.InboxController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Federation.InboxHandler
+  alias Cairn.Federation.InboxHandler
 
   @doc "POST /inbox — receives ActivityPub activities from federated nodes."
   def create(conn, params) do

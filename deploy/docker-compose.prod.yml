@@ -1,6 +1,6 @@
 services:
   server:
-    image: ${MURMURING_IMAGE:-murmuring/server:latest}
+    image: ${CAIRN_IMAGE:-cairn/server:latest}
     build:
       context: ../server
       dockerfile: Dockerfile
@@ -8,10 +8,10 @@ services:
     ports:
       - "${SERVER_PORT:-4000}:4000"
     environment:
-      DATABASE_URL: "ecto://murmuring:${POSTGRES_PASSWORD}@postgres:5432/murmuring"
+      DATABASE_URL: "ecto://cairn:${POSTGRES_PASSWORD}@postgres:5432/cairn"
       SECRET_KEY_BASE: "${SECRET_KEY_BASE}"
       JWT_SECRET: "${JWT_SECRET}"
-      PHX_HOST: "${MURMURING_DOMAIN}"
+      PHX_HOST: "${CAIRN_DOMAIN}"
       PHX_SERVER: "true"
       PORT: "4000"
       REDIS_URL: "redis://redis:6379/0"
@@ -20,9 +20,9 @@ services:
       SFU_URL: "http://sfu:4001"
       SFU_AUTH_SECRET: "${SFU_AUTH_SECRET}"
       TURN_SECRET: "${TURN_SECRET}"
-      TURN_URLS: "${TURN_URLS:-turn:${MURMURING_DOMAIN}:3478}"
+      TURN_URLS: "${TURN_URLS:-turn:${CAIRN_DOMAIN}:3478}"
       FEDERATION_ENABLED: "${FEDERATION_ENABLED:-false}"
-      MURMURING_DOMAIN: "${MURMURING_DOMAIN}"
+      CAIRN_DOMAIN: "${CAIRN_DOMAIN}"
       NODE_KEY_PATH: "/app/priv/keys/node_ed25519.key"
       STORAGE_BACKEND: "${STORAGE_BACKEND:-local}"
       S3_BUCKET: "${S3_BUCKET:-}"
@@ -46,7 +46,7 @@ services:
           cpus: "1.0"
 
   sfu:
-    image: ${SFU_IMAGE:-murmuring/sfu:latest}
+    image: ${SFU_IMAGE:-cairn/sfu:latest}
     build:
       context: ../sfu
       dockerfile: Dockerfile
@@ -56,7 +56,7 @@ services:
       AUTH_SECRET: "${SFU_AUTH_SECRET}"
       RTC_MIN_PORT: "40000"
       RTC_MAX_PORT: "40100"
-      ANNOUNCED_IP: "${MURMURING_DOMAIN}"
+      ANNOUNCED_IP: "${CAIRN_DOMAIN}"
     network_mode: host
     deploy:
       resources:
@@ -68,13 +68,13 @@ services:
     image: postgres:18-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: murmuring
+      POSTGRES_USER: cairn
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_DB: murmuring
+      POSTGRES_DB: cairn
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U murmuring"]
+      test: ["CMD-SHELL", "pg_isready -U cairn"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -123,7 +123,7 @@ services:
     network_mode: host
     command: >
       turnserver
-      --realm=${MURMURING_DOMAIN}
+      --realm=${CAIRN_DOMAIN}
       --use-auth-secret
       --static-auth-secret=${TURN_SECRET}
       --listening-port=3478

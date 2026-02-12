@@ -1,8 +1,8 @@
-defmodule MurmuringWeb.Plugs.RequireSsl do
+defmodule CairnWeb.Plugs.RequireSsl do
   @moduledoc """
   Runtime-configurable SSL redirect plug.
 
-  When `config :murmuring, :force_ssl` is true, redirects HTTP requests to HTTPS.
+  When `config :cairn, :force_ssl` is true, redirects HTTP requests to HTTPS.
   Unlike Phoenix's built-in `force_ssl` (which is compile-time), this reads the
   config at runtime so it can be toggled via the `FORCE_SSL` environment variable.
 
@@ -14,7 +14,7 @@ defmodule MurmuringWeb.Plugs.RequireSsl do
   def init(opts), do: opts
 
   def call(conn, _opts) do
-    if Application.get_env(:murmuring, :force_ssl, true) and not secure?(conn) and not skip?(conn) do
+    if Application.get_env(:cairn, :force_ssl, true) and not secure?(conn) and not skip?(conn) do
       url = "https://#{conn.host}#{port_suffix(conn)}#{conn.request_path}#{query_string(conn)}"
 
       conn

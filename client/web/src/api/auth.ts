@@ -1,8 +1,8 @@
 /**
- * Auth API endpoints — delegates to @murmuring/proto.
+ * Auth API endpoints — delegates to @cairn/proto.
  */
 
-import { authApi } from "@murmuring/proto";
+import { authApi } from "@cairn/proto";
 import { client } from "./client.ts";
 
 export type {
@@ -13,7 +13,7 @@ export type {
   TotpAuthResponse,
   RefreshResponse,
   MeResponse,
-} from "@murmuring/proto/api";
+} from "@cairn/proto/api";
 
 export function register(params: {
   username: string;

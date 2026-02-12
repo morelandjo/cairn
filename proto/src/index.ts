@@ -1,8 +1,8 @@
 /**
- * @murmuring/proto — Murmuring Protocol definitions
+ * @cairn/proto — Cairn Protocol definitions
  *
  * Shared types, constants, and protocol definitions for the
- * Murmuring federated communication platform.
+ * Cairn federated communication platform.
  */
 
 export type {
@@ -12,7 +12,7 @@ export type {
   MessageEnvelope,
   HealthCheckResponse,
   FederationMetadata,
-  MurmuringActivityType,
+  CairnActivityType,
   KeyPair,
   IdentityKeyPair,
   SignedPreKey,
@@ -35,7 +35,7 @@ export {
   PROTOCOL_VERSION,
   PROTOCOL_VERSION_STRING,
   PROTOCOL_NAME,
-  MURMURING_NS,
+  CAIRN_NS,
   WELL_KNOWN,
   ALLOWED_MARKDOWN,
   LIMITS,

@@ -1,12 +1,12 @@
-defmodule Murmuring.Moderation do
+defmodule Cairn.Moderation do
   @moduledoc """
   The Moderation context — mutes, bans, kicks, and moderation log.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Moderation.{ServerMute, ServerBan, ModLog, UnmuteWorker, UnbanWorker}
-  alias Murmuring.Servers
+  alias Cairn.Repo
+  alias Cairn.Moderation.{ServerMute, ServerBan, ModLog, UnmuteWorker, UnbanWorker}
+  alias Cairn.Servers
 
   # Mutes
 
@@ -219,7 +219,7 @@ defmodule Murmuring.Moderation do
 
   # Reports
 
-  alias Murmuring.Moderation.MessageReport
+  alias Cairn.Moderation.MessageReport
 
   def create_report(attrs) do
     %MessageReport{}
@@ -276,7 +276,7 @@ defmodule Murmuring.Moderation do
 
   # Auto-mod rules
 
-  alias Murmuring.Moderation.AutoModRule
+  alias Cairn.Moderation.AutoModRule
 
   def create_auto_mod_rule(attrs) do
     %AutoModRule{}

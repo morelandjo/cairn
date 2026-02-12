@@ -1,5 +1,5 @@
-defmodule MurmuringWeb.HealthController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.HealthController do
+  use CairnWeb, :controller
 
   def index(conn, _params) do
     postgres_status = check_postgres()
@@ -15,12 +15,12 @@ defmodule MurmuringWeb.HealthController do
       version: "0.1.0",
       postgres: Atom.to_string(postgres_status),
       redis: Atom.to_string(redis_status),
-      force_ssl: Application.get_env(:murmuring, :force_ssl, true)
+      force_ssl: Application.get_env(:cairn, :force_ssl, true)
     })
   end
 
   defp check_postgres do
-    case Ecto.Adapters.SQL.query(Murmuring.Repo, "SELECT 1") do
+    case Ecto.Adapters.SQL.query(Cairn.Repo, "SELECT 1") do
       {:ok, _} -> :up
       {:error, _} -> :down
     end
@@ -29,7 +29,7 @@ defmodule MurmuringWeb.HealthController do
   end
 
   defp check_redis do
-    case Redix.command(:murmuring_redis, ["PING"]) do
+    case Redix.command(:cairn_redis, ["PING"]) do
       {:ok, "PONG"} -> :up
       _ -> :down
     end

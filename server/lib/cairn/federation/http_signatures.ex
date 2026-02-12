@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.HttpSignatures do
+defmodule Cairn.Federation.HttpSignatures do
   @moduledoc """
   HTTP Message Signatures per RFC 9421.
 
@@ -7,7 +7,7 @@ defmodule Murmuring.Federation.HttpSignatures do
   content-digest, date.
   """
 
-  alias Murmuring.Federation.ContentDigest
+  alias Cairn.Federation.ContentDigest
 
   # seconds
   @max_clock_skew 300

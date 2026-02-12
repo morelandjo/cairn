@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.CustomEmoji do
+defmodule Cairn.Chat.CustomEmoji do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,8 +10,8 @@ defmodule Murmuring.Chat.CustomEmoji do
     field :file_key, :string
     field :animated, :boolean, default: false
 
-    belongs_to :server, Murmuring.Servers.Server
-    belongs_to :uploader, Murmuring.Accounts.User
+    belongs_to :server, Cairn.Servers.Server
+    belongs_to :uploader, Cairn.Accounts.User
 
     timestamps()
   end

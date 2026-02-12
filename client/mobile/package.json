@@ -1,5 +1,5 @@
 {
-  "name": "@murmuring/mobile",
+  "name": "@cairn/mobile",
   "version": "0.1.0",
   "private": true,
   "main": "expo-router/entry",
@@ -10,7 +10,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@murmuring/proto": "file:../../proto",
+    "@cairn/proto": "file:../../proto",
     "expo": "~52.0.0",
     "expo-local-authentication": "~15.0.0",
     "expo-notifications": "~0.29.0",

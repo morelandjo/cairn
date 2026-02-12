@@ -28,7 +28,7 @@ export default function LoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Murmuring</h1>
+        <h1>Cairn</h1>
         <h2>Welcome back</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">

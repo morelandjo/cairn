@@ -1,4 +1,4 @@
-defmodule Murmuring.Notifications.Preference do
+defmodule Cairn.Notifications.Preference do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -13,9 +13,9 @@ defmodule Murmuring.Notifications.Preference do
     field :quiet_hours_start, :time
     field :quiet_hours_end, :time
 
-    belongs_to :user, Murmuring.Accounts.User
-    belongs_to :server, Murmuring.Servers.Server
-    belongs_to :channel, Murmuring.Chat.Channel
+    belongs_to :user, Cairn.Accounts.User
+    belongs_to :server, Cairn.Servers.Server
+    belongs_to :channel, Cairn.Chat.Channel
 
     timestamps()
   end

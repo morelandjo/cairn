@@ -1,14 +1,14 @@
 ---
-# Murmuring Deploy Playbook
+# Cairn Deploy Playbook
 # Usage: ansible-playbook -i inventory.ini deploy.yml
 
-- name: Deploy Murmuring
-  hosts: murmuring
+- name: Deploy Cairn
+  hosts: cairn
   become: true
-  become_user: murmuring
+  become_user: cairn
 
   vars:
-    deploy_dir: /opt/murmuring
+    deploy_dir: /opt/cairn
     compose_file: docker-compose.prod.yml
 
   tasks:
@@ -16,16 +16,16 @@
       copy:
         src: ../docker-compose.prod.yml
         dest: "{{ deploy_dir }}/docker-compose.yml"
-        owner: murmuring
-        group: murmuring
+        owner: cairn
+        group: cairn
         mode: "0640"
 
     - name: Copy .env file (if not exists)
       copy:
         src: ../.env
         dest: "{{ deploy_dir }}/.env"
-        owner: murmuring
-        group: murmuring
+        owner: cairn
+        group: cairn
         mode: "0600"
         force: false
 
@@ -40,7 +40,7 @@
         chdir: "{{ deploy_dir }}"
 
     - name: Wait for PostgreSQL to be healthy
-      command: docker compose exec -T postgres pg_isready -U murmuring
+      command: docker compose exec -T postgres pg_isready -U cairn
       args:
         chdir: "{{ deploy_dir }}"
       register: pg_ready
@@ -49,7 +49,7 @@
       until: pg_ready.rc == 0
 
     - name: Run database migrations
-      command: docker compose exec -T server bin/murmuring eval "Murmuring.Release.migrate()"
+      command: docker compose exec -T server bin/cairn eval "Cairn.Release.migrate()"
       args:
         chdir: "{{ deploy_dir }}"
 

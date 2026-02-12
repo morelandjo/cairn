@@ -1,8 +1,8 @@
-defmodule MurmuringWeb.ServerController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.ServerController do
+  use CairnWeb, :controller
 
-  alias Murmuring.{Chat, Servers}
-  alias Murmuring.Servers.Permissions
+  alias Cairn.{Chat, Servers}
+  alias Cairn.Servers.Permissions
 
   # GET /api/v1/servers
   def index(conn, _params) do

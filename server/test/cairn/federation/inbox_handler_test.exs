@@ -1,8 +1,8 @@
-defmodule Murmuring.Federation.InboxHandlerTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.Federation.InboxHandlerTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.{Chat, Federation}
-  alias Murmuring.Federation.InboxHandler
+  alias Cairn.{Chat, Federation}
+  alias Cairn.Federation.InboxHandler
 
   setup do
     {:ok, node} =
@@ -17,14 +17,14 @@ defmodule Murmuring.Federation.InboxHandlerTest do
 
     # Create a server and channel for message tests
     {:ok, {user, _codes}} =
-      Murmuring.Accounts.register_user(%{
+      Cairn.Accounts.register_user(%{
         username: "inbox_owner_#{:erlang.unique_integer([:positive])}",
         password: "TestPassword123!",
         display_name: "Inbox Owner"
       })
 
     {:ok, server} =
-      Murmuring.Servers.create_server(%{name: "Inbox Server", creator_id: user.id})
+      Cairn.Servers.create_server(%{name: "Inbox Server", creator_id: user.id})
 
     {:ok, channel} =
       Chat.create_channel(%{name: "general", type: "public", server_id: server.id})
@@ -59,10 +59,10 @@ defmodule Murmuring.Federation.InboxHandlerTest do
           "type" => "Note",
           "id" => "https://inbox-test.example.com/channels/#{channel.id}/messages/#{Ecto.UUID.generate()}",
           "content" => "Hello from remote",
-          "murmuring:channelId" => channel.id,
-          "murmuring:did" => "did:murmuring:testdid123",
-          "murmuring:homeInstance" => "inbox-test.example.com",
-          "murmuring:displayName" => "Bob Remote"
+          "cairn:channelId" => channel.id,
+          "cairn:did" => "did:cairn:testdid123",
+          "cairn:homeInstance" => "inbox-test.example.com",
+          "cairn:displayName" => "Bob Remote"
         }
       }
 
@@ -83,7 +83,7 @@ defmodule Murmuring.Federation.InboxHandlerTest do
           "type" => "Note",
           "id" => "https://inbox-test.example.com/channels/#{channel.id}/messages/#{Ecto.UUID.generate()}",
           "content" => "No DID message",
-          "murmuring:channelId" => channel.id
+          "cairn:channelId" => channel.id
         }
       }
 
@@ -114,7 +114,7 @@ defmodule Murmuring.Federation.InboxHandlerTest do
           "type" => "Note",
           "id" => "https://inbox-test.example.com/channels/#{fake_channel_id}/messages/#{Ecto.UUID.generate()}",
           "content" => "To nowhere",
-          "murmuring:channelId" => fake_channel_id
+          "cairn:channelId" => fake_channel_id
         }
       }
 
@@ -127,7 +127,7 @@ defmodule Murmuring.Federation.InboxHandlerTest do
       # First create a federated user and message
       {:ok, fed_user} =
         Federation.get_or_create_federated_user(%{
-          did: "did:murmuring:updatetest",
+          did: "did:cairn:updatetest",
           username: "updater",
           home_instance: "inbox-test.example.com",
           public_key: :crypto.strong_rand_bytes(32),
@@ -164,7 +164,7 @@ defmodule Murmuring.Federation.InboxHandlerTest do
     test "soft-deletes federated message", %{node: node, channel: channel} do
       {:ok, fed_user} =
         Federation.get_or_create_federated_user(%{
-          did: "did:murmuring:deletetest",
+          did: "did:cairn:deletetest",
           username: "deleter",
           home_instance: "inbox-test.example.com",
           public_key: :crypto.strong_rand_bytes(32),

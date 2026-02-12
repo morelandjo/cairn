@@ -1,4 +1,4 @@
-defmodule Murmuring.Storage.FileRecord do
+defmodule Cairn.Storage.FileRecord do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -12,7 +12,7 @@ defmodule Murmuring.Storage.FileRecord do
     field :size_bytes, :integer
     field :thumbnail_key, :string
 
-    belongs_to :uploader, Murmuring.Accounts.User
+    belongs_to :uploader, Cairn.Accounts.User
 
     timestamps()
   end

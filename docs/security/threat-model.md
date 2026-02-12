@@ -1,8 +1,8 @@
-# Murmuring Threat Model
+# Cairn Threat Model
 
 ## Overview
 
-Murmuring is a privacy-first federated communication platform. This document identifies trust boundaries, attack surfaces, threat actors, and mitigations.
+Cairn is a privacy-first federated communication platform. This document identifies trust boundaries, attack surfaces, threat actors, and mitigations.
 
 ## Trust Boundaries
 
@@ -17,8 +17,8 @@ Murmuring is a privacy-first federated communication platform. This document ide
 
 ### Server ↔ Federation Peers
 - **Transport:** HTTPS with HTTP Signatures (RFC 9421) for request authentication.
-- **Trust model:** Remote nodes are **partially trusted**. Each node's identity is verified via Ed25519 keys published at `/.well-known/murmuring-federation`. Federated messages have metadata stripped before relay. Remote nodes can be blocked (defederated) by operators.
-- **User identity:** Remote users authenticate via federated auth tokens signed by their home node. User identity is verified via `did:murmuring` operation chains — self-certifying, tamper-evident, and independently verifiable by any node.
+- **Trust model:** Remote nodes are **partially trusted**. Each node's identity is verified via Ed25519 keys published at `/.well-known/cairn-federation`. Federated messages have metadata stripped before relay. Remote nodes can be blocked (defederated) by operators.
+- **User identity:** Remote users authenticate via federated auth tokens signed by their home node. User identity is verified via `did:cairn` operation chains — self-certifying, tamper-evident, and independently verifiable by any node.
 
 ### Server ↔ Database
 - **Transport:** TLS optional (recommended for remote databases). Connection via Ecto/Postgrex.
@@ -105,7 +105,7 @@ Murmuring is a privacy-first federated communication platform. This document ide
   - Rate limiting: max 10 DM requests/hour per user, max 5 pending per recipient
   - DID-based block list: blocked DIDs cannot send new requests
   - DM hints authenticated via HTTP Signatures (node-to-node)
-  - Sender identity verified via `did:murmuring` — no impersonation possible without rotation key
+  - Sender identity verified via `did:cairn` — no impersonation possible without rotation key
   - DM messages never federated via ActivityPub — only the hint crosses instances
   - DM channel hosted on one instance only — no cross-instance message replication
   - E2EE (X3DH + Double Ratchet) — hosting instance only sees ciphertext

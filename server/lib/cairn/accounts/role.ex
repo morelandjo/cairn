@@ -1,4 +1,4 @@
-defmodule Murmuring.Accounts.Role do
+defmodule Cairn.Accounts.Role do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -11,7 +11,7 @@ defmodule Murmuring.Accounts.Role do
     field :priority, :integer, default: 0
     field :color, :string
 
-    belongs_to :server, Murmuring.Servers.Server
+    belongs_to :server, Cairn.Servers.Server
 
     timestamps()
   end

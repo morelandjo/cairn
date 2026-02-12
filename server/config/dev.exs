@@ -1,12 +1,12 @@
 import Config
 
 # Configure your database
-config :murmuring, Murmuring.Repo,
-  username: "murmuring",
-  password: "murmuring_dev",
+config :cairn, Cairn.Repo,
+  username: "cairn",
+  password: "cairn_dev",
   hostname: "localhost",
   port: 5433,
-  database: "murmuring_dev",
+  database: "cairn_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -17,7 +17,7 @@ config :murmuring, Murmuring.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :murmuring, MurmuringWeb.Endpoint,
+config :cairn, CairnWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}],
@@ -51,7 +51,7 @@ config :murmuring, MurmuringWeb.Endpoint,
 # different ports.
 
 # Enable dev routes for dashboard and mailbox
-config :murmuring, dev_routes: true
+config :cairn, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"
@@ -67,7 +67,7 @@ config :phoenix, :plug_init_mode, :runtime
 config :swoosh, :api_client, false
 
 # JWT secret for development
-config :murmuring, :jwt_secret, "dev_jwt_secret_change_me"
+config :cairn, :jwt_secret, "dev_jwt_secret_change_me"
 
 # ALTCHA proof-of-work HMAC key for development
-config :murmuring, :altcha_hmac_key, "dev_altcha_hmac_key_not_for_production"
+config :cairn, :altcha_hmac_key, "dev_altcha_hmac_key_not_for_production"

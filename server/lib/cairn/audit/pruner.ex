@@ -1,4 +1,4 @@
-defmodule Murmuring.Audit.Pruner do
+defmodule Cairn.Audit.Pruner do
   @moduledoc """
   Oban worker that prunes old audit log entries.
   Runs daily by default.
@@ -10,9 +10,9 @@ defmodule Murmuring.Audit.Pruner do
 
   @impl Oban.Worker
   def perform(_job) do
-    retention_days = Application.get_env(:murmuring, :audit_retention_days, 90)
+    retention_days = Application.get_env(:cairn, :audit_retention_days, 90)
 
-    case Murmuring.Audit.prune(retention_days) do
+    case Cairn.Audit.prune(retention_days) do
       {:ok, count} ->
         if count > 0, do: Logger.info("Pruned #{count} audit log entries")
         :ok

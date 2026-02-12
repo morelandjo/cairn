@@ -4,7 +4,7 @@
 /// - Linux: Secret Service D-Bus API via secret-service
 /// - Windows: Credential Manager via windows crate
 
-const SERVICE_NAME: &str = "dev.murmuring.desktop";
+const SERVICE_NAME: &str = "dev.cairn.desktop";
 
 #[tauri::command]
 pub fn keychain_store(key: String, value: String) -> Result<(), String> {

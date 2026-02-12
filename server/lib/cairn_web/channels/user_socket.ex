@@ -1,14 +1,14 @@
-defmodule MurmuringWeb.UserSocket do
+defmodule CairnWeb.UserSocket do
   use Phoenix.Socket
 
-  channel "channel:*", MurmuringWeb.ChannelChannel
-  channel "voice:*", MurmuringWeb.VoiceChannel
-  channel "user:*", MurmuringWeb.UserChannel
+  channel "channel:*", CairnWeb.ChannelChannel
+  channel "voice:*", CairnWeb.VoiceChannel
+  channel "user:*", CairnWeb.UserChannel
 
   @impl true
   def connect(%{"token" => token}, socket, _connect_info) do
     # Try local JWT first, then federated token
-    case Murmuring.Auth.verify_access_token(token) do
+    case Cairn.Auth.verify_access_token(token) do
       {:ok, %{"sub" => user_id}} ->
         {:ok, assign(socket, :user_id, user_id) |> assign(:is_federated, false)}
 
@@ -29,7 +29,7 @@ defmodule MurmuringWeb.UserSocket do
   end
 
   defp try_federated_token(token, socket) do
-    case Murmuring.Federation.FederatedAuth.verify_token(token) do
+    case Cairn.Federation.FederatedAuth.verify_token(token) do
       {:ok, claims} ->
         # Look up or create the federated user
         attrs = %{
@@ -42,7 +42,7 @@ defmodule MurmuringWeb.UserSocket do
           last_synced_at: DateTime.utc_now() |> DateTime.truncate(:microsecond)
         }
 
-        case Murmuring.Federation.get_or_create_federated_user(attrs) do
+        case Cairn.Federation.get_or_create_federated_user(attrs) do
           {:ok, federated_user} ->
             socket =
               socket

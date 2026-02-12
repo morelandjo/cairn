@@ -1,11 +1,11 @@
 /**
- * Webhooks & Bots — delegates to @murmuring/proto.
+ * Webhooks & Bots — delegates to @cairn/proto.
  */
 
-import { webhooksApi } from "@murmuring/proto";
+import { webhooksApi } from "@cairn/proto";
 import { client } from "./client";
 
-export type { Webhook, BotAccount } from "@murmuring/proto/api";
+export type { Webhook, BotAccount } from "@cairn/proto/api";
 
 export function listWebhooks(serverId: string) {
   return webhooksApi.listWebhooks(client, serverId);

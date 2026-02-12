@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Murmuring Install Script
-# Usage: curl -sSL https://get.murmuring.dev/install | bash
+# Cairn Install Script
+# Usage: curl -sSL https://get.cairn.chat/install | bash
 # Or: ./install.sh [--config /path/to/config.yml] [--env /path/to/.env] [--json]
 #
-# This script provisions a bare Linux server and deploys Murmuring end-to-end:
+# This script provisions a bare Linux server and deploys Cairn end-to-end:
 #   1. Installs Docker + Compose (if missing)
-#   2. Creates a dedicated murmuring system user
+#   2. Creates a dedicated cairn system user
 #   3. Configures firewall (UFW) and fail2ban
 #   4. Sets up swap (for small VPS / Raspberry Pi)
 #   5. Walks through interactive configuration
@@ -15,9 +15,9 @@ set -euo pipefail
 #   7. Runs database migrations and verifies health
 
 VERSION="0.1.0"
-DEPLOY_DIR="/opt/murmuring"
-COMPOSE_URL="https://raw.githubusercontent.com/murmuring/murmuring/main/deploy/docker-compose.prod.yml"
-ENV_TEMPLATE_URL="https://raw.githubusercontent.com/murmuring/murmuring/main/deploy/.env.example"
+DEPLOY_DIR="/opt/cairn"
+COMPOSE_URL="https://raw.githubusercontent.com/cairn/cairn/main/deploy/docker-compose.prod.yml"
+ENV_TEMPLATE_URL="https://raw.githubusercontent.com/cairn/cairn/main/deploy/.env.example"
 
 # Colors
 RED='\033[0;31m'
@@ -93,7 +93,7 @@ check_root() {
 
 detect_distro() {
   if [[ ! -f /etc/os-release ]]; then
-    error "Unsupported OS. Murmuring requires Linux (Debian, Ubuntu, or Fedora)."
+    error "Unsupported OS. Cairn requires Linux (Debian, Ubuntu, or Fedora)."
     exit 1
   fi
   # shellcheck source=/dev/null
@@ -157,15 +157,15 @@ install_docker() {
 }
 
 create_user() {
-  if id murmuring &>/dev/null; then
-    log "System user 'murmuring' already exists"
+  if id cairn &>/dev/null; then
+    log "System user 'cairn' already exists"
     # Ensure they're in the docker group
-    usermod -aG docker murmuring 2>/dev/null || true
+    usermod -aG docker cairn 2>/dev/null || true
     return
   fi
 
-  log "Creating system user 'murmuring'..."
-  useradd --system --create-home --shell /bin/bash --groups docker murmuring
+  log "Creating system user 'cairn'..."
+  useradd --system --create-home --shell /bin/bash --groups docker cairn
 }
 
 setup_firewall() {
@@ -277,12 +277,12 @@ check_prerequisites() {
 run_wizard() {
   echo ""
   echo -e "${GREEN}╔══════════════════════════════════════╗${NC}"
-  echo -e "${GREEN}║     Murmuring Installation Wizard    ║${NC}"
+  echo -e "${GREEN}║     Cairn Installation Wizard    ║${NC}"
   echo -e "${GREEN}║          v${VERSION}                      ║${NC}"
   echo -e "${GREEN}╚══════════════════════════════════════╝${NC}"
   echo ""
 
-  prompt MURMURING_DOMAIN "Domain name or IP address for this instance" ""
+  prompt CAIRN_DOMAIN "Domain name or IP address for this instance" ""
   prompt SERVER_PORT "HTTP port" "4000"
 
   # Secrets
@@ -343,7 +343,7 @@ run_wizard() {
   S3_ENDPOINT=""
   if [[ "$s3_choice" =~ ^[Yy] ]]; then
     STORAGE_BACKEND="s3"
-    prompt S3_BUCKET "S3 bucket name" "murmuring-uploads"
+    prompt S3_BUCKET "S3 bucket name" "cairn-uploads"
     prompt S3_ENDPOINT "S3 endpoint URL" "https://s3.amazonaws.com"
   fi
 
@@ -356,8 +356,8 @@ run_wizard() {
 write_env() {
   local env_path="$1"
   cat > "$env_path" <<EOF
-# Murmuring Configuration — generated $(date -u +%Y-%m-%dT%H:%M:%SZ)
-MURMURING_DOMAIN=${MURMURING_DOMAIN}
+# Cairn Configuration — generated $(date -u +%Y-%m-%dT%H:%M:%SZ)
+CAIRN_DOMAIN=${CAIRN_DOMAIN}
 SERVER_PORT=${SERVER_PORT}
 SECRET_KEY_BASE=${SECRET_KEY_BASE}
 JWT_SECRET=${JWT_SECRET}
@@ -365,7 +365,7 @@ POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
 SFU_AUTH_SECRET=${SFU_AUTH_SECRET}
 TURN_SECRET=${TURN_SECRET}
-TURN_URLS=turn:${MURMURING_DOMAIN}:3478
+TURN_URLS=turn:${CAIRN_DOMAIN}:3478
 FEDERATION_ENABLED=${FEDERATION_ENABLED}
 FORCE_SSL=${FORCE_SSL}
 STORAGE_BACKEND=${STORAGE_BACKEND}
@@ -378,14 +378,14 @@ EOF
   chmod 600 "$env_path"
 }
 
-install_murmuring_ctl() {
-  if [ -f /usr/local/bin/murmuring-ctl ]; then
+install_cairn_ctl() {
+  if [ -f /usr/local/bin/cairn-ctl ]; then
     return
   fi
-  local ctl_url="https://raw.githubusercontent.com/murmuring/murmuring/main/deploy/murmuring-ctl"
-  log "Installing murmuring-ctl..."
-  curl -sSL "$ctl_url" -o /usr/local/bin/murmuring-ctl
-  chmod +x /usr/local/bin/murmuring-ctl
+  local ctl_url="https://raw.githubusercontent.com/cairn/cairn/main/deploy/cairn-ctl"
+  log "Installing cairn-ctl..."
+  curl -sSL "$ctl_url" -o /usr/local/bin/cairn-ctl
+  chmod +x /usr/local/bin/cairn-ctl
 }
 
 # ── Main ──
@@ -395,7 +395,7 @@ main() {
   detect_distro
 
   echo ""
-  echo -e "${GREEN}Murmuring Installer v${VERSION}${NC}"
+  echo -e "${GREEN}Cairn Installer v${VERSION}${NC}"
   echo ""
 
   # Phase 1: System provisioning
@@ -413,7 +413,7 @@ main() {
 
   # Phase 2: Create deploy directory
   mkdir -p "$DEPLOY_DIR"/{backups,keys}
-  chown -R murmuring:murmuring "$DEPLOY_DIR"
+  chown -R cairn:cairn "$DEPLOY_DIR"
   chmod 750 "$DEPLOY_DIR"
 
   # Phase 3: Configuration
@@ -421,13 +421,13 @@ main() {
     log "Using provided .env file: $ENV_FILE"
     cp "$ENV_FILE" "$DEPLOY_DIR/.env"
     chmod 600 "$DEPLOY_DIR/.env"
-    chown murmuring:murmuring "$DEPLOY_DIR/.env"
+    chown cairn:cairn "$DEPLOY_DIR/.env"
   elif [ -f "$DEPLOY_DIR/.env" ]; then
     warn "Existing .env found at $DEPLOY_DIR/.env — keeping it."
   else
     run_wizard
     write_env "$DEPLOY_DIR/.env"
-    chown murmuring:murmuring "$DEPLOY_DIR/.env"
+    chown cairn:cairn "$DEPLOY_DIR/.env"
     log "Configuration written to $DEPLOY_DIR/.env"
   fi
 
@@ -438,18 +438,18 @@ main() {
   else
     curl -sSL "$COMPOSE_URL" -o "$DEPLOY_DIR/docker-compose.yml"
   fi
-  chown murmuring:murmuring "$DEPLOY_DIR/docker-compose.yml"
+  chown cairn:cairn "$DEPLOY_DIR/docker-compose.yml"
 
-  # Phase 5: Install murmuring-ctl
-  install_murmuring_ctl
+  # Phase 5: Install cairn-ctl
+  install_cairn_ctl
 
-  # Phase 6: Pull images and start services (as murmuring user)
+  # Phase 6: Pull images and start services (as cairn user)
   log "Pulling Docker images (this may take a few minutes)..."
   cd "$DEPLOY_DIR"
-  sudo -u murmuring docker compose pull
+  sudo -u cairn docker compose pull
 
   log "Starting services..."
-  sudo -u murmuring docker compose up -d
+  sudo -u cairn docker compose up -d
 
   # Phase 7: Wait for health
   log "Waiting for services to be healthy..."
@@ -464,22 +464,22 @@ main() {
 
   # Phase 8: Migrations
   log "Running database migrations..."
-  sudo -u murmuring docker compose exec -T server bin/murmuring eval "Murmuring.Release.migrate()" 2>/dev/null || true
+  sudo -u cairn docker compose exec -T server bin/cairn eval "Cairn.Release.migrate()" 2>/dev/null || true
 
   # Final health check
   if curl -sf "http://localhost:${port}/health" &>/dev/null; then
     local domain
-    domain=$(grep -oP 'MURMURING_DOMAIN=\K.*' "$DEPLOY_DIR/.env" 2>/dev/null || echo "localhost")
+    domain=$(grep -oP 'CAIRN_DOMAIN=\K.*' "$DEPLOY_DIR/.env" 2>/dev/null || echo "localhost")
     local force_ssl
     force_ssl=$(grep -oP 'FORCE_SSL=\K.*' "$DEPLOY_DIR/.env" 2>/dev/null || echo "true")
 
     echo ""
-    log "Murmuring is running!"
+    log "Cairn is running!"
     echo ""
     echo -e "  ${GREEN}URL:${NC}     http://${domain}:${port}"
     echo -e "  ${GREEN}Config:${NC}  $DEPLOY_DIR/.env"
     echo -e "  ${GREEN}Logs:${NC}    cd $DEPLOY_DIR && docker compose logs -f"
-    echo -e "  ${GREEN}Manage:${NC}  murmuring-ctl status"
+    echo -e "  ${GREEN}Manage:${NC}  cairn-ctl status"
     echo ""
     echo -e "  ${YELLOW}Next steps:${NC}"
     if [[ "$force_ssl" == "true" ]]; then

@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.KeyBackupTest do
-  use MurmuringWeb.ConnCase, async: true
+defmodule CairnWeb.KeyBackupTest do
+  use CairnWeb.ConnCase, async: true
 
-  alias Murmuring.Accounts
+  alias Cairn.Accounts
 
   @valid_password "secure_password_123"
 
@@ -131,7 +131,7 @@ defmodule MurmuringWeb.KeyBackupTest do
         "password" => @valid_password
       })
 
-    {:ok, tokens} = Murmuring.Auth.generate_tokens(user)
+    {:ok, tokens} = Cairn.Auth.generate_tokens(user)
     {user, tokens}
   end
 end

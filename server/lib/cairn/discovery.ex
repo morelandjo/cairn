@@ -1,12 +1,12 @@
-defmodule Murmuring.Discovery do
+defmodule Cairn.Discovery do
   @moduledoc """
   The Discovery context — public server directory.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Discovery.DirectoryEntry
-  alias Murmuring.Servers
+  alias Cairn.Repo
+  alias Cairn.Discovery.DirectoryEntry
+  alias Cairn.Servers
 
   def list_directory(opts \\ []) do
     limit = opts[:limit] || 50

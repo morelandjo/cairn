@@ -1,4 +1,4 @@
-defmodule Murmuring.Search do
+defmodule Cairn.Search do
   @moduledoc """
   Meilisearch client wrapper for full-text message search.
   Uses Req directly (no extra dependency).
@@ -83,13 +83,13 @@ defmodule Murmuring.Search do
   end
 
   defp meili_url do
-    Application.get_env(:murmuring, :meilisearch, [])
+    Application.get_env(:cairn, :meilisearch, [])
     |> Keyword.get(:url, "http://localhost:7700")
   end
 
   defp meili_headers do
     key =
-      Application.get_env(:murmuring, :meilisearch, [])
+      Application.get_env(:cairn, :meilisearch, [])
       |> Keyword.get(:master_key)
 
     if key do

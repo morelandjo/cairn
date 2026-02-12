@@ -1,4 +1,4 @@
-defmodule MurmuringWeb.Telemetry do
+defmodule CairnWeb.Telemetry do
   use Supervisor
   import Telemetry.Metrics
 
@@ -53,23 +53,23 @@ defmodule MurmuringWeb.Telemetry do
       ),
 
       # Database Metrics
-      summary("murmuring.repo.query.total_time",
+      summary("cairn.repo.query.total_time",
         unit: {:native, :millisecond},
         description: "The sum of the other measurements"
       ),
-      summary("murmuring.repo.query.decode_time",
+      summary("cairn.repo.query.decode_time",
         unit: {:native, :millisecond},
         description: "The time spent decoding the data received from the database"
       ),
-      summary("murmuring.repo.query.query_time",
+      summary("cairn.repo.query.query_time",
         unit: {:native, :millisecond},
         description: "The time spent executing the query"
       ),
-      summary("murmuring.repo.query.queue_time",
+      summary("cairn.repo.query.queue_time",
         unit: {:native, :millisecond},
         description: "The time spent waiting for a database connection"
       ),
-      summary("murmuring.repo.query.idle_time",
+      summary("cairn.repo.query.idle_time",
         unit: {:native, :millisecond},
         description:
           "The time the connection spent waiting before being checked out for the query"
@@ -87,7 +87,7 @@ defmodule MurmuringWeb.Telemetry do
     [
       # A module, function and arguments to be invoked periodically.
       # This function must call :telemetry.execute/3 and a metric must be added above.
-      # {MurmuringWeb, :count_users, []}
+      # {CairnWeb, :count_users, []}
     ]
   end
 end

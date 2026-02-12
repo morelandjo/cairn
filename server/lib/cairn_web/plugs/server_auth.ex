@@ -1,4 +1,4 @@
-defmodule MurmuringWeb.Plugs.ServerAuth do
+defmodule CairnWeb.Plugs.ServerAuth do
   @moduledoc """
   Plug that checks server-level permissions for the current user.
 
@@ -12,8 +12,8 @@ defmodule MurmuringWeb.Plugs.ServerAuth do
   """
 
   import Plug.Conn
-  alias Murmuring.Chat
-  alias Murmuring.Servers.Permissions
+  alias Cairn.Chat
+  alias Cairn.Servers.Permissions
 
   def init(opts), do: opts
 

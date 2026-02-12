@@ -2,17 +2,17 @@
 -- This script is mounted into the PostgreSQL container at
 -- /docker-entrypoint-initdb.d/ and runs automatically on first start.
 
-CREATE DATABASE murmuring_node_a;
-CREATE DATABASE murmuring_node_b;
+CREATE DATABASE cairn_node_a;
+CREATE DATABASE cairn_node_b;
 
--- Grant full privileges to the murmuring user on both databases.
-GRANT ALL PRIVILEGES ON DATABASE murmuring_node_a TO murmuring;
-GRANT ALL PRIVILEGES ON DATABASE murmuring_node_b TO murmuring;
+-- Grant full privileges to the cairn user on both databases.
+GRANT ALL PRIVILEGES ON DATABASE cairn_node_a TO cairn;
+GRANT ALL PRIVILEGES ON DATABASE cairn_node_b TO cairn;
 
--- Ensure the murmuring user owns the public schema in each database
+-- Ensure the cairn user owns the public schema in each database
 -- so that Ecto migrations can create tables without issues.
-\connect murmuring_node_a
-GRANT ALL ON SCHEMA public TO murmuring;
+\connect cairn_node_a
+GRANT ALL ON SCHEMA public TO cairn;
 
-\connect murmuring_node_b
-GRANT ALL ON SCHEMA public TO murmuring;
+\connect cairn_node_b
+GRANT ALL ON SCHEMA public TO cairn;

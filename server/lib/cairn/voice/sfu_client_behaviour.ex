@@ -1,4 +1,4 @@
-defmodule Murmuring.Voice.SfuClientBehaviour do
+defmodule Cairn.Voice.SfuClientBehaviour do
   @callback create_room(String.t()) :: {:ok, map()} | {:error, term()}
   @callback destroy_room(String.t()) :: {:ok, map()} | {:error, term()}
   @callback get_rtp_capabilities(String.t()) :: {:ok, map()} | {:error, term()}

@@ -1,7 +1,7 @@
 /**
- * Murmuring Protocol Types
+ * Cairn Protocol Types
  *
- * Core type definitions for the Murmuring federated communication protocol.
+ * Core type definitions for the Cairn federated communication protocol.
  */
 
 /** Semantic version string for protocol versioning */
@@ -72,7 +72,7 @@ export interface MessageEnvelope {
   editRevision?: number;
 }
 
-/** Health check response from any Murmuring service */
+/** Health check response from any Cairn service */
 export interface HealthCheckResponse {
   status: "healthy" | "degraded" | "unhealthy";
   version: string;
@@ -84,7 +84,7 @@ export interface HealthCheckResponse {
   };
 }
 
-/** Federation handshake metadata at /.well-known/murmuring-federation */
+/** Federation handshake metadata at /.well-known/cairn-federation */
 export interface FederationMetadata {
   protocol: string;
   version: string;
@@ -101,16 +101,16 @@ export interface FederationMetadata {
 }
 
 /** Supported ActivityPub extension types */
-export type MurmuringActivityType =
-  | "MurmuringServer"
-  | "MurmuringChannel"
-  | "MurmuringMessage"
-  | "MurmuringRole"
-  | "MurmuringReaction";
+export type CairnActivityType =
+  | "CairnServer"
+  | "CairnChannel"
+  | "CairnMessage"
+  | "CairnRole"
+  | "CairnReaction";
 
 // ─── Server/Guild Types ───
 
-/** A MurmuringServer (guild) that owns channels, roles, and members */
+/** A CairnServer (guild) that owns channels, roles, and members */
 export interface Server {
   id: string;
   name: string;
@@ -486,7 +486,7 @@ export interface RatchetHeader {
   messageNumber: number;
 }
 
-/** Encrypted payload in the Murmuring wire format */
+/** Encrypted payload in the Cairn wire format */
 export interface EncryptedPayload {
   /** Ratchet header */
   header: RatchetHeader;

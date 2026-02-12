@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.MetadataStripper do
+defmodule Cairn.Federation.MetadataStripper do
   @moduledoc """
   Strips sensitive metadata from outbound federation activities.
   Removes IP addresses, user agents, device fingerprints, and internal IDs.

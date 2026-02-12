@@ -1,11 +1,11 @@
-defmodule Murmuring.Auth do
+defmodule Cairn.Auth do
   @moduledoc """
   The Auth context — token generation, refresh rotation, account recovery.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Auth.{Token, RefreshToken}
+  alias Cairn.Repo
+  alias Cairn.Auth.{Token, RefreshToken}
 
   def generate_tokens(user) do
     token_opts = if user.did, do: [did: user.did], else: []

@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.AddHistoryAccessibleToChannels do
+defmodule Cairn.Repo.Migrations.AddHistoryAccessibleToChannels do
   use Ecto.Migration
 
   def change do

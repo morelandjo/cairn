@@ -1,6 +1,6 @@
-alias Murmuring.Repo
-alias Murmuring.Accounts.{User, Role}
-alias Murmuring.Chat.{Channel, ChannelMember}
+alias Cairn.Repo
+alias Cairn.Accounts.{User, Role}
+alias Cairn.Chat.{Channel, ChannelMember}
 import Ecto.Query
 
 # Create @everyone role (idempotent)

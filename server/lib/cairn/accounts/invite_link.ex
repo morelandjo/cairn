@@ -1,4 +1,4 @@
-defmodule Murmuring.Accounts.InviteLink do
+defmodule Cairn.Accounts.InviteLink do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -11,9 +11,9 @@ defmodule Murmuring.Accounts.InviteLink do
     field :uses, :integer, default: 0
     field :expires_at, :utc_datetime
 
-    belongs_to :creator, Murmuring.Accounts.User
-    belongs_to :channel, Murmuring.Chat.Channel
-    belongs_to :server, Murmuring.Servers.Server
+    belongs_to :creator, Cairn.Accounts.User
+    belongs_to :channel, Cairn.Chat.Channel
+    belongs_to :server, Cairn.Servers.Server
 
     timestamps()
   end

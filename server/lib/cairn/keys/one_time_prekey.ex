@@ -1,4 +1,4 @@
-defmodule Murmuring.Keys.OneTimePrekey do
+defmodule Cairn.Keys.OneTimePrekey do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,7 +10,7 @@ defmodule Murmuring.Keys.OneTimePrekey do
     field :public_key, :binary
     field :consumed, :boolean, default: false
 
-    belongs_to :user, Murmuring.Accounts.User
+    belongs_to :user, Cairn.Accounts.User
 
     timestamps()
   end

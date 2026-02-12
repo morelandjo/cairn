@@ -1,12 +1,12 @@
-defmodule Murmuring.Audit do
+defmodule Cairn.Audit do
   @moduledoc """
   Audit logging context.
   Records security-relevant events with configurable IP logging and auto-pruning.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Audit.AuditLog
+  alias Cairn.Repo
+  alias Cairn.Audit.AuditLog
 
   @retention_days 90
 
@@ -22,7 +22,7 @@ defmodule Murmuring.Audit do
   """
   def log(event_type, opts \\ []) do
     ip =
-      if Application.get_env(:murmuring, :audit_log_ip, false) do
+      if Application.get_env(:cairn, :audit_log_ip, false) do
         Keyword.get(opts, :ip_address)
       else
         nil

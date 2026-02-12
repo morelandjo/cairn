@@ -1,11 +1,11 @@
-defmodule Murmuring.Voice do
+defmodule Cairn.Voice do
   @moduledoc """
   Voice context — manages voice state for channels.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Chat.{Channel, VoiceState}
+  alias Cairn.Repo
+  alias Cairn.Chat.{Channel, VoiceState}
 
   @hard_max 100
 

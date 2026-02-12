@@ -1,12 +1,12 @@
-defmodule MurmuringWeb.ActorController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.ActorController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Accounts
-  alias Murmuring.Federation.ActivityPub
+  alias Cairn.Accounts
+  alias Cairn.Federation.ActivityPub
 
   @doc "GET /users/:username — returns ActivityPub actor profile."
   def show(conn, %{"username" => username}) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
     domain = Keyword.get(config, :domain, "localhost")
 
     case Accounts.get_user_by_username(username) do
@@ -33,7 +33,7 @@ defmodule MurmuringWeb.ActorController do
 
   @doc "GET /users/:username/outbox — returns user's outbox."
   def outbox(conn, %{"username" => username}) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
     domain = Keyword.get(config, :domain, "localhost")
 
     case Accounts.get_user_by_username(username) do

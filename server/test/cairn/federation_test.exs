@@ -1,7 +1,7 @@
-defmodule Murmuring.FederationTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.FederationTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.Federation
+  alias Cairn.Federation
 
   describe "register_node/1" do
     test "creates a federated node" do

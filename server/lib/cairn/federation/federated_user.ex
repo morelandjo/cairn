@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.FederatedUser do
+defmodule Cairn.Federation.FederatedUser do
   @moduledoc """
   Schema for cached remote (federated) user profiles.
 

@@ -89,10 +89,10 @@
   - Key management, remote unlock via dropbear SSH
 
 - [ ] **8.13** Automated backup:
-  - Mix task: `mix murmuring.backup` (pg_dump + file archive + optional key archive)
+  - Mix task: `mix cairn.backup` (pg_dump + file archive + optional key archive)
   - Encrypted with operator key (AES-256-GCM)
   - Upload to local path, S3, or rsync
-  - `mix murmuring.restore` for restore
+  - `mix cairn.restore` for restore
   - Oban scheduled job for daily backup
 
 - [ ] **8.14** Prometheus metrics endpoint:
@@ -111,28 +111,28 @@
 ### Distribution — Server
 
 - [ ] **8.17** Interactive install script (`deploy/install.sh`):
-  - One-command: `curl -sSL https://get.murmuring.dev/install | sh`
+  - One-command: `curl -sSL https://get.cairn.chat/install | sh`
   - Prerequisites check: Docker, Docker Compose, ports, disk space, OS compatibility
   - Interactive wizard: domain, TLS (Let's Encrypt), storage, admin account, federation, voice, resource limits
-  - Writes `.env` + `murmuring.yml`, pulls images, starts services, runs migrations
+  - Writes `.env` + `cairn.yml`, pulls images, starts services, runs migrations
 
 - [ ] **8.18** Advanced / non-interactive install:
-  - `install.sh --config /path/to/murmuring.yml` — skip wizard
+  - `install.sh --config /path/to/cairn.yml` — skip wizard
   - `install.sh --env /path/to/.env` — skip wizard
   - `--json` flag for machine-readable output
   - Docker Compose override support
 
-- [ ] **8.19** Operator CLI tool (`murmuring-ctl`):
+- [ ] **8.19** Operator CLI tool (`cairn-ctl`):
   - Commands: `status`, `upgrade`, `backup`, `restore`, `federation list/add`, `user create/reset-password`, `config set`, `logs`
   - Mix task suite with Docker exec shell wrapper
 
 - [ ] **8.20** Package manager distribution (server):
   - Homebrew tap, AUR PKGBUILD, Nix flake, apt/deb repo
-  - All use Docker under the hood — packages provide orchestration + `murmuring-ctl`
+  - All use Docker under the hood — packages provide orchestration + `cairn-ctl`
 
 - [ ] **8.21** Upgrade path:
-  - `murmuring-ctl upgrade` — auto backup, version check, pull images, migrate, verify
-  - `murmuring-ctl rollback` — revert to previous image tags + restore backup
+  - `cairn-ctl upgrade` — auto backup, version check, pull images, migrate, verify
+  - `cairn-ctl rollback` — revert to previous image tags + restore backup
   - Release notes displayed before confirmation
 
 ### Distribution — Web Client
@@ -143,7 +143,7 @@
   - Hashed filenames with immutable cache, `index.html` with no-cache
 
 - [ ] **8.23** Web client configuration injection:
-  - Phoenix renders `<script>` with `window.__MURMURING_CONFIG__` in `index.html`
+  - Phoenix renders `<script>` with `window.__CAIRN_CONFIG__` in `index.html`
   - Config: instance name, domain, branding, feature flags, upload limits
 
 ### Distribution — Desktop
@@ -158,9 +158,9 @@
   - CI: automate submissions on release
 
 - [ ] **8.26** Desktop first-run experience:
-  - "Connect to a Murmuring server" → enter server URL
+  - "Connect to a Cairn server" → enter server URL
   - Server list: remember previously connected servers
-  - Deep link handling: `murmuring://invite/...` opens app and joins
+  - Deep link handling: `cairn://invite/...` opens app and joins
 
 ### Distribution — Mobile
 
@@ -199,7 +199,7 @@
   - Fresh VPS (Debian/Ubuntu/Fedora): install script → wizard → running with HTTPS
   - Non-interactive install with config file
   - Upgrade + rollback cycle verified
-  - All `murmuring-ctl` commands work
+  - All `cairn-ctl` commands work
 
 - [ ] Client distribution:
   - Web client served at `/` on any instance

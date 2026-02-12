@@ -23,7 +23,7 @@ export async function getBiometricTypes(): Promise<LocalAuthentication.Authentic
  * Returns true if authentication succeeds, false otherwise.
  */
 export async function authenticate(
-  promptMessage = "Unlock Murmuring",
+  promptMessage = "Unlock Cairn",
 ): Promise<boolean> {
   const result = await LocalAuthentication.authenticateAsync({
     promptMessage,

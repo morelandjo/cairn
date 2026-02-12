@@ -1,4 +1,4 @@
-defmodule MurmuringWeb.Plugs.RateLimiter do
+defmodule CairnWeb.Plugs.RateLimiter do
   @moduledoc """
   HTTP API rate limiting plug using ETS token bucket.
   Limits requests per IP (unauthenticated) or per user (authenticated).
@@ -37,7 +37,7 @@ defmodule MurmuringWeb.Plugs.RateLimiter do
   def init(opts), do: opts
 
   def call(conn, _opts) do
-    if Application.get_env(:murmuring, :http_rate_limiting, true) do
+    if Application.get_env(:cairn, :http_rate_limiting, true) do
       do_rate_limit(conn)
     else
       conn

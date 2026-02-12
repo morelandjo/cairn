@@ -1,7 +1,7 @@
 /**
  * Server connection page — desktop first-run experience.
  * Shown when no server URL is configured (desktop app only).
- * Allows user to enter a Murmuring server URL to connect to.
+ * Allows user to enter a Cairn server URL to connect to.
  */
 
 import { useState, useEffect, type FormEvent } from "react";
@@ -19,7 +19,7 @@ export default function ServerConnect({ onConnect }: ServerConnectProps) {
 
   useEffect(() => {
     // Load recent servers from localStorage
-    const saved = localStorage.getItem("murmuring_recent_servers");
+    const saved = localStorage.getItem("cairn_recent_servers");
     if (saved) {
       try {
         setRecentServers(JSON.parse(saved));
@@ -45,7 +45,7 @@ export default function ServerConnect({ onConnect }: ServerConnectProps) {
 
       // Save to recent
       const updated = [serverUrl, ...recentServers.filter((s) => s !== serverUrl)].slice(0, 5);
-      localStorage.setItem("murmuring_recent_servers", JSON.stringify(updated));
+      localStorage.setItem("cairn_recent_servers", JSON.stringify(updated));
 
       // Warn if connecting over plain HTTP
       if (serverUrl.startsWith("http://")) {
@@ -68,13 +68,13 @@ export default function ServerConnect({ onConnect }: ServerConnectProps) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "#1a1a2e" }}>
       <div style={{ width: 400, padding: 32, background: "#16213e", borderRadius: 12, color: "#e0e0e0" }}>
-        <h1 style={{ fontSize: 24, marginBottom: 8 }}>Murmuring</h1>
-        <p style={{ color: "#888", marginBottom: 24 }}>Connect to a Murmuring server</p>
+        <h1 style={{ fontSize: 24, marginBottom: 8 }}>Cairn</h1>
+        <p style={{ color: "#888", marginBottom: 24 }}>Connect to a Cairn server</p>
 
         <form onSubmit={handleSubmit}>
           <input
             type="text"
-            placeholder="murmuring.example.com"
+            placeholder="cairn.example.com"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             style={{ width: "100%", padding: 12, borderRadius: 8, border: "1px solid #333", background: "#0f3460", color: "#fff", fontSize: 16, boxSizing: "border-box" }}

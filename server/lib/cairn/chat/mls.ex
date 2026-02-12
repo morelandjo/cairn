@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.Mls do
+defmodule Cairn.Chat.Mls do
   @moduledoc """
   MLS delivery service — stores and relays opaque MLS protocol messages.
 
@@ -7,8 +7,8 @@ defmodule Murmuring.Chat.Mls do
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Chat.{MlsMessage, MlsGroupInfo}
+  alias Cairn.Repo
+  alias Cairn.Chat.{MlsMessage, MlsGroupInfo}
 
   # --- Group Info ---
 

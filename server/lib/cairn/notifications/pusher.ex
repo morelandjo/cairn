@@ -1,4 +1,4 @@
-defmodule Murmuring.Notifications.Pusher do
+defmodule Cairn.Notifications.Pusher do
   @moduledoc """
   Oban worker that sends push notifications via the Expo Push API.
   Privacy-first: never includes message content, sender name, or identifiable info.
@@ -9,7 +9,7 @@ defmodule Murmuring.Notifications.Pusher do
     max_attempts: 5
 
   require Logger
-  alias Murmuring.Notifications
+  alias Cairn.Notifications
 
   @expo_push_url "https://exp.host/--/api/v2/push/send"
 
@@ -33,7 +33,7 @@ defmodule Murmuring.Notifications.Pusher do
         Enum.map(tokens, fn push_token ->
           %{
             "to" => push_token.token,
-            "title" => "Murmuring",
+            "title" => "Cairn",
             "body" => "New message in ##{channel_name}",
             "data" => %{
               "channel_id" => channel_id,

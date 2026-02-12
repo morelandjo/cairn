@@ -70,7 +70,7 @@ export default function RegisterPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Murmuring</h1>
+        <h1>Cairn</h1>
         <h2>Create an account</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">

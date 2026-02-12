@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.MessageFederator do
+defmodule Cairn.Federation.MessageFederator do
   @moduledoc """
   Federates message create/edit/delete events to subscribed remote nodes.
   Enqueues Oban delivery jobs for each active federated node.
@@ -6,9 +6,9 @@ defmodule Murmuring.Federation.MessageFederator do
   DMs (channels with type "dm" or no server_id) are NEVER federated.
   """
 
-  alias Murmuring.{Chat, Federation}
-  alias Murmuring.Federation.ActivityPub
-  alias Murmuring.Federation.DeliveryWorker
+  alias Cairn.{Chat, Federation}
+  alias Cairn.Federation.ActivityPub
+  alias Cairn.Federation.DeliveryWorker
 
   @doc "Federate a new message to all active nodes."
   def federate_create(message, channel_id) do
@@ -64,7 +64,7 @@ defmodule Murmuring.Federation.MessageFederator do
   # ── Private ──
 
   defp with_federation(channel_id, fun) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
 
     if Keyword.get(config, :enabled, false) and not dm_channel?(channel_id) do
       domain = Keyword.get(config, :domain, "localhost")
@@ -83,7 +83,7 @@ defmodule Murmuring.Federation.MessageFederator do
 
   defp get_author(message) do
     if message.author_id do
-      Murmuring.Accounts.get_user(message.author_id)
+      Cairn.Accounts.get_user(message.author_id)
     end
   end
 

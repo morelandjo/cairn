@@ -1,7 +1,7 @@
-defmodule Murmuring.SearchTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.SearchTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.Search
+  alias Cairn.Search
 
   describe "search module" do
     test "ensure_index doesn't crash when Meilisearch is unavailable" do

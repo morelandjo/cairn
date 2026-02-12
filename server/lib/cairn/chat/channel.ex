@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.Channel do
+defmodule Cairn.Chat.Channel do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -16,10 +16,10 @@ defmodule Murmuring.Chat.Channel do
     field :bitrate, :integer, default: 64000
     field :history_accessible, :boolean, default: false
 
-    belongs_to :server, Murmuring.Servers.Server
-    belongs_to :category, Murmuring.Chat.ChannelCategory
-    has_many :members, Murmuring.Chat.ChannelMember
-    has_many :messages, Murmuring.Chat.Message
+    belongs_to :server, Cairn.Servers.Server
+    belongs_to :category, Cairn.Chat.ChannelCategory
+    has_many :members, Cairn.Chat.ChannelMember
+    has_many :messages, Cairn.Chat.Message
 
     timestamps()
   end

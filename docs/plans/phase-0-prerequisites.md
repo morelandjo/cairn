@@ -21,7 +21,7 @@
 
 - [ ] **0.1** Initialize monorepo root with directory structure:
   ```
-  murmuring/
+  cairn/
   ├── server/          # Elixir/Phoenix
   ├── sfu/             # Node.js mediasoup sidecar
   ├── client/
@@ -48,7 +48,7 @@
 - [ ] **0.5** Scaffold Phoenix project:
   ```bash
   cd server/
-  mix phx.new server --no-html --no-assets --app murmuring
+  mix phx.new server --no-html --no-assets --app cairn
   ```
   Configure for API-only mode, JSON responses, WebSocket support.
 - [ ] **0.6** Scaffold Node.js SFU project in `sfu/`:
@@ -74,11 +74,11 @@
 - [ ] **0.9** Write protocol specification draft (`docs/protocol-spec.md`):
 
   - [ ] **0.9.1** ActivityPub extensions — define custom object types:
-    - `MurmuringServer` — server/guild representation
-    - `MurmuringChannel` — channel with type (public/private/dm), encryption status
-    - `MurmuringMessage` — message with optional encrypted payload
-    - `MurmuringRole` — role with permissions map
-    - `MurmuringReaction` — emoji reaction on message
+    - `CairnServer` — server/guild representation
+    - `CairnChannel` — channel with type (public/private/dm), encryption status
+    - `CairnMessage` — message with optional encrypted payload
+    - `CairnRole` — role with permissions map
+    - `CairnReaction` — emoji reaction on message
 
   - [ ] **0.9.2** Federation handshake protocol:
     - Node discovery via `/.well-known/federation`

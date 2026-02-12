@@ -1,9 +1,9 @@
 /**
- * Cross-instance DM API endpoints — delegates to @murmuring/proto.
+ * Cross-instance DM API endpoints — delegates to @cairn/proto.
  */
 
-import { dmApi } from "@murmuring/proto";
-import type { ApiClient } from "@murmuring/proto";
+import { dmApi } from "@cairn/proto";
+import type { ApiClient } from "@cairn/proto";
 import { client } from "./client.ts";
 
 /**

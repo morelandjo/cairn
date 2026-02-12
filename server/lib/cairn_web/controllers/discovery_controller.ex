@@ -1,8 +1,8 @@
-defmodule MurmuringWeb.DiscoveryController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.DiscoveryController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Discovery
-  alias Murmuring.Servers.Permissions
+  alias Cairn.Discovery
+  alias Cairn.Servers.Permissions
 
   # GET /api/v1/directory
   def index(conn, params) do

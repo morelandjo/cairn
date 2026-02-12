@@ -1,7 +1,7 @@
 {
-  "name": "@murmuring/proto",
+  "name": "@cairn/proto",
   "version": "0.1.0",
-  "description": "Murmuring protocol types, constants, and shared definitions",
+  "description": "Cairn protocol types, constants, and shared definitions",
   "license": "AGPL-3.0",
   "type": "module",
   "main": "./dist/cjs/index.js",

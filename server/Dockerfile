@@ -35,18 +35,18 @@ RUN apk add --no-cache \
   ncurses-libs \
   vips \
   curl \
-  && addgroup -S murmuring \
-  && adduser -S murmuring -G murmuring
+  && addgroup -S cairn \
+  && adduser -S cairn -G cairn
 
 WORKDIR /app
 
-COPY --from=builder --chown=murmuring:murmuring /app/_build/prod/rel/murmuring ./
+COPY --from=builder --chown=cairn:cairn /app/_build/prod/rel/cairn ./
 
 # Create directories for runtime data
 RUN mkdir -p /app/priv/uploads /app/priv/keys /app/priv/exports \
-  && chown -R murmuring:murmuring /app
+  && chown -R cairn:cairn /app
 
-USER murmuring
+USER cairn
 
 ENV PHX_SERVER=true
 ENV PORT=4000
@@ -56,4 +56,4 @@ EXPOSE 4000
 HEALTHCHECK --interval=15s --timeout=5s --retries=3 \
   CMD curl -sf http://localhost:4000/health || exit 1
 
-CMD ["bin/murmuring", "start"]
+CMD ["bin/cairn", "start"]

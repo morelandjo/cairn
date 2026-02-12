@@ -1,13 +1,13 @@
-defmodule Murmuring.Federation.HandshakeTest do
-  use Murmuring.DataCase, async: false
+defmodule Cairn.Federation.HandshakeTest do
+  use Cairn.DataCase, async: false
 
-  alias Murmuring.Federation
-  alias Murmuring.Federation.Handshake
-  alias Murmuring.Federation.NodeIdentity
+  alias Cairn.Federation
+  alias Cairn.Federation.Handshake
+  alias Cairn.Federation.NodeIdentity
 
   setup do
     # Start NodeIdentity for signing — stop any existing instance first
-    tmp_dir = Path.join(System.tmp_dir!(), "murmuring_hs_test")
+    tmp_dir = Path.join(System.tmp_dir!(), "cairn_hs_test")
     File.mkdir_p!(tmp_dir)
     key_path = Path.join(tmp_dir, "test_#{:erlang.unique_integer([:positive, :monotonic])}.key")
 
@@ -23,9 +23,9 @@ defmodule Murmuring.Federation.HandshakeTest do
 
     {:ok, _} = NodeIdentity.start_link(key_path: key_path)
 
-    original_config = Application.get_env(:murmuring, :federation, [])
+    original_config = Application.get_env(:cairn, :federation, [])
 
-    Application.put_env(:murmuring, :federation,
+    Application.put_env(:cairn, :federation,
       enabled: true,
       domain: "local.example.com"
     )
@@ -37,7 +37,7 @@ defmodule Murmuring.Federation.HandshakeTest do
         :exit, {:noproc, _} -> :ok
       end
 
-      Application.put_env(:murmuring, :federation, original_config)
+      Application.put_env(:cairn, :federation, original_config)
       File.rm_rf!(tmp_dir)
     end)
 

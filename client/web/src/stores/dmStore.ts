@@ -3,7 +3,7 @@
  */
 
 import { create } from "zustand";
-import type { DmRequest } from "@murmuring/proto";
+import type { DmRequest } from "@cairn/proto";
 import {
   listDmRequests,
   listSentDmRequests,

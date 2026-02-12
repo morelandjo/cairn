@@ -1,8 +1,8 @@
-defmodule MurmuringWeb.FederatedAuthController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.FederatedAuthController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Federation.FederatedAuth
-  alias Murmuring.Servers
+  alias Cairn.Federation.FederatedAuth
+  alias Cairn.Servers
 
   @doc """
   POST /api/v1/federation/auth-token
@@ -70,7 +70,7 @@ defmodule MurmuringWeb.FederatedAuthController do
     federated_user = conn.assigns.federated_user
 
     if Servers.is_federated_member?(server_id, federated_user.id) do
-      channels = Murmuring.Chat.list_channels(server_id)
+      channels = Cairn.Chat.list_channels(server_id)
 
       json(conn, %{
         channels:
@@ -95,7 +95,7 @@ defmodule MurmuringWeb.FederatedAuthController do
   def use_invite(conn, %{"code" => code}) do
     federated_user = conn.assigns.federated_user
 
-    case Murmuring.Chat.get_invite_by_code(code) do
+    case Cairn.Chat.get_invite_by_code(code) do
       nil ->
         conn |> put_status(:not_found) |> json(%{error: "Invite not found or expired"})
 

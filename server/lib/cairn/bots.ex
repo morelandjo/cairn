@@ -1,14 +1,14 @@
-defmodule Murmuring.Bots do
+defmodule Cairn.Bots do
   @moduledoc """
   The Bots context — webhooks and bot accounts.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Bots.{Webhook, BotAccount}
-  alias Murmuring.Accounts
-  alias Murmuring.Servers
-  alias Murmuring.Chat
+  alias Cairn.Repo
+  alias Cairn.Bots.{Webhook, BotAccount}
+  alias Cairn.Accounts
+  alias Cairn.Servers
+  alias Cairn.Chat
 
   # Webhooks
 

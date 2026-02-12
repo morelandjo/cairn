@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.CreateAuditLogs do
+defmodule Cairn.Repo.Migrations.CreateAuditLogs do
   use Ecto.Migration
 
   def change do

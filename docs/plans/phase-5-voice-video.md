@@ -90,7 +90,7 @@
 
 - [ ] **5.11** Voice encryption key derivation:
   - For MLS-encrypted channels: derive voice key from current MLS epoch secret using HKDF
-    - `voice_key = HKDF-Expand(epoch_secret, "murmuring-voice-key", 16)`
+    - `voice_key = HKDF-Expand(epoch_secret, "cairn-voice-key", 16)`
   - For non-encrypted channels with opt-in voice E2E: ephemeral key exchange via Double Ratchet-style DH
   - Key rotation: on MLS epoch change, derive new voice key, brief transition period where both keys are valid
 

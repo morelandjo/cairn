@@ -1,7 +1,7 @@
-defmodule Murmuring.Federation.ActivityPubTest do
+defmodule Cairn.Federation.ActivityPubTest do
   use ExUnit.Case, async: true
 
-  alias Murmuring.Federation.ActivityPub
+  alias Cairn.Federation.ActivityPub
 
   describe "serialize_user/2" do
     test "serializes user as AP Person" do
@@ -49,7 +49,7 @@ defmodule Murmuring.Federation.ActivityPubTest do
       assert result["id"] == "https://example.com/channels/ch-123/messages/msg-456"
       assert result["content"] == "Hello world"
       assert result["attributedTo"] == "https://example.com/users/user-789"
-      assert result["murmuring:channelId"] == "ch-123"
+      assert result["cairn:channelId"] == "ch-123"
     end
 
     test "includes DID extension fields when author has DID" do
@@ -60,13 +60,13 @@ defmodule Murmuring.Federation.ActivityPubTest do
         inserted_at: ~U[2026-02-10 15:00:00Z]
       }
 
-      author = %{did: "did:murmuring:abc123", display_name: "Alice"}
+      author = %{did: "did:cairn:abc123", display_name: "Alice"}
 
       result = ActivityPub.serialize_message(message, "ch-123", "example.com", author)
 
-      assert result["murmuring:did"] == "did:murmuring:abc123"
-      assert result["murmuring:homeInstance"] == "example.com"
-      assert result["murmuring:displayName"] == "Alice"
+      assert result["cairn:did"] == "did:cairn:abc123"
+      assert result["cairn:homeInstance"] == "example.com"
+      assert result["cairn:displayName"] == "Alice"
     end
 
     test "omits DID fields when author has no DID" do
@@ -79,8 +79,8 @@ defmodule Murmuring.Federation.ActivityPubTest do
 
       result = ActivityPub.serialize_message(message, "ch-123", "example.com", nil)
 
-      refute Map.has_key?(result, "murmuring:did")
-      refute Map.has_key?(result, "murmuring:homeInstance")
+      refute Map.has_key?(result, "cairn:did")
+      refute Map.has_key?(result, "cairn:homeInstance")
     end
   end
 

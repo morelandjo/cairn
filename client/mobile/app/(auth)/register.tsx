@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useRouter, Link } from "expo-router";
 import { useAuthStore } from "@/stores/authStore";
-import { authApi } from "@murmuring/proto";
+import { authApi } from "@cairn/proto";
 import { client } from "@/api/client";
 
 export default function RegisterScreen() {
@@ -82,7 +82,7 @@ export default function RegisterScreen() {
     >
       <View style={styles.inner}>
         <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Join Murmuring</Text>
+        <Text style={styles.subtitle}>Join Cairn</Text>
 
         {error && <Text style={styles.error}>{error}</Text>}
 

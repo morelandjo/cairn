@@ -1,20 +1,20 @@
 # Phase 3.5: Federation
 
 **Status:** Complete
-**Goal:** Implement node-to-node federation so that multiple Murmuring instances can discover each other, verify identity, and exchange messages with causal ordering and privacy protections.
+**Goal:** Implement node-to-node federation so that multiple Cairn instances can discover each other, verify identity, and exchange messages with causal ordering and privacy protections.
 **Dependencies:** Phase 3 complete (Server/Guild entity, per-server roles, permissions, 137 server tests).
-**Deliverable:** Two or more Murmuring nodes can federate — ActivityPub inbox/outbox, HTTP message signatures (RFC 9421), HLC timestamps, Follow/Accept handshake, message/edit/delete federation, metadata stripping, per-node rate limiting.
+**Deliverable:** Two or more Cairn nodes can federate — ActivityPub inbox/outbox, HTTP message signatures (RFC 9421), HLC timestamps, Follow/Accept handshake, message/edit/delete federation, metadata stripping, per-node rate limiting.
 
 ---
 
 ## Architecture Overview
 
-Federation uses ActivityPub as the message transport with Murmuring-specific extensions. Each node has an Ed25519 identity key for signing, discovered via well-known endpoints. Messages are delivered asynchronously via Oban job queues with exponential backoff. Hybrid Logical Clocks provide causal ordering across nodes.
+Federation uses ActivityPub as the message transport with Cairn-specific extensions. Each node has an Ed25519 identity key for signing, discovered via well-known endpoints. Messages are delivered asynchronously via Oban job queues with exponential backoff. Hybrid Logical Clocks provide causal ordering across nodes.
 
 ```
 Node A                                          Node B
   │                                                │
-  ├─ GET /.well-known/murmuring-federation ───────►│
+  ├─ GET /.well-known/cairn-federation ───────►│
   │◄──────────────────── {node_id, public_key} ────┤
   │                                                │
   ├─ POST /inbox  (Follow activity, signed) ──────►│
@@ -30,7 +30,7 @@ Node A                                          Node B
 
 ## Node Identity
 
-### `Murmuring.Federation.NodeIdentity` (GenServer)
+### `Cairn.Federation.NodeIdentity` (GenServer)
 
 Generates and persists an Ed25519 signing key pair on first boot.
 
@@ -42,7 +42,7 @@ Generates and persists an Ed25519 signing key pair on first boot.
   - `node_id/0` — SHA-256 fingerprint of public key (hex-encoded)
   - `sign/1` — Ed25519 signature over arbitrary binary
   - `verify/3` — stateless signature verification (message, signature, public_key)
-- **Config:** `FEDERATION_ENABLED=true` + `MURMURING_DOMAIN` env vars required
+- **Config:** `FEDERATION_ENABLED=true` + `CAIRN_DOMAIN` env vars required
 - **Supervision:** Conditional child of Application supervisor, only started when federation enabled
 - **Global name:** `__MODULE__` — tests must be `async: false` or carefully stop/start
 
@@ -50,20 +50,20 @@ Generates and persists an Ed25519 signing key pair on first boot.
 
 ## Well-Known Endpoints
 
-### `MurmuringWeb.FederationController`
+### `CairnWeb.FederationController`
 
 Three unauthenticated endpoints for node discovery:
 
 | Method | Path | Description |
 |---|---|---|
-| GET | `/.well-known/murmuring-federation` | Node identity, public key, inbox URL, capabilities |
+| GET | `/.well-known/cairn-federation` | Node identity, public key, inbox URL, capabilities |
 | GET | `/.well-known/privacy-manifest` | Privacy practices, retention, federation policies |
 | GET | `/.well-known/webfinger?resource=acct:user@domain` | RFC 7033 user discovery, returns JRD with AP actor URI |
 
 **Federation metadata response:**
 ```json
 {
-  "protocol": "murmuring",
+  "protocol": "cairn",
   "version": "1.0.0",
   "nodeName": "My Node",
   "domain": "example.com",
@@ -78,7 +78,7 @@ Three unauthenticated endpoints for node discovery:
 }
 ```
 
-**WebFinger:** Resolves `acct:username@domain` to AP actor URI. Returns 404 for unknown users. Only resolves users when queried domain matches `MURMURING_DOMAIN`.
+**WebFinger:** Resolves `acct:username@domain` to AP actor URI. Returns 404 for unknown users. Only resolves users when queried domain matches `CAIRN_DOMAIN`.
 
 ---
 
@@ -91,7 +91,7 @@ Two tables:
 - **`federated_nodes`**: `domain` (unique), `node_id`, `public_key`, `inbox_url`, `protocol_version`, `privacy_manifest` (JSONB), `status` (pending/active/blocked), timestamps
 - **`federation_activities`**: `federated_node_id` (FK), `activity_type`, `direction` (inbound/outbound), `actor_uri`, `object_uri`, `payload` (JSONB), `status` (pending/delivered/failed), `error`, timestamps
 
-### `Murmuring.Federation` (context)
+### `Cairn.Federation` (context)
 
 - `register_node/1`, `get_node/1`, `get_node_by_domain/1`, `list_nodes/0`
 - `block_node/1`, `unblock_node/1`, `update_node_status/2`
@@ -115,7 +115,7 @@ Pipeline: `[:api, :authenticated, :admin]` with `AdminAuth` plug (checks if user
 
 ## HTTP Message Signatures (RFC 9421)
 
-### `Murmuring.Federation.HttpSignatures`
+### `Cairn.Federation.HttpSignatures`
 
 Signs outbound requests and verifies inbound requests per RFC 9421.
 
@@ -126,12 +126,12 @@ Signs outbound requests and verifies inbound requests per RFC 9421.
 - **Date validation:** Rejects requests with `date` header older than 300 seconds
 - **Signature format:** `sig1=:base64:` with `sig1=(...components...);keyid="node-key";alg="ed25519";created=<unix>`
 
-### `Murmuring.Federation.ContentDigest` (RFC 9530)
+### `Cairn.Federation.ContentDigest` (RFC 9530)
 
 - `generate/1` — SHA-256 digest of request body, formatted as `sha-256=:base64:`
 - `verify/2` — verifies Content-Digest header matches body
 
-### `MurmuringWeb.Plugs.VerifyHttpSignature`
+### `CairnWeb.Plugs.VerifyHttpSignature`
 
 Plug applied to `/inbox` route. Extracts signature from headers, fetches signer's public key from `FederatedNode` record, verifies signature. Returns 401 on failure.
 
@@ -139,19 +139,19 @@ Plug applied to `/inbox` route. Extracts signature from headers, fetches signer'
 
 ## ActivityPub
 
-### `Murmuring.Federation.ActivityPub` (serializers)
+### `Cairn.Federation.ActivityPub` (serializers)
 
 Converts internal Ecto schemas to AP JSON-LD format:
 
 - `serialize_user/1` → AP Person with public key
-- `serialize_server/1` → AP Group (MurmuringServer extension)
-- `serialize_channel/1` → AP Collection (MurmuringChannel extension)
-- `serialize_message/1` → AP Note (MurmuringMessage extension) with HLC timestamp
+- `serialize_server/1` → AP Group (CairnServer extension)
+- `serialize_channel/1` → AP Collection (CairnChannel extension)
+- `serialize_message/1` → AP Note (CairnMessage extension) with HLC timestamp
 - `wrap_activity/3` → wraps object in Create/Update/Delete activity envelope
 
-All activities include `@context` with ActivityStreams and Murmuring namespace.
+All activities include `@context` with ActivityStreams and Cairn namespace.
 
-### `Murmuring.Federation.InboxHandler`
+### `Cairn.Federation.InboxHandler`
 
 Dispatches inbound activities by type:
 
@@ -163,12 +163,12 @@ Dispatches inbound activities by type:
 | `Update` | `handle_update/2` | Message edit → update local message |
 | `Delete` | `handle_delete/2` | Message deletion → soft-delete local message |
 
-### `MurmuringWeb.InboxController`
+### `CairnWeb.InboxController`
 
 - `POST /inbox` — receives AP activities, protected by `VerifyHttpSignature` and `FederationRateLimiter` plugs
 - Logs all inbound activities via `Federation.log_activity/1`
 
-### `MurmuringWeb.ActorController`
+### `CairnWeb.ActorController`
 
 - `GET /users/:username` — AP Person document with public key
 - `GET /users/:username/outbox` — AP OrderedCollection of user's public activities
@@ -185,13 +185,13 @@ Oban jobs table (version 12).
 
 ```elixir
 # config.exs
-config :murmuring, Oban, repo: Murmuring.Repo, queues: [default: 10, federation: 10]
+config :cairn, Oban, repo: Cairn.Repo, queues: [default: 10, federation: 10]
 
 # test.exs
-config :murmuring, Oban, testing: :inline  # runs jobs synchronously in tests
+config :cairn, Oban, testing: :inline  # runs jobs synchronously in tests
 ```
 
-### `Murmuring.Federation.DeliveryWorker` (Oban.Worker)
+### `Cairn.Federation.DeliveryWorker` (Oban.Worker)
 
 - Queue: `:federation`, max_attempts: 15
 - `perform/1` — strips metadata, signs request with HTTP Signatures, POSTs to remote inbox via `Req`
@@ -207,7 +207,7 @@ config :murmuring, Oban, testing: :inline  # runs jobs synchronously in tests
 
 Added to messages table: `hlc_wall` (bigint), `hlc_counter` (integer, default 0), `hlc_node` (string)
 
-### `Murmuring.Federation.HLC` (GenServer)
+### `Cairn.Federation.HLC` (GenServer)
 
 Provides monotonic timestamps for causal ordering across nodes.
 
@@ -219,17 +219,17 @@ Provides monotonic timestamps for causal ordering across nodes.
 
 ### Message Schema Update
 
-`Murmuring.Chat.Message` — added `hlc_wall`, `hlc_counter`, `hlc_node` fields.
+`Cairn.Chat.Message` — added `hlc_wall`, `hlc_counter`, `hlc_node` fields.
 
 ---
 
 ## Federation Handshake
 
-### `Murmuring.Federation.Handshake`
+### `Cairn.Federation.Handshake`
 
 Implements the Follow/Accept protocol for establishing federation:
 
-1. `initiate/1` — fetches remote `/.well-known/murmuring-federation`, validates response, registers node, sends Follow activity via DeliveryWorker
+1. `initiate/1` — fetches remote `/.well-known/cairn-federation`, validates response, registers node, sends Follow activity via DeliveryWorker
 2. `handle_follow/2` — receives Follow from remote node, auto-accepts for public channels, sends Accept back
 3. `handle_accept/2` — confirms handshake, updates node status to "active"
 
@@ -237,7 +237,7 @@ Implements the Follow/Accept protocol for establishing federation:
 
 ## Message Federation
 
-### `Murmuring.Federation.MessageFederator`
+### `Cairn.Federation.MessageFederator`
 
 Bridges local message events to federation delivery:
 
@@ -253,7 +253,7 @@ Called from `ChannelChannel` after message creation/edit/deletion.
 
 ### Metadata Stripping
 
-#### `Murmuring.Federation.MetadataStripper`
+#### `Cairn.Federation.MetadataStripper`
 
 Strips sensitive metadata from all outbound activities before federation:
 
@@ -264,7 +264,7 @@ Strips sensitive metadata from all outbound activities before federation:
 
 ### Rate Limiting
 
-#### `Murmuring.Federation.FederationRateLimiter`
+#### `Cairn.Federation.FederationRateLimiter`
 
 Per-node Redis-backed rate limiting:
 
@@ -274,7 +274,7 @@ Per-node Redis-backed rate limiting:
 - `current_count/1` — returns current request count for a domain
 - Graceful degradation: allows through if Redis is unavailable
 
-#### `MurmuringWeb.Plugs.FederationRateLimiter`
+#### `CairnWeb.Plugs.FederationRateLimiter`
 
 Plug applied to `/inbox` route. Extracts domain from request, checks rate limit, returns 429 Too Many Requests when exceeded.
 
@@ -321,22 +321,22 @@ interface FederationActivity {
 | Variable | Default | Description |
 |---|---|---|
 | `FEDERATION_ENABLED` | `false` | Enable federation features |
-| `MURMURING_DOMAIN` | — | This node's public domain |
+| `CAIRN_DOMAIN` | — | This node's public domain |
 | `NODE_KEY_PATH` | `priv/keys/node_ed25519.key` | Path to Ed25519 key file |
 
 ### Application Config
 
 ```elixir
 # Federation defaults
-config :murmuring, :federation,
+config :cairn, :federation,
   enabled: false,
   domain: nil,
   rate_limit: 100,
   rate_burst: 200
 
 # Oban job queues
-config :murmuring, Oban,
-  repo: Murmuring.Repo,
+config :cairn, Oban,
+  repo: Cairn.Repo,
   queues: [default: 10, federation: 10]
 ```
 
@@ -368,32 +368,32 @@ config :murmuring, Oban,
 
 | File | Description |
 |---|---|
-| `lib/murmuring/federation/node_identity.ex` | GenServer for Ed25519 key management |
-| `lib/murmuring/federation/federated_node.ex` | FederatedNode Ecto schema |
-| `lib/murmuring/federation/federation_activity.ex` | FederationActivity Ecto schema |
-| `lib/murmuring/federation.ex` | Federation context (node CRUD, activity logging) |
-| `lib/murmuring/federation/content_digest.ex` | RFC 9530 Content-Digest |
-| `lib/murmuring/federation/http_signatures.ex` | RFC 9421 HTTP Message Signatures |
-| `lib/murmuring/federation/activity_pub.ex` | AP serializers |
-| `lib/murmuring/federation/inbox_handler.ex` | Inbound activity dispatcher |
-| `lib/murmuring/federation/delivery_worker.ex` | Oban outbound delivery worker |
-| `lib/murmuring/federation/hlc.ex` | Hybrid Logical Clock GenServer |
-| `lib/murmuring/federation/handshake.ex` | Follow/Accept handshake protocol |
-| `lib/murmuring/federation/message_federator.ex` | Message → federation bridge |
-| `lib/murmuring/federation/metadata_stripper.ex` | Outbound metadata stripping |
-| `lib/murmuring/federation/federation_rate_limiter.ex` | Redis per-node rate limiting |
+| `lib/cairn/federation/node_identity.ex` | GenServer for Ed25519 key management |
+| `lib/cairn/federation/federated_node.ex` | FederatedNode Ecto schema |
+| `lib/cairn/federation/federation_activity.ex` | FederationActivity Ecto schema |
+| `lib/cairn/federation.ex` | Federation context (node CRUD, activity logging) |
+| `lib/cairn/federation/content_digest.ex` | RFC 9530 Content-Digest |
+| `lib/cairn/federation/http_signatures.ex` | RFC 9421 HTTP Message Signatures |
+| `lib/cairn/federation/activity_pub.ex` | AP serializers |
+| `lib/cairn/federation/inbox_handler.ex` | Inbound activity dispatcher |
+| `lib/cairn/federation/delivery_worker.ex` | Oban outbound delivery worker |
+| `lib/cairn/federation/hlc.ex` | Hybrid Logical Clock GenServer |
+| `lib/cairn/federation/handshake.ex` | Follow/Accept handshake protocol |
+| `lib/cairn/federation/message_federator.ex` | Message → federation bridge |
+| `lib/cairn/federation/metadata_stripper.ex` | Outbound metadata stripping |
+| `lib/cairn/federation/federation_rate_limiter.ex` | Redis per-node rate limiting |
 
 ### Server — Controllers & Plugs
 
 | File | Description |
 |---|---|
-| `lib/murmuring_web/controllers/federation_controller.ex` | Well-known endpoints |
-| `lib/murmuring_web/controllers/inbox_controller.ex` | AP inbox (POST /inbox) |
-| `lib/murmuring_web/controllers/actor_controller.ex` | AP actor profiles |
-| `lib/murmuring_web/controllers/admin/federation_controller.ex` | Admin federation CRUD |
-| `lib/murmuring_web/plugs/admin_auth.ex` | Admin authorization |
-| `lib/murmuring_web/plugs/verify_http_signature.ex` | Inbound signature verification |
-| `lib/murmuring_web/plugs/federation_rate_limiter.ex` | Per-node rate limiting plug |
+| `lib/cairn_web/controllers/federation_controller.ex` | Well-known endpoints |
+| `lib/cairn_web/controllers/inbox_controller.ex` | AP inbox (POST /inbox) |
+| `lib/cairn_web/controllers/actor_controller.ex` | AP actor profiles |
+| `lib/cairn_web/controllers/admin/federation_controller.ex` | Admin federation CRUD |
+| `lib/cairn_web/plugs/admin_auth.ex` | Admin authorization |
+| `lib/cairn_web/plugs/verify_http_signature.ex` | Inbound signature verification |
+| `lib/cairn_web/plugs/federation_rate_limiter.ex` | Per-node rate limiting plug |
 
 ### Server — Migrations
 
@@ -410,11 +410,11 @@ config :murmuring, Oban,
 | `mix.exs` | Added `{:oban, "~> 2.18"}` |
 | `config/config.exs` | Federation config, Oban config |
 | `config/test.exs` | Oban inline testing mode |
-| `config/runtime.exs` | FEDERATION_ENABLED, MURMURING_DOMAIN, NODE_KEY_PATH |
-| `lib/murmuring/application.ex` | Oban child, conditional federation children |
-| `lib/murmuring/chat/message.ex` | HLC fields |
-| `lib/murmuring_web/router.ex` | Federation routes, admin routes, well-known, inbox/outbox, actor |
-| `lib/murmuring_web/channels/channel_channel.ex` | MessageFederator calls on create/edit/delete |
+| `config/runtime.exs` | FEDERATION_ENABLED, CAIRN_DOMAIN, NODE_KEY_PATH |
+| `lib/cairn/application.ex` | Oban child, conditional federation children |
+| `lib/cairn/chat/message.ex` | HLC fields |
+| `lib/cairn_web/router.ex` | Federation routes, admin routes, well-known, inbox/outbox, actor |
+| `lib/cairn_web/channels/channel_channel.ex` | MessageFederator calls on create/edit/delete |
 
 ---
 

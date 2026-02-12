@@ -1,11 +1,11 @@
 /**
- * Notification Preferences — delegates to @murmuring/proto.
+ * Notification Preferences — delegates to @cairn/proto.
  */
 
-import { notificationsApi } from "@murmuring/proto";
+import { notificationsApi } from "@cairn/proto";
 import { client } from "./client.ts";
 
-export type { NotificationPreference } from "@murmuring/proto/api";
+export type { NotificationPreference } from "@cairn/proto/api";
 
 export function getPreferences() {
   return notificationsApi.getPreferences(client);

@@ -1,19 +1,19 @@
-defmodule Murmuring.Export do
+defmodule Cairn.Export do
   @moduledoc """
   The Export context — GDPR data export and account portability.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Accounts
-  alias Murmuring.Chat
+  alias Cairn.Repo
+  alias Cairn.Accounts
+  alias Cairn.Chat
 
   @export_dir "priv/exports"
 
   def request_export(user_id) do
     # Enqueue export job
     %{user_id: user_id}
-    |> Murmuring.Export.DataExportWorker.new()
+    |> Cairn.Export.DataExportWorker.new()
     |> Oban.insert()
   end
 
@@ -60,7 +60,7 @@ defmodule Murmuring.Export do
 
     data = %{
       version: "1.0",
-      platform: "murmuring",
+      platform: "cairn",
       user: %{
         username: user.username,
         display_name: user.display_name,
@@ -110,7 +110,7 @@ defmodule Murmuring.Export do
   end
 
   defp export_servers(user_id) do
-    from(sm in Murmuring.Servers.ServerMember,
+    from(sm in Cairn.Servers.ServerMember,
       where: sm.user_id == ^user_id,
       join: s in assoc(sm, :server),
       select: %{
@@ -123,6 +123,6 @@ defmodule Murmuring.Export do
   end
 
   defp export_path do
-    Path.join(Application.app_dir(:murmuring), @export_dir)
+    Path.join(Application.app_dir(:cairn), @export_dir)
   end
 end

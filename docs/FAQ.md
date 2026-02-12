@@ -2,12 +2,12 @@
 
 ## 1. What is federation?
 
-Think of it like the United Federation of Planets in Star Trek. Each planet (Murmuring instance) is independently governed — it has its own captain, its own crew, its own rules. But because they're all part of the Federation, a crew member from Earth can visit Deep Space Nine, talk to people on Vulcan, and send subspace messages across the quadrant — all without needing to apply for citizenship on every planet they visit.
+Think of it like the United Federation of Planets in Star Trek. Each planet (Cairn instance) is independently governed — it has its own captain, its own crew, its own rules. But because they're all part of the Federation, a crew member from Earth can visit Deep Space Nine, talk to people on Vulcan, and send subspace messages across the quadrant — all without needing to apply for citizenship on every planet they visit.
 
-That's how Murmuring federation works:
+That's how Cairn federation works:
 
 - **Each instance is a planet.** You run your own server, you make the rules, you control your data. Nobody else can tell you what to do on your instance.
-- **Your identity is your communicator badge.** When you register on your home instance, you get a cryptographic identity (`did:murmuring`) that proves who you are everywhere. It's like a Starfleet ID — any allied planet can verify it.
+- **Your identity is your communicator badge.** When you register on your home instance, you get a cryptographic identity (`did:cairn`) that proves who you are everywhere. It's like a Starfleet ID — any allied planet can verify it.
 - **Visiting other instances is like visiting other planets.** You can join servers on remote instances without creating a new account. Your home instance vouches for you (issues a signed token), and the remote instance lets you in.
 - **Messages stay encrypted in transit.** Just like subspace communications, your messages are end-to-end encrypted. The servers carrying them can't read the contents — they just route them.
 - **You can go solo.** Don't want to join the Federation? Disable it and run a fully self-contained private server. You're the Romulan Empire — totally independent, everything works internally, you just don't talk to the outside.
@@ -16,17 +16,17 @@ The technical details: federation uses ActivityPub for activity delivery, HTTP S
 
 ## 2. Do I need to register a user every time I want to add a new server?
 
-**No.** Your Murmuring identity is portable across instances:
+**No.** Your Cairn identity is portable across instances:
 
-- **Joining a new server (guild) on the same instance** — Your account works across all servers within the same Murmuring instance. Just join via an invite link, invite code, or the server discovery directory. One account, unlimited servers.
+- **Joining a new server (guild) on the same instance** — Your account works across all servers within the same Cairn instance. Just join via an invite link, invite code, or the server discovery directory. One account, unlimited servers.
 
-- **Joining a server on a different Murmuring instance** — You do **not** need to create a new account. Murmuring uses a portable cryptographic identity system (`did:murmuring`) that lets you join servers on any federated instance using your existing account. Your home instance issues a signed authentication token that the remote instance verifies, so you can participate in remote servers without re-registering.
+- **Joining a server on a different Cairn instance** — You do **not** need to create a new account. Cairn uses a portable cryptographic identity system (`did:cairn`) that lets you join servers on any federated instance using your existing account. Your home instance issues a signed authentication token that the remote instance verifies, so you can participate in remote servers without re-registering.
 
 Your identity is a self-certifying decentralized identifier (DID) derived from your cryptographic keys. It stays the same even if you rotate your keys or change your username. In the client, remote servers appear grouped by instance in the sidebar, and your messages show your `username@home-instance` to other users.
 
 ## 3. What happens if my signing key is compromised?
 
-Murmuring uses two separate key pairs: a **signing key** for daily use (E2EE, message signing) and a **rotation key** used only for identity operations. If your signing key is compromised:
+Cairn uses two separate key pairs: a **signing key** for daily use (E2EE, message signing) and a **rotation key** used only for identity operations. If your signing key is compromised:
 
 1. Use the **Rotate Signing Key** button in Security Settings
 2. Your rotation key signs a new operation in your DID's hash-chained operation log
@@ -65,7 +65,7 @@ Cross-instance DMs are supported — see [Q6](#6-can-i-dm-users-on-other-instanc
 
 ## 6. Can I DM users on other instances?
 
-**Yes.** Murmuring supports cross-instance encrypted DMs using an "initiator hosts" model:
+**Yes.** Cairn supports cross-instance encrypted DMs using an "initiator hosts" model:
 
 1. **You initiate the DM** from a shared server's member list (click "DM" on a federated user's profile)
 2. Your client fetches the recipient's X3DH key bundle from their home instance (via federation)
@@ -99,16 +99,16 @@ Disabling federation gives you a **fully self-contained private server** — thi
 - Custom emoji, notifications, data export
 
 **What you give up:**
-- Users from other Murmuring instances cannot join your servers
+- Users from other Cairn instances cannot join your servers
 - Your users cannot join servers on other instances
 - Cross-instance DMs are not available
 - Your instance won't appear in any federated discovery or exchanges
 
-This is the right choice for a **personal or small group server** where everyone has an account on the same instance and there's no need to interact with the broader Murmuring network. You can always enable federation later if your needs change — it's a configuration toggle, not a one-way decision.
+This is the right choice for a **personal or small group server** where everyone has an account on the same instance and there's no need to interact with the broader Cairn network. You can always enable federation later if your needs change — it's a configuration toggle, not a one-way decision.
 
-## 8. Can I run Murmuring without a domain name?
+## 8. Can I run Cairn without a domain name?
 
-**Yes**, when federation is disabled. Murmuring supports three deployment modes:
+**Yes**, when federation is disabled. Cairn supports three deployment modes:
 
 1. **Domain + reverse proxy + TLS** (recommended) — standard production setup with a domain name and TLS certificate.
 2. **IP + tunnel** (Tailscale, Cloudflare Tunnel) — the server is accessible via a VPN or tunnel that provides transport encryption. You can use a bare IP address.

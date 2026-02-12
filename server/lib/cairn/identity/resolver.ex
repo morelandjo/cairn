@@ -1,11 +1,11 @@
-defmodule Murmuring.Identity.Resolver do
+defmodule Cairn.Identity.Resolver do
   @moduledoc """
   Resolves remote actor URIs to federated users by fetching their profile
   and DID operation chain, verifying the chain, and caching the result.
   """
 
-  alias Murmuring.Federation
-  alias Murmuring.Identity
+  alias Cairn.Federation
+  alias Cairn.Identity
 
   @doc """
   Resolves a remote actor URI, fetching the actor profile and verifying
@@ -67,7 +67,7 @@ defmodule Murmuring.Identity.Resolver do
   defp extract_did(actor) do
     also_known_as = Map.get(actor, "alsoKnownAs", [])
 
-    case Enum.find(also_known_as, &String.starts_with?(&1, "did:murmuring:")) do
+    case Enum.find(also_known_as, &String.starts_with?(&1, "did:cairn:")) do
       nil -> {:error, :no_did}
       did -> {:ok, did}
     end
@@ -113,7 +113,7 @@ defmodule Murmuring.Identity.Resolver do
     Federation.get_or_create_federated_user(attrs)
   end
 
-  defp did_suffix("did:murmuring:" <> suffix), do: suffix
+  defp did_suffix("did:cairn:" <> suffix), do: suffix
   defp did_suffix(did), do: did
 
   defp parse_operation(op) do

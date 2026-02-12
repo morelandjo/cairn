@@ -1,37 +1,37 @@
-defmodule MurmuringWeb.Router do
-  use MurmuringWeb, :router
+defmodule CairnWeb.Router do
+  use CairnWeb, :router
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug MurmuringWeb.Plugs.RateLimiter
+    plug CairnWeb.Plugs.RateLimiter
   end
 
   pipeline :authenticated do
-    plug MurmuringWeb.Plugs.Auth
+    plug CairnWeb.Plugs.Auth
   end
 
   pipeline :admin do
-    plug MurmuringWeb.Plugs.AdminAuth
+    plug CairnWeb.Plugs.AdminAuth
   end
 
   pipeline :federated do
-    plug MurmuringWeb.Plugs.FederatedAuth
+    plug CairnWeb.Plugs.FederatedAuth
   end
 
-  scope "/", MurmuringWeb do
+  scope "/", CairnWeb do
     get "/health", HealthController, :index
   end
 
   # Prometheus metrics endpoint
   scope "/" do
-    get "/metrics", PromEx.Plug, prom_ex_module: Murmuring.PromEx
+    get "/metrics", PromEx.Plug, prom_ex_module: Cairn.PromEx
   end
 
   # Well-known federation endpoints (no auth required)
-  scope "/.well-known", MurmuringWeb do
+  scope "/.well-known", CairnWeb do
     pipe_through :api
 
-    get "/murmuring-federation", FederationController, :federation_info
+    get "/cairn-federation", FederationController, :federation_info
     get "/privacy-manifest", FederationController, :privacy_manifest
     get "/webfinger", FederationController, :webfinger
     get "/did/:did", FederationController, :resolve_did
@@ -39,28 +39,28 @@ defmodule MurmuringWeb.Router do
   end
 
   # Federation inbox (verified by HTTP signatures, no user auth)
-  scope "/", MurmuringWeb do
+  scope "/", CairnWeb do
     pipe_through :api
 
     post "/inbox", InboxController, :create
   end
 
   # Federation node-to-node endpoints (no user auth, verified by HTTP signatures)
-  scope "/api/v1/federation", MurmuringWeb do
+  scope "/api/v1/federation", CairnWeb do
     pipe_through :api
 
     get "/users/:did/keys", FederationController, :user_keys_by_did
   end
 
   # ActivityPub actor profiles (public, no auth required)
-  scope "/users", MurmuringWeb do
+  scope "/users", CairnWeb do
     pipe_through :api
 
     get "/:username", ActorController, :show
     get "/:username/outbox", ActorController, :outbox
   end
 
-  scope "/api/v1", MurmuringWeb do
+  scope "/api/v1", CairnWeb do
     pipe_through :api
 
     get "/auth/challenge", AuthController, :challenge
@@ -75,7 +75,7 @@ defmodule MurmuringWeb.Router do
     post "/webhooks/:token", WebhookController, :execute
   end
 
-  scope "/api/v1", MurmuringWeb do
+  scope "/api/v1", CairnWeb do
     pipe_through [:api, :authenticated]
 
     get "/auth/me", AuthController, :me
@@ -275,7 +275,7 @@ defmodule MurmuringWeb.Router do
   end
 
   # Federated routes (authenticated via FederatedToken, not JWT)
-  scope "/api/v1/federated", MurmuringWeb do
+  scope "/api/v1/federated", CairnWeb do
     pipe_through [:api, :federated]
 
     post "/join/:server_id", FederatedAuthController, :join_server
@@ -284,7 +284,7 @@ defmodule MurmuringWeb.Router do
   end
 
   # Admin endpoints (require auth + admin privileges)
-  scope "/api/v1/admin", MurmuringWeb.Admin do
+  scope "/api/v1/admin", CairnWeb.Admin do
     pipe_through [:api, :authenticated, :admin]
 
     get "/federation/nodes", FederationController, :index
@@ -298,21 +298,21 @@ defmodule MurmuringWeb.Router do
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
-  if Application.compile_env(:murmuring, :dev_routes) do
+  if Application.compile_env(:cairn, :dev_routes) do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
       pipe_through [:fetch_session, :protect_from_forgery]
 
-      live_dashboard "/dashboard", metrics: MurmuringWeb.Telemetry
+      live_dashboard "/dashboard", metrics: CairnWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end
 
   # SPA catch-all — serves the web client for any unmatched GET request.
   # Must be last so API routes take priority.
-  if Application.compile_env(:murmuring, :serve_spa, false) do
-    scope "/", MurmuringWeb do
+  if Application.compile_env(:cairn, :serve_spa, false) do
+    scope "/", CairnWeb do
       get "/*path", SpaController, :index
     end
   end

@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.CreatePhase5VoiceTables do
+defmodule Cairn.Repo.Migrations.CreatePhase5VoiceTables do
   use Ecto.Migration
 
   def change do

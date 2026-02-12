@@ -1,13 +1,13 @@
-defmodule MurmuringWeb.Plugs.Auth do
+defmodule CairnWeb.Plugs.Auth do
   @moduledoc """
   Plug that extracts and verifies Bearer JWT tokens from the Authorization header.
   Assigns `current_user` to the connection on success.
   """
 
   import Plug.Conn
-  alias Murmuring.Auth
-  alias Murmuring.Accounts
-  alias Murmuring.Bots
+  alias Cairn.Auth
+  alias Cairn.Accounts
+  alias Cairn.Bots
 
   def init(opts), do: opts
 

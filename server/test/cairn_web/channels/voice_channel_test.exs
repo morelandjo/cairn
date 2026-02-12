@@ -1,12 +1,12 @@
-defmodule MurmuringWeb.VoiceChannelTest do
-  use MurmuringWeb.ChannelCase
+defmodule CairnWeb.VoiceChannelTest do
+  use CairnWeb.ChannelCase
 
-  alias Murmuring.{Accounts, Auth, Chat, Servers}
+  alias Cairn.{Accounts, Auth, Chat, Servers}
 
   @valid_password "secure_password_123"
 
   defmodule MockSfuClient do
-    @behaviour Murmuring.Voice.SfuClientBehaviour
+    @behaviour Cairn.Voice.SfuClientBehaviour
 
     @impl true
     def create_room(_channel_id),
@@ -77,10 +77,10 @@ defmodule MurmuringWeb.VoiceChannelTest do
 
   setup do
     # Use mock SFU client
-    Application.put_env(:murmuring, :sfu_client, MockSfuClient)
+    Application.put_env(:cairn, :sfu_client, MockSfuClient)
 
     on_exit(fn ->
-      Application.put_env(:murmuring, :sfu_client, Murmuring.Voice.SfuClient)
+      Application.put_env(:cairn, :sfu_client, Cairn.Voice.SfuClient)
     end)
 
     {:ok, {user, _codes}} =
@@ -96,7 +96,7 @@ defmodule MurmuringWeb.VoiceChannelTest do
       Chat.create_channel(%{name: "voice-room", type: "voice", server_id: server.id})
 
     {:ok, socket} =
-      connect(MurmuringWeb.UserSocket, %{"token" => tokens.access_token})
+      connect(CairnWeb.UserSocket, %{"token" => tokens.access_token})
 
     {:ok, socket: socket, user: user, server: server, channel: channel}
   end

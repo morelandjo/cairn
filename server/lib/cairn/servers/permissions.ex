@@ -1,4 +1,4 @@
-defmodule Murmuring.Servers.Permissions do
+defmodule Cairn.Servers.Permissions do
   @moduledoc """
   Permission resolution for server members.
   Resolves effective permissions from assigned roles using additive OR.
@@ -13,9 +13,9 @@ defmodule Murmuring.Servers.Permissions do
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Accounts.Role
-  alias Murmuring.Servers.{Server, ServerMember, MemberRole, ChannelPermissionOverride}
+  alias Cairn.Repo
+  alias Cairn.Accounts.Role
+  alias Cairn.Servers.{Server, ServerMember, MemberRole, ChannelPermissionOverride}
 
   @permission_keys ~w(
     send_messages read_messages manage_messages

@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.PermissionOverrideTest do
-  use MurmuringWeb.ConnCase, async: true
+defmodule CairnWeb.PermissionOverrideTest do
+  use CairnWeb.ConnCase, async: true
 
-  alias Murmuring.{Accounts, Auth, Chat, Servers}
+  alias Cairn.{Accounts, Auth, Chat, Servers}
 
   @valid_password "secure_password_123"
 

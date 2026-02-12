@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.CreatePhase1Tables do
+defmodule Cairn.Repo.Migrations.CreatePhase1Tables do
   use Ecto.Migration
 
   def change do

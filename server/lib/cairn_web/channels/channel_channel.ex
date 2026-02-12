@@ -1,13 +1,13 @@
-defmodule MurmuringWeb.ChannelChannel do
-  use MurmuringWeb, :channel
+defmodule CairnWeb.ChannelChannel do
+  use CairnWeb, :channel
 
-  alias Murmuring.Chat
-  alias Murmuring.Chat.Mls
-  alias Murmuring.Chat.Sanitizer
-  alias Murmuring.{Bots, Moderation, RateLimiter}
-  alias Murmuring.Moderation.AutoMod
-  alias Murmuring.Servers.Permissions
-  alias MurmuringWeb.Presence
+  alias Cairn.Chat
+  alias Cairn.Chat.Mls
+  alias Cairn.Chat.Sanitizer
+  alias Cairn.{Bots, Moderation, RateLimiter}
+  alias Cairn.Moderation.AutoMod
+  alias Cairn.Servers.Permissions
+  alias CairnWeb.Presence
 
   @impl true
   def join("channel:" <> channel_id, _params, socket) do
@@ -30,7 +30,7 @@ defmodule MurmuringWeb.ChannelChannel do
 
               # Federated users can join server channels via server membership
               server_id != nil ->
-                Murmuring.Servers.is_federated_member?(server_id, federated_user_id)
+                Cairn.Servers.is_federated_member?(server_id, federated_user_id)
 
               true ->
                 false
@@ -52,7 +52,7 @@ defmodule MurmuringWeb.ChannelChannel do
 
         if authorized do
           # Subscribe to federated message broadcasts (separate topic from Phoenix channel)
-          Phoenix.PubSub.subscribe(Murmuring.PubSub, "federated:channel:#{channel_id}")
+          Phoenix.PubSub.subscribe(Cairn.PubSub, "federated:channel:#{channel_id}")
           send(self(), :after_join)
 
           {:ok,
@@ -83,7 +83,7 @@ defmodule MurmuringWeb.ChannelChannel do
       })
     else
       user_id = socket.assigns.user_id
-      user = Murmuring.Accounts.get_user!(user_id)
+      user = Cairn.Accounts.get_user!(user_id)
 
       Presence.track(socket, user_id, %{
         username: user.username,
@@ -156,7 +156,7 @@ defmodule MurmuringWeb.ChannelChannel do
 
                 case Chat.create_message(attrs) do
                   {:ok, message} ->
-                    user = Murmuring.Accounts.get_user!(user_id)
+                    user = Cairn.Accounts.get_user!(user_id)
 
                     broadcast!(socket, "new_msg", %{
                       id: message.id,
@@ -257,7 +257,7 @@ defmodule MurmuringWeb.ChannelChannel do
 
     case RateLimiter.check(:typing, user_id) do
       :ok ->
-        user = Murmuring.Accounts.get_user!(user_id)
+        user = Cairn.Accounts.get_user!(user_id)
 
         broadcast_from!(socket, "typing", %{
           user_id: user_id,
@@ -408,7 +408,7 @@ defmodule MurmuringWeb.ChannelChannel do
     server_id = socket.assigns[:server_id]
 
     if server_id do
-      user = Murmuring.Accounts.get_user!(user_id)
+      user = Cairn.Accounts.get_user!(user_id)
 
       if user.is_bot do
         case Bots.get_bot_for_user(user_id, server_id) do

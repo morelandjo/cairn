@@ -1,4 +1,4 @@
-defmodule Murmuring.Moderation.ServerMute do
+defmodule Cairn.Moderation.ServerMute do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -9,10 +9,10 @@ defmodule Murmuring.Moderation.ServerMute do
     field :reason, :string
     field :expires_at, :utc_datetime
 
-    belongs_to :server, Murmuring.Servers.Server
-    belongs_to :user, Murmuring.Accounts.User
-    belongs_to :channel, Murmuring.Chat.Channel
-    belongs_to :muted_by, Murmuring.Accounts.User
+    belongs_to :server, Cairn.Servers.Server
+    belongs_to :user, Cairn.Accounts.User
+    belongs_to :channel, Cairn.Chat.Channel
+    belongs_to :muted_by, Cairn.Accounts.User
 
     timestamps()
   end

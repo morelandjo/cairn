@@ -1,4 +1,4 @@
-defmodule Murmuring.Bots.BotAccount do
+defmodule Cairn.Bots.BotAccount do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -9,9 +9,9 @@ defmodule Murmuring.Bots.BotAccount do
     field :api_token_hash, :string
     field :allowed_channels, {:array, :binary_id}, default: []
 
-    belongs_to :user, Murmuring.Accounts.User
-    belongs_to :server, Murmuring.Servers.Server
-    belongs_to :creator, Murmuring.Accounts.User
+    belongs_to :user, Cairn.Accounts.User
+    belongs_to :server, Cairn.Servers.Server
+    belongs_to :creator, Cairn.Accounts.User
 
     timestamps()
   end

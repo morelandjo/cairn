@@ -1,4 +1,4 @@
-defmodule Murmuring.Moderation.ModLog do
+defmodule Cairn.Moderation.ModLog do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -9,11 +9,11 @@ defmodule Murmuring.Moderation.ModLog do
     field :action, :string
     field :details, :map, default: %{}
 
-    belongs_to :server, Murmuring.Servers.Server
-    belongs_to :moderator, Murmuring.Accounts.User
-    belongs_to :target_user, Murmuring.Accounts.User
-    belongs_to :target_message, Murmuring.Chat.Message
-    belongs_to :target_channel, Murmuring.Chat.Channel
+    belongs_to :server, Cairn.Servers.Server
+    belongs_to :moderator, Cairn.Accounts.User
+    belongs_to :target_user, Cairn.Accounts.User
+    belongs_to :target_message, Cairn.Chat.Message
+    belongs_to :target_channel, Cairn.Chat.Channel
 
     timestamps()
   end

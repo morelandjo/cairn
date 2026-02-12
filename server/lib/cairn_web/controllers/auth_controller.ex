@@ -1,12 +1,12 @@
-defmodule MurmuringWeb.AuthController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.AuthController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Accounts
-  alias Murmuring.Auth
-  alias Murmuring.Auth.PasswordValidator
+  alias Cairn.Accounts
+  alias Cairn.Auth
+  alias Cairn.Auth.PasswordValidator
 
   def challenge(conn, _params) do
-    hmac_key = Application.fetch_env!(:murmuring, :altcha_hmac_key)
+    hmac_key = Application.fetch_env!(:cairn, :altcha_hmac_key)
 
     challenge =
       Altcha.create_challenge(%Altcha.ChallengeOptions{
@@ -82,8 +82,8 @@ defmodule MurmuringWeb.AuthController do
          {:ok, _user} <- Accounts.use_recovery_code(user, code) do
       {:ok, updated_user} =
         user
-        |> Murmuring.Accounts.User.registration_changeset(%{password: new_password})
-        |> Murmuring.Repo.update()
+        |> Cairn.Accounts.User.registration_changeset(%{password: new_password})
+        |> Cairn.Repo.update()
 
       Auth.revoke_all_user_tokens(user.id)
       {:ok, tokens} = Auth.generate_tokens(updated_user)
@@ -133,8 +133,8 @@ defmodule MurmuringWeb.AuthController do
   defp check_honeypot(_params), do: :ok
 
   defp verify_pow(params) do
-    if Application.get_env(:murmuring, :require_pow, true) do
-      hmac_key = Application.fetch_env!(:murmuring, :altcha_hmac_key)
+    if Application.get_env(:cairn, :require_pow, true) do
+      hmac_key = Application.fetch_env!(:cairn, :altcha_hmac_key)
 
       case params["altcha"] do
         nil ->

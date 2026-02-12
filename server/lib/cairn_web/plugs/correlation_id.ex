@@ -1,4 +1,4 @@
-defmodule MurmuringWeb.Plugs.CorrelationId do
+defmodule CairnWeb.Plugs.CorrelationId do
   @moduledoc """
   Assigns a correlation ID to each request for distributed tracing.
   Uses X-Request-ID if present, otherwise generates a UUID.

@@ -1,8 +1,8 @@
-defmodule MurmuringWeb.WebhookController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.WebhookController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Bots
-  alias Murmuring.Servers.Permissions
+  alias Cairn.Bots
+  alias Cairn.Servers.Permissions
 
   # POST /api/v1/webhooks/:token (no auth needed — token IS auth)
   def execute(conn, %{"token" => token} = params) do
@@ -74,7 +74,7 @@ defmodule MurmuringWeb.WebhookController do
     unless Permissions.has_permission?(server_id, user_id, "manage_webhooks") do
       conn |> put_status(:forbidden) |> json(%{error: "insufficient permissions"})
     else
-      webhook = Murmuring.Repo.get!(Murmuring.Bots.Webhook, webhook_id)
+      webhook = Cairn.Repo.get!(Cairn.Bots.Webhook, webhook_id)
       {:ok, _} = Bots.delete_webhook(webhook)
       json(conn, %{ok: true})
     end
@@ -87,7 +87,7 @@ defmodule MurmuringWeb.WebhookController do
     unless Permissions.has_permission?(server_id, user_id, "manage_webhooks") do
       conn |> put_status(:forbidden) |> json(%{error: "insufficient permissions"})
     else
-      webhook = Murmuring.Repo.get!(Murmuring.Bots.Webhook, webhook_id)
+      webhook = Cairn.Repo.get!(Cairn.Bots.Webhook, webhook_id)
 
       case Bots.regenerate_webhook_token(webhook) do
         {:ok, updated} ->

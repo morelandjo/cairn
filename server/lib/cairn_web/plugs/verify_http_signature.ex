@@ -1,12 +1,12 @@
-defmodule MurmuringWeb.Plugs.VerifyHttpSignature do
+defmodule CairnWeb.Plugs.VerifyHttpSignature do
   @moduledoc """
   Plug for verifying HTTP message signatures on federation inbox routes.
   Returns 401 on verification failure.
   """
 
   import Plug.Conn
-  alias Murmuring.Federation
-  alias Murmuring.Federation.HttpSignatures
+  alias Cairn.Federation
+  alias Cairn.Federation.HttpSignatures
 
   def init(opts), do: opts
 

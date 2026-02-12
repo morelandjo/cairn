@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.PushTokenController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.PushTokenController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Notifications
+  alias Cairn.Notifications
 
   @doc "Register a push notification token for the current user."
   def create(conn, %{"token" => token, "platform" => platform} = params) do

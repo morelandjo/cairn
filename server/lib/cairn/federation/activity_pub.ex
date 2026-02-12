@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.ActivityPub do
+defmodule Cairn.Federation.ActivityPub do
   @moduledoc """
   ActivityPub serializers for converting internal entities to AP JSON-LD format.
   """
@@ -53,16 +53,16 @@ defmodule Murmuring.Federation.ActivityPub do
       "attributedTo" => "https://#{domain}/users/#{message.author_id}",
       "content" => message.content,
       "published" => DateTime.to_iso8601(message.inserted_at),
-      "murmuring:channelId" => channel_id
+      "cairn:channelId" => channel_id
     }
 
     # Add DID and home instance extension fields if author has a DID
     case author do
       %{did: did} when is_binary(did) ->
         note
-        |> Map.put("murmuring:did", did)
-        |> Map.put("murmuring:homeInstance", domain)
-        |> Map.put("murmuring:displayName", Map.get(author, :display_name))
+        |> Map.put("cairn:did", did)
+        |> Map.put("cairn:homeInstance", domain)
+        |> Map.put("cairn:displayName", Map.get(author, :display_name))
 
       _ ->
         note

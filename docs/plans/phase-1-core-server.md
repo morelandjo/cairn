@@ -130,7 +130,7 @@
   - `POST /api/v1/auth/webauthn/authenticate/complete` — verify assertion
 
 - [ ] **1.15** Auth plug middleware:
-  - `MurmuringWeb.Plugs.Authenticate` — extract JWT from `Authorization: Bearer <token>`, verify, assign `current_user` to conn
+  - `CairnWeb.Plugs.Authenticate` — extract JWT from `Authorization: Bearer <token>`, verify, assign `current_user` to conn
   - WebSocket auth: verify JWT in `connect/3` callback of `UserSocket`
   - Return 401 for invalid/expired tokens with clear error messages
 

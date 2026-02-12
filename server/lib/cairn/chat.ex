@@ -1,12 +1,12 @@
-defmodule Murmuring.Chat do
+defmodule Cairn.Chat do
   @moduledoc """
   The Chat context — channels, messages, and membership management.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
+  alias Cairn.Repo
 
-  alias Murmuring.Chat.{
+  alias Cairn.Chat.{
     Channel,
     ChannelMember,
     ChannelCategory,
@@ -18,7 +18,7 @@ defmodule Murmuring.Chat do
     Reaction
   }
 
-  alias Murmuring.Accounts.InviteLink
+  alias Cairn.Accounts.InviteLink
 
   # Channels
 

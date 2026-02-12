@@ -1,7 +1,7 @@
-defmodule Murmuring.Chat.FederatedDmTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.Chat.FederatedDmTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.{Accounts, Chat, Federation}
+  alias Cairn.{Accounts, Chat, Federation}
 
   @valid_password "secure_password_123"
 
@@ -15,7 +15,7 @@ defmodule Murmuring.Chat.FederatedDmTest do
     # Simulate a federated user
     {:ok, federated_user} =
       Federation.get_or_create_federated_user(%{
-        did: "did:murmuring:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}",
+        did: "did:cairn:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}",
         username: "bob",
         display_name: "Bob Remote",
         home_instance: "instance-b.com",
@@ -146,7 +146,7 @@ defmodule Murmuring.Chat.FederatedDmTest do
   describe "DM blocks" do
     setup %{user: user} do
       blocked_did =
-        "did:murmuring:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
+        "did:cairn:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
 
       {:ok, blocked_did: blocked_did, user: user}
     end

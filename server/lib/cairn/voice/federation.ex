@@ -1,4 +1,4 @@
-defmodule Murmuring.Voice.Federation do
+defmodule Cairn.Voice.Federation do
   @moduledoc """
   Federation voice support.
 
@@ -7,15 +7,15 @@ defmodule Murmuring.Voice.Federation do
   is verified via federation credentials.
   """
 
-  alias Murmuring.Federation
-  alias Murmuring.Voice
+  alias Cairn.Federation
+  alias Cairn.Voice
 
   @doc """
   Relay a voice join request to the hosting node for a federated channel.
   Returns SFU transport params if the remote node accepts.
   """
   def relay_join(remote_domain, channel_id, user_id) do
-    federation_config = Application.get_env(:murmuring, :federation, [])
+    federation_config = Application.get_env(:cairn, :federation, [])
 
     if federation_config[:enabled] do
       url = "https://#{remote_domain}/api/v1/federation/voice/join"
@@ -37,7 +37,7 @@ defmodule Murmuring.Voice.Federation do
   Relay a voice signal (connect, produce, consume) to the hosting node.
   """
   def relay_signal(remote_domain, channel_id, event, payload) do
-    federation_config = Application.get_env(:murmuring, :federation, [])
+    federation_config = Application.get_env(:cairn, :federation, [])
 
     if federation_config[:enabled] do
       url = "https://#{remote_domain}/api/v1/federation/voice/signal"

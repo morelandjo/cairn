@@ -1,14 +1,14 @@
 ---
-# Murmuring Update Playbook
+# Cairn Update Playbook
 # Usage: ansible-playbook -i inventory.ini update.yml
 
-- name: Update Murmuring
-  hosts: murmuring
+- name: Update Cairn
+  hosts: cairn
   become: true
-  become_user: murmuring
+  become_user: cairn
 
   vars:
-    deploy_dir: /opt/murmuring
+    deploy_dir: /opt/cairn
 
   tasks:
     - name: Create pre-update backup
@@ -33,7 +33,7 @@
       until: health.status == 200
 
     - name: Run database migrations
-      command: docker compose exec -T server bin/murmuring eval "Murmuring.Release.migrate()"
+      command: docker compose exec -T server bin/cairn eval "Cairn.Release.migrate()"
       args:
         chdir: "{{ deploy_dir }}"
 

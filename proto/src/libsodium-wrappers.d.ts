@@ -1,7 +1,7 @@
 /**
  * Type declarations for libsodium-wrappers.
  *
- * Minimal declarations covering the APIs used by the Murmuring crypto module.
+ * Minimal declarations covering the APIs used by the Cairn crypto module.
  * The official package does not ship .d.ts files.
  */
 declare module "libsodium-wrappers-sumo" {

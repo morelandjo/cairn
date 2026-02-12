@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.FederationRateLimiter do
+defmodule Cairn.Federation.FederationRateLimiter do
   @moduledoc """
   Per-node rate limiter for federation inbox requests.
   Default: 100 requests/minute, burst up to 200.
@@ -15,15 +15,15 @@ defmodule Murmuring.Federation.FederationRateLimiter do
   """
   @spec check(String.t()) :: :ok | {:error, :rate_limited}
   def check(domain) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
     burst = Keyword.get(config, :rate_burst, @default_burst)
 
     key = "federation:rate:#{domain}"
 
-    case Redix.command(:murmuring_redis, ["INCR", key]) do
+    case Redix.command(:cairn_redis, ["INCR", key]) do
       {:ok, count} when count == 1 ->
         # First request in window — set expiry
-        Redix.command(:murmuring_redis, ["EXPIRE", key, @window_seconds])
+        Redix.command(:cairn_redis, ["EXPIRE", key, @window_seconds])
         :ok
 
       {:ok, count} when count <= burst ->
@@ -43,7 +43,7 @@ defmodule Murmuring.Federation.FederationRateLimiter do
   def current_count(domain) do
     key = "federation:rate:#{domain}"
 
-    case Redix.command(:murmuring_redis, ["GET", key]) do
+    case Redix.command(:cairn_redis, ["GET", key]) do
       {:ok, nil} -> 0
       {:ok, count} -> String.to_integer(count)
       {:error, _} -> 0

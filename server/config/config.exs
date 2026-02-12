@@ -7,19 +7,19 @@
 # General application configuration
 import Config
 
-config :murmuring,
-  ecto_repos: [Murmuring.Repo],
+config :cairn,
+  ecto_repos: [Cairn.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 # Configure the endpoint
-config :murmuring, MurmuringWeb.Endpoint,
+config :cairn, CairnWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [json: MurmuringWeb.ErrorJSON],
+    formats: [json: CairnWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: Murmuring.PubSub,
+  pubsub_server: Cairn.PubSub,
   live_view: [signing_salt: "uF+7O8/J"]
 
 # Configure the mailer
@@ -29,7 +29,7 @@ config :murmuring, MurmuringWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :murmuring, Murmuring.Mailer, adapter: Swoosh.Adapters.Local
+config :cairn, Cairn.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure Elixir's Logger with JSON backend for production
 config :logger, :default_formatter,
@@ -42,36 +42,36 @@ config :logger_json, :backend, metadata: [:request_id, :correlation_id, :module]
 config :phoenix, :json_library, Jason
 
 # File storage configuration
-config :murmuring, :storage_backend, Murmuring.Storage.LocalBackend
-config :murmuring, Murmuring.Storage.LocalBackend, root: Path.expand("priv/uploads")
+config :cairn, :storage_backend, Cairn.Storage.LocalBackend
+config :cairn, Cairn.Storage.LocalBackend, root: Path.expand("priv/uploads")
 
 # Federation configuration
-config :murmuring, :federation,
+config :cairn, :federation,
   enabled: false,
   domain: "localhost"
 
 # SFU configuration
-config :murmuring, :sfu_url, "http://localhost:4001"
-config :murmuring, :sfu_auth_secret, "dev-sfu-secret"
-config :murmuring, :sfu_client, Murmuring.Voice.SfuClient
+config :cairn, :sfu_url, "http://localhost:4001"
+config :cairn, :sfu_auth_secret, "dev-sfu-secret"
+config :cairn, :sfu_client, Cairn.Voice.SfuClient
 
 # TURN configuration
-config :murmuring, :turn_secret, "dev-turn-secret"
-config :murmuring, :turn_urls, []
+config :cairn, :turn_secret, "dev-turn-secret"
+config :cairn, :turn_urls, []
 
 # Meilisearch configuration
-config :murmuring, :meilisearch,
+config :cairn, :meilisearch,
   url: "http://localhost:7700",
   master_key: nil
 
 # Oban job queue
-config :murmuring, Oban,
-  repo: Murmuring.Repo,
+config :cairn, Oban,
+  repo: Cairn.Repo,
   queues: [federation: 10, moderation: 5, search: 5, export: 2, push: 10],
   plugins: [
     {Oban.Plugins.Cron,
      crontab: [
-       {"0 3 * * *", Murmuring.Audit.Pruner}
+       {"0 3 * * *", Cairn.Audit.Pruner}
      ]}
   ]
 

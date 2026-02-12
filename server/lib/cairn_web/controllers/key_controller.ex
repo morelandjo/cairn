@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.KeyController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.KeyController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Keys
+  alias Cairn.Keys
 
   @doc "POST /api/v1/users/me/keys — Upload key bundle"
   def upload(conn, params) do
@@ -225,7 +225,7 @@ defmodule MurmuringWeb.KeyController do
         |> put_status(:bad_request)
         |> json(%{error: "user does not have a DID"})
       else
-        case Murmuring.Identity.rotate_signing_key(
+        case Cairn.Identity.rotate_signing_key(
                user.did,
                new_signing_key,
                rotation_private_key
@@ -233,7 +233,7 @@ defmodule MurmuringWeb.KeyController do
           {:ok, _op} ->
             # Also update the user's identity_public_key
             {:ok, _user} =
-              Murmuring.Accounts.update_user_keys(user, %{identity_public_key: new_signing_key})
+              Cairn.Accounts.update_user_keys(user, %{identity_public_key: new_signing_key})
 
             json(conn, %{ok: true, did: user.did})
 

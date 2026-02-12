@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.VoiceState do
+defmodule Cairn.Chat.VoiceState do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -12,9 +12,9 @@ defmodule Murmuring.Chat.VoiceState do
     field :screen_sharing, :boolean, default: false
     field :joined_at, :utc_datetime
 
-    belongs_to :channel, Murmuring.Chat.Channel
-    belongs_to :user, Murmuring.Accounts.User
-    belongs_to :server, Murmuring.Servers.Server
+    belongs_to :channel, Cairn.Chat.Channel
+    belongs_to :user, Cairn.Accounts.User
+    belongs_to :server, Cairn.Servers.Server
 
     timestamps()
   end

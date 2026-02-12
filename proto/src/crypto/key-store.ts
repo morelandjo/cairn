@@ -1,5 +1,5 @@
 /**
- * IndexedDB-based key persistence for the Murmuring E2EE protocol.
+ * IndexedDB-based key persistence for the Cairn E2EE protocol.
  *
  * Stores identity keys (encrypted with a passphrase via Argon2id + XChaCha20-Poly1305)
  * and ratchet sessions in the browser's IndexedDB.
@@ -11,7 +11,7 @@ import { ensureSodium } from "./keys.js";
 import type { IdentityKeyPair, RatchetState } from "../types.js";
 
 /** IndexedDB database name */
-const DB_NAME = "murmuring-keystore";
+const DB_NAME = "cairn-keystore";
 
 /** IndexedDB database version */
 const DB_VERSION = 1;

@@ -1,15 +1,15 @@
-defmodule MurmuringWeb.UploadControllerTest do
-  use MurmuringWeb.ConnCase, async: true
+defmodule CairnWeb.UploadControllerTest do
+  use CairnWeb.ConnCase, async: true
 
-  alias Murmuring.Accounts
+  alias Cairn.Accounts
 
   @valid_password "secure_password_123"
 
   setup do
-    root = Application.get_env(:murmuring, Murmuring.Storage.LocalBackend)[:root]
+    root = Application.get_env(:cairn, Cairn.Storage.LocalBackend)[:root]
 
     tmp_dir =
-      Path.join(System.tmp_dir!(), "murmuring_upload_test_#{:erlang.unique_integer([:positive])}")
+      Path.join(System.tmp_dir!(), "cairn_upload_test_#{:erlang.unique_integer([:positive])}")
 
     File.mkdir_p!(tmp_dir)
 
@@ -197,13 +197,13 @@ defmodule MurmuringWeb.UploadControllerTest do
         "password" => @valid_password
       })
 
-    {:ok, tokens} = Murmuring.Auth.generate_tokens(user)
+    {:ok, tokens} = Cairn.Auth.generate_tokens(user)
     {user, tokens}
   end
 
   defp create_tmp_file(content, dir \\ nil) do
     base = dir || System.tmp_dir!()
-    path = Path.join(base, "murmuring_test_#{:erlang.unique_integer([:positive])}")
+    path = Path.join(base, "cairn_test_#{:erlang.unique_integer([:positive])}")
     File.write!(path, content)
     path
   end

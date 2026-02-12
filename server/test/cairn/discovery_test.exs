@@ -1,7 +1,7 @@
-defmodule Murmuring.DiscoveryTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.DiscoveryTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.{Accounts, Discovery, Servers}
+  alias Cairn.{Accounts, Discovery, Servers}
 
   @valid_password "secure_password_123"
 

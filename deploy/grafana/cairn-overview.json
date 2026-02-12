@@ -42,7 +42,7 @@
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {
-          "expr": "murmuring_websocket_connections_total",
+          "expr": "cairn_websocket_connections_total",
           "legendFormat": "Connections"
         }
       ],
@@ -54,7 +54,7 @@
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {
-          "expr": "rate(murmuring_messages_sent_total[5m])",
+          "expr": "rate(cairn_messages_sent_total[5m])",
           "legendFormat": "msg/s"
         }
       ],
@@ -66,7 +66,7 @@
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {
-          "expr": "murmuring_federation_nodes_active",
+          "expr": "cairn_federation_nodes_active",
           "legendFormat": "Nodes"
         }
       ],
@@ -78,7 +78,7 @@
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {
-          "expr": "rate(murmuring_voice_joins_total[5m]) * 60",
+          "expr": "rate(cairn_voice_joins_total[5m]) * 60",
           "legendFormat": "joins/min"
         }
       ],
@@ -144,11 +144,11 @@
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {
-          "expr": "rate(murmuring_auth_login_total{result=\"success\"}[5m])",
+          "expr": "rate(cairn_auth_login_total{result=\"success\"}[5m])",
           "legendFormat": "success"
         },
         {
-          "expr": "rate(murmuring_auth_login_total{result=\"failure\"}[5m])",
+          "expr": "rate(cairn_auth_login_total{result=\"failure\"}[5m])",
           "legendFormat": "failure"
         }
       ],
@@ -156,9 +156,9 @@
     }
   ],
   "schemaVersion": 39,
-  "tags": ["murmuring"],
+  "tags": ["cairn"],
   "templating": { "list": [] },
   "time": { "from": "now-1h", "to": "now" },
-  "title": "Murmuring Overview",
-  "uid": "murmuring-overview"
+  "title": "Cairn Overview",
+  "uid": "cairn-overview"
 }

@@ -1,4 +1,4 @@
-defmodule Murmuring.Notifications.PushToken do
+defmodule Cairn.Notifications.PushToken do
   @moduledoc "Ecto schema for push notification tokens (Expo Push)."
 
   use Ecto.Schema
@@ -12,7 +12,7 @@ defmodule Murmuring.Notifications.PushToken do
     field :platform, :string
     field :device_id, :string
 
-    belongs_to :user, Murmuring.Accounts.User
+    belongs_to :user, Cairn.Accounts.User
 
     timestamps()
   end

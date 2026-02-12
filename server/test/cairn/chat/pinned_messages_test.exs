@@ -1,7 +1,7 @@
-defmodule Murmuring.Chat.PinnedMessagesTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.Chat.PinnedMessagesTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.{Accounts, Chat, Servers}
+  alias Cairn.{Accounts, Chat, Servers}
 
   @valid_password "secure_password_123"
 

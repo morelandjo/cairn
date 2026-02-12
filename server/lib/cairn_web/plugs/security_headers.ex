@@ -1,4 +1,4 @@
-defmodule MurmuringWeb.Plugs.SecurityHeaders do
+defmodule CairnWeb.Plugs.SecurityHeaders do
   @moduledoc """
   Plug that sets security-related HTTP response headers.
   Applied to all responses.
@@ -31,7 +31,7 @@ defmodule MurmuringWeb.Plugs.SecurityHeaders do
   end
 
   defp put_hsts_header(conn) do
-    if Application.get_env(:murmuring, :force_ssl, false) do
+    if Application.get_env(:cairn, :force_ssl, false) do
       put_resp_header(conn, "strict-transport-security", "max-age=31536000; includeSubDomains")
     else
       conn
@@ -40,7 +40,7 @@ defmodule MurmuringWeb.Plugs.SecurityHeaders do
 
   defp put_csp_header(conn) do
     csp =
-      Application.get_env(:murmuring, :content_security_policy, default_csp())
+      Application.get_env(:cairn, :content_security_policy, default_csp())
 
     put_resp_header(conn, "content-security-policy", csp)
   end

@@ -1,10 +1,10 @@
-defmodule Mix.Tasks.Murmuring.Backup do
+defmodule Mix.Tasks.Cairn.Backup do
   @moduledoc """
-  Creates a backup of the Murmuring database and uploads.
+  Creates a backup of the Cairn database and uploads.
 
   ## Usage
 
-      mix murmuring.backup [--output /path/to/backup]
+      mix cairn.backup [--output /path/to/backup]
 
   Creates a timestamped backup containing:
   - PostgreSQL database dump
@@ -16,7 +16,7 @@ defmodule Mix.Tasks.Murmuring.Backup do
 
   require Logger
 
-  @shortdoc "Back up Murmuring database and files"
+  @shortdoc "Back up Cairn database and files"
 
   @impl Mix.Task
   def run(args) do
@@ -30,7 +30,7 @@ defmodule Mix.Tasks.Murmuring.Backup do
 
     timestamp = DateTime.utc_now() |> DateTime.to_iso8601() |> String.replace(~r/[:\.]/, "-")
     backup_dir = opts[:output] || Path.expand("priv/backups")
-    backup_name = "murmuring-#{timestamp}"
+    backup_name = "cairn-#{timestamp}"
     backup_path = Path.join(backup_dir, backup_name)
 
     File.mkdir_p!(backup_dir)
@@ -39,16 +39,16 @@ defmodule Mix.Tasks.Murmuring.Backup do
     Mix.shell().info("Creating backup: #{backup_name}")
 
     # Database dump
-    db_config = Application.get_env(:murmuring, Murmuring.Repo, [])
+    db_config = Application.get_env(:cairn, Cairn.Repo, [])
     dump_path = Path.join(backup_path, "database.pgdump")
 
     pg_args = [
       "-h", Keyword.get(db_config, :hostname, "localhost"),
       "-p", to_string(Keyword.get(db_config, :port, 5432)),
-      "-U", Keyword.get(db_config, :username, "murmuring"),
+      "-U", Keyword.get(db_config, :username, "cairn"),
       "-Fc",
       "-f", dump_path,
-      Keyword.get(db_config, :database, "murmuring")
+      Keyword.get(db_config, :database, "cairn")
     ]
 
     env = [{"PGPASSWORD", Keyword.get(db_config, :password, "")}]
@@ -62,7 +62,7 @@ defmodule Mix.Tasks.Murmuring.Backup do
     end
 
     # Upload files
-    upload_root = Application.get_env(:murmuring, Murmuring.Storage.LocalBackend, [])[:root]
+    upload_root = Application.get_env(:cairn, Cairn.Storage.LocalBackend, [])[:root]
 
     if upload_root && File.exists?(upload_root) do
       uploads_archive = Path.join(backup_path, "uploads.tar.gz")

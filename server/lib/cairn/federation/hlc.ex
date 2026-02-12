@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.HLC do
+defmodule Cairn.Federation.HLC do
   @moduledoc """
   Hybrid Logical Clock (HLC) for ordering events across federated nodes.
 

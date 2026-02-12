@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.CreateMlsKeyPackages do
+defmodule Cairn.Repo.Migrations.CreateMlsKeyPackages do
   use Ecto.Migration
 
   def change do

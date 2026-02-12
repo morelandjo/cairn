@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.FederatedAuth do
+defmodule Cairn.Federation.FederatedAuth do
   @moduledoc """
   Issues and verifies federated authentication tokens.
 
@@ -10,8 +10,8 @@ defmodule Murmuring.Federation.FederatedAuth do
   Wire format: `base64url(json_payload).base64url(ed25519_signature)`
   """
 
-  alias Murmuring.Federation
-  alias Murmuring.Federation.NodeIdentity
+  alias Cairn.Federation
+  alias Cairn.Federation.NodeIdentity
 
   @max_clock_skew 300
   @token_ttl 3600
@@ -21,7 +21,7 @@ defmodule Murmuring.Federation.FederatedAuth do
   the target instance. Signed by the local node's Ed25519 key.
   """
   def issue_token(user, target_instance) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
     domain = Keyword.get(config, :domain, "localhost")
 
     payload = %{
@@ -56,7 +56,7 @@ defmodule Murmuring.Federation.FederatedAuth do
   5. Check target_instance matches local domain
   """
   def verify_token(token) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
     local_domain = Keyword.get(config, :domain, "localhost")
 
     with {:ok, {payload, signature}} <- decode_token(token),

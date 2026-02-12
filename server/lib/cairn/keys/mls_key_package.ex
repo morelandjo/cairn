@@ -1,4 +1,4 @@
-defmodule Murmuring.Keys.MlsKeyPackage do
+defmodule Cairn.Keys.MlsKeyPackage do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,7 +8,7 @@ defmodule Murmuring.Keys.MlsKeyPackage do
   schema "mls_key_packages" do
     field :data, :binary
     field :consumed, :boolean, default: false
-    belongs_to :user, Murmuring.Accounts.User
+    belongs_to :user, Cairn.Accounts.User
 
     timestamps()
   end

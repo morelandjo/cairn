@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.ExportController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.ExportController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Export
+  alias Cairn.Export
 
   # POST /api/v1/users/me/export
   def create(conn, _params) do
@@ -26,7 +26,7 @@ defmodule MurmuringWeb.ExportController do
         |> put_resp_content_type("application/json")
         |> put_resp_header(
           "content-disposition",
-          "attachment; filename=\"murmuring_export.json\""
+          "attachment; filename=\"cairn_export.json\""
         )
         |> send_file(200, path)
 

@@ -1,4 +1,4 @@
-defmodule MurmuringWeb.Plugs.FederatedAuth do
+defmodule CairnWeb.Plugs.FederatedAuth do
   @moduledoc """
   Plug that extracts and verifies a FederatedToken from the Authorization header.
 
@@ -9,8 +9,8 @@ defmodule MurmuringWeb.Plugs.FederatedAuth do
   """
 
   import Plug.Conn
-  alias Murmuring.Federation.FederatedAuth
-  alias Murmuring.Federation
+  alias Cairn.Federation.FederatedAuth
+  alias Cairn.Federation
 
   def init(opts), do: opts
 

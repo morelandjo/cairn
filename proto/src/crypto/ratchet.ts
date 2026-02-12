@@ -23,7 +23,7 @@ import type { RatchetHeader, RatchetState } from "../types.js";
 const MAX_SKIP = 1000;
 
 /** Info string for root key KDF */
-const ROOT_KDF_INFO = "murmuring-ratchet-root-v1";
+const ROOT_KDF_INFO = "cairn-ratchet-root-v1";
 
 /** Byte used for chain key derivation (message key) */
 const CHAIN_KEY_MSG = 0x01;

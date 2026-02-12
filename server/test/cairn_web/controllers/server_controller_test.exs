@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.ServerControllerTest do
-  use MurmuringWeb.ConnCase, async: true
+defmodule CairnWeb.ServerControllerTest do
+  use CairnWeb.ConnCase, async: true
 
-  alias Murmuring.{Accounts, Auth, Servers}
+  alias Cairn.{Accounts, Auth, Servers}
 
   @valid_password "secure_password_123"
 
@@ -135,10 +135,10 @@ defmodule MurmuringWeb.ServerControllerTest do
       {:ok, server} = Servers.create_server(%{name: "ChanTest", creator_id: user.id})
 
       {:ok, _} =
-        Murmuring.Chat.create_channel(%{name: "general", type: "public", server_id: server.id})
+        Cairn.Chat.create_channel(%{name: "general", type: "public", server_id: server.id})
 
       {:ok, _} =
-        Murmuring.Chat.create_channel(%{name: "random", type: "public", server_id: server.id})
+        Cairn.Chat.create_channel(%{name: "random", type: "public", server_id: server.id})
 
       conn = get(conn, "/api/v1/servers/#{server.id}/channels")
       assert %{"channels" => channels} = json_response(conn, 200)

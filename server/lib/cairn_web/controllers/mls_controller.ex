@@ -1,8 +1,8 @@
-defmodule MurmuringWeb.MlsController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.MlsController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Chat
-  alias Murmuring.Chat.Mls
+  alias Cairn.Chat
+  alias Cairn.Chat.Mls
 
   @doc "POST /api/v1/channels/:id/mls/group-info — Store MLS group info"
   def store_group_info(conn, %{"id" => channel_id} = params) do

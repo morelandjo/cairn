@@ -1,4 +1,4 @@
-defmodule Murmuring.Storage.LocalBackend do
+defmodule Cairn.Storage.LocalBackend do
   @moduledoc """
   Content-addressable local filesystem storage backend.
 
@@ -6,7 +6,7 @@ defmodule Murmuring.Storage.LocalBackend do
   two characters of the storage key: `<root>/ab/abcdef1234...`
   """
 
-  @behaviour Murmuring.Storage
+  @behaviour Cairn.Storage
 
   @impl true
   def put(key, data, _content_type) do
@@ -55,7 +55,7 @@ defmodule Murmuring.Storage.LocalBackend do
   end
 
   defp root_dir do
-    config = Application.get_env(:murmuring, Murmuring.Storage.LocalBackend, [])
+    config = Application.get_env(:cairn, Cairn.Storage.LocalBackend, [])
     Keyword.get(config, :root, Path.expand("priv/uploads"))
   end
 end

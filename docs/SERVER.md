@@ -2,11 +2,11 @@
 
 ## Overview
 
-Murmuring is a privacy-first federated communication platform. It provides text messaging with end-to-end encryption (MLS + Double Ratchet), voice and video calls with E2E encryption, file sharing, full-text search, and federation between independent instances.
+Cairn is a privacy-first federated communication platform. It provides text messaging with end-to-end encryption (MLS + Double Ratchet), voice and video calls with E2E encryption, file sharing, full-text search, and federation between independent instances.
 
 ### Architecture
 
-A Murmuring deployment consists of six services:
+A Cairn deployment consists of six services:
 
 | Service | Technology | Purpose |
 |---------|-----------|---------|
@@ -57,26 +57,26 @@ The **Personal** tier is designed for close friend groups, families, and small g
 The install script takes a bare Linux server (Debian, Ubuntu, or Fedora) and sets up everything from scratch — no prerequisites needed other than `curl` and root access.
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/murmuring/murmuring/main/deploy/install.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/cairn/cairn/main/deploy/install.sh | sudo bash
 ```
 
 The script will:
 
-1. **Provision the system** — install Docker + Compose, create a `murmuring` system user, configure UFW firewall rules (SSH, HTTP, HTTPS, TURN), set up fail2ban (SSH brute-force protection), and add swap on small servers
+1. **Provision the system** — install Docker + Compose, create a `cairn` system user, configure UFW firewall rules (SSH, HTTP, HTTPS, TURN), set up fail2ban (SSH brute-force protection), and add swap on small servers
 2. **Walk you through configuration** — prompt for domain/IP, server port, secrets (auto-generate or provide your own), federation, SSL enforcement, and S3 storage
-3. **Deploy Murmuring** — write `.env`, download `docker-compose.yml`, pull Docker images, start all services, run database migrations, and verify health
+3. **Deploy Cairn** — write `.env`, download `docker-compose.yml`, pull Docker images, start all services, run database migrations, and verify health
 
 Everything is idempotent — if Docker is already installed, or the firewall is already configured, those steps are skipped. Safe to re-run.
 
 On success:
 
 ```
-Murmuring is running!
+Cairn is running!
 
 URL:     http://your.domain.com:4000
-Config:  /opt/murmuring/.env
-Logs:    cd /opt/murmuring && docker compose logs -f
-Manage:  murmuring-ctl status
+Config:  /opt/cairn/.env
+Logs:    cd /opt/cairn && docker compose logs -f
+Manage:  cairn-ctl status
 
 Next steps:
 1. Set up reverse proxy (nginx/Caddy) with TLS
@@ -89,20 +89,20 @@ Next steps:
 1. Create the deployment directory:
 
 ```bash
-mkdir -p /opt/murmuring && cd /opt/murmuring
+mkdir -p /opt/cairn && cd /opt/cairn
 ```
 
 2. Download the production Compose file:
 
 ```bash
-curl -O https://raw.githubusercontent.com/murmuring/murmuring/main/deploy/docker-compose.prod.yml
+curl -O https://raw.githubusercontent.com/cairn/cairn/main/deploy/docker-compose.prod.yml
 mv docker-compose.prod.yml docker-compose.yml
 ```
 
 3. Create a `.env` file from the template:
 
 ```bash
-curl -O https://raw.githubusercontent.com/murmuring/murmuring/main/deploy/.env.example
+curl -O https://raw.githubusercontent.com/cairn/cairn/main/deploy/.env.example
 cp .env.example .env
 chmod 600 .env
 ```
@@ -124,7 +124,7 @@ docker compose up -d
 6. Run database migrations:
 
 ```bash
-docker compose exec -T server bin/murmuring eval "Murmuring.Release.migrate()"
+docker compose exec -T server bin/cairn eval "Cairn.Release.migrate()"
 ```
 
 7. Verify health:
@@ -139,8 +139,8 @@ For operators managing multiple servers or preferring infrastructure-as-code, fo
 
 | Playbook | Purpose |
 |----------|---------|
-| `setup.yml` | Provision a fresh VPS (Docker, firewall, fail2ban, swap, murmuring user) |
-| `deploy.yml` | Deploy Murmuring services (Compose, migrations, health check) |
+| `setup.yml` | Provision a fresh VPS (Docker, firewall, fail2ban, swap, cairn user) |
+| `deploy.yml` | Deploy Cairn services (Compose, migrations, health check) |
 | `backup.yml` | Create full backup (database, uploads, keys) with 30-day retention |
 | `update.yml` | Rolling update with pre-update backup and zero-downtime restart |
 
@@ -150,7 +150,7 @@ Usage:
 # Initial server setup
 ansible-playbook -i inventory.ini deploy/ansible/setup.yml
 
-# Deploy Murmuring
+# Deploy Cairn
 ansible-playbook -i inventory.ini deploy/ansible/deploy.yml
 
 # Create backup
@@ -171,8 +171,8 @@ Requirements:
 
 ```bash
 # Clone the repository
-git clone https://github.com/murmuring/murmuring.git
-cd murmuring
+git clone https://github.com/cairn/cairn.git
+cd cairn
 
 # Install runtimes (if using mise)
 mise install
@@ -199,26 +199,26 @@ npm run dev
 
 ## Configuration Reference
 
-All configuration is via environment variables. Set them in `/opt/murmuring/.env` for Docker deployments, or export them for source builds.
+All configuration is via environment variables. Set them in `/opt/cairn/.env` for Docker deployments, or export them for source builds.
 
 ### Core
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `MURMURING_DOMAIN` | Yes | — | Public domain (e.g., `murmuring.example.com`) |
+| `CAIRN_DOMAIN` | Yes | — | Public domain (e.g., `cairn.example.com`) |
 | `SECRET_KEY_BASE` | Yes | — | Phoenix session secret. Generate: `openssl rand -base64 48` |
 | `JWT_SECRET` | Yes | — | JWT signing secret. Generate: `openssl rand -base64 48` |
 | `SERVER_PORT` | No | `4000` | HTTP port for the server |
 | `FORCE_SSL` | No | `true` | Set to `false` to allow HTTP (only safe on private networks, requires federation disabled) |
-| `PHX_HOST` | No | `$MURMURING_DOMAIN` | Hostname for URL generation |
+| `PHX_HOST` | No | `$CAIRN_DOMAIN` | Hostname for URL generation |
 | `PHX_SERVER` | No | `true` | Enable HTTP server (always true in Docker) |
 
 ### Database
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `DATABASE_URL` | Prod | — | Ecto URL (e.g., `ecto://murmuring:pass@postgres:5432/murmuring`) |
-| `POSTGRES_PASSWORD` | Yes | — | PostgreSQL password for the `murmuring` user |
+| `DATABASE_URL` | Prod | — | Ecto URL (e.g., `ecto://cairn:pass@postgres:5432/cairn`) |
+| `POSTGRES_PASSWORD` | Yes | — | PostgreSQL password for the `cairn` user |
 | `POOL_SIZE` | No | `10` | Database connection pool size |
 | `ECTO_IPV6` | No | `false` | Set `true` to connect to PostgreSQL over IPv6 |
 
@@ -239,7 +239,7 @@ All configuration is via environment variables. Set them in `/opt/murmuring/.env
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `FEDERATION_ENABLED` | No | `false` | Set `true` to enable federation |
-| `MURMURING_DOMAIN` | If federated | — | Domain used in ActivityPub actor URIs |
+| `CAIRN_DOMAIN` | If federated | — | Domain used in ActivityPub actor URIs |
 | `NODE_KEY_PATH` | No | `/app/priv/keys/node_ed25519.key` | Path to Ed25519 node identity key |
 
 ### Voice & TURN
@@ -249,17 +249,17 @@ All configuration is via environment variables. Set them in `/opt/murmuring/.env
 | `SFU_URL` | No | `http://sfu:4001` | Internal URL to the SFU service |
 | `SFU_AUTH_SECRET` | Yes | — | Shared secret for server-SFU auth |
 | `TURN_SECRET` | Yes | — | HMAC shared secret for TURN credentials |
-| `TURN_URLS` | No | `turn:${MURMURING_DOMAIN}:3478` | TURN server URLs (comma-separated) |
+| `TURN_URLS` | No | `turn:${CAIRN_DOMAIN}:3478` | TURN server URLs (comma-separated) |
 | `RTC_MIN_PORT` | No | `40000` | Minimum UDP port for WebRTC media |
 | `RTC_MAX_PORT` | No | `40100` | Maximum UDP port for WebRTC media |
-| `ANNOUNCED_IP` | No | `$MURMURING_DOMAIN` | Public IP/hostname for SFU media |
+| `ANNOUNCED_IP` | No | `$CAIRN_DOMAIN` | Public IP/hostname for SFU media |
 
 ### Storage
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `STORAGE_BACKEND` | No | `local` | `local` (filesystem) or `s3` |
-| `S3_BUCKET` | If S3 | `murmuring-uploads` | S3 bucket name |
+| `S3_BUCKET` | If S3 | `cairn-uploads` | S3 bucket name |
 | `S3_ENDPOINT` | If S3 | — | S3 endpoint URL |
 | `AWS_REGION` | If S3 | `us-east-1` | AWS region |
 | `AWS_ACCESS_KEY_ID` | If S3 | — | AWS access key |
@@ -276,8 +276,8 @@ All configuration is via environment variables. Set them in `/opt/murmuring/.env
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `MURMURING_IMAGE` | No | `murmuring/server:latest` | Server Docker image |
-| `SFU_IMAGE` | No | `murmuring/sfu:latest` | SFU Docker image |
+| `CAIRN_IMAGE` | No | `cairn/server:latest` | Server Docker image |
+| `SFU_IMAGE` | No | `cairn/sfu:latest` | SFU Docker image |
 
 ---
 
@@ -287,13 +287,13 @@ Both images use multi-stage Alpine-based builds:
 
 **Server image** (`server/Dockerfile`):
 - Build stage: `elixir:1.19-otp-28-alpine` — compiles Mix release
-- Runtime: `alpine:3.21` — runs as non-root `murmuring` user
+- Runtime: `alpine:3.21` — runs as non-root `cairn` user
 - Exposes port 4000, healthcheck on `/health`
-- Entrypoint: `bin/murmuring start`
+- Entrypoint: `bin/cairn start`
 
 **SFU image** (`sfu/Dockerfile`):
 - Build stage: `node:24-alpine` — compiles TypeScript, prunes dev deps
-- Runtime: `node:24-alpine` — runs as non-root `murmuring` user
+- Runtime: `node:24-alpine` — runs as non-root `cairn` user
 - Exposes port 4001, healthcheck on `/health`
 - Entrypoint: `node dist/index.js`
 
@@ -330,19 +330,19 @@ The `docker-compose.prod.yml` defines resource limits for each service:
 If you chose to enable federation during the install wizard (or set `FEDERATION_ENABLED=true` in your `.env`), federation is already active — no extra steps required. The server automatically:
 
 - Generates an Ed25519 node identity key on first start (stored at `NODE_KEY_PATH`)
-- Serves the well-known discovery endpoints (`/.well-known/murmuring`, `/.well-known/webfinger`, `/.well-known/did/:did`)
+- Serves the well-known discovery endpoints (`/.well-known/cairn`, `/.well-known/webfinger`, `/.well-known/did/:did`)
 - Signs outbound requests with HTTP Signatures (RFC 9421)
 - Delivers activities asynchronously via ActivityPub with exponential backoff
-- Verifies inbound `did:murmuring` operation chains for anti-impersonation
+- Verifies inbound `did:cairn` operation chains for anti-impersonation
 
 ### Enabling federation on an existing instance
 
 If you initially installed without federation and want to enable it later:
 
 ```bash
-murmuring-ctl config FEDERATION_ENABLED true
-murmuring-ctl config MURMURING_DOMAIN your.domain.com
-murmuring-ctl restart
+cairn-ctl config FEDERATION_ENABLED true
+cairn-ctl config CAIRN_DOMAIN your.domain.com
+cairn-ctl restart
 ```
 
 Federation requires TLS — if `FORCE_SSL` was set to `false`, the server will automatically re-enable SSL enforcement.
@@ -351,16 +351,16 @@ Federation requires TLS — if `FORCE_SSL` was set to `false`, the server will a
 
 ```bash
 # Check that well-known endpoints are reachable
-curl https://your.domain.com/.well-known/murmuring
+curl https://your.domain.com/.well-known/cairn
 
 # List known federation nodes
-murmuring-ctl federation list
+cairn-ctl federation list
 ```
 
 ### How it works
 
 - **Node identity:** Each instance has an Ed25519 key pair for signing HTTP requests and issuing federated auth tokens.
-- **Portable identity:** Users have `did:murmuring` self-certifying identifiers. Users on remote instances can join your servers without creating a local account — their home instance issues a signed token, and your server verifies it.
+- **Portable identity:** Users have `did:cairn` self-certifying identifiers. Users on remote instances can join your servers without creating a local account — their home instance issues a signed token, and your server verifies it.
 - **Cross-instance DMs:** Users can DM users on other instances. The DM channel lives on the initiator's instance only — messages are never replicated via federation.
 
 See the [Administration Guide](ADMINISTRATION.md#federation-admin) for key rotation, node blocking, and activity monitoring.
@@ -369,7 +369,7 @@ See the [Administration Guide](ADMINISTRATION.md#federation-admin) for key rotat
 
 ## TLS Modes
 
-Murmuring supports three deployment modes for TLS:
+Cairn supports three deployment modes for TLS:
 
 ### Mode 1: Domain + Reverse Proxy + TLS (Recommended)
 
@@ -404,12 +404,12 @@ Clients connecting to an HTTP server will see a warning dialog explaining the ri
 
 ## TLS & Reverse Proxy
 
-The Murmuring server listens on HTTP (port 4000). Use a reverse proxy for TLS termination.
+The Cairn server listens on HTTP (port 4000). Use a reverse proxy for TLS termination.
 
 ### nginx
 
 ```nginx
-upstream murmuring {
+upstream cairn {
     server 127.0.0.1:4000;
 }
 
@@ -425,7 +425,7 @@ server {
 
     # Proxy
     location / {
-        proxy_pass http://murmuring;
+        proxy_pass http://cairn;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -434,7 +434,7 @@ server {
 
     # WebSocket support
     location /socket {
-        proxy_pass http://murmuring;
+        proxy_pass http://cairn;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -469,10 +469,10 @@ Caddy handles TLS automatically via Let's Encrypt.
 
 ## Upgrades
 
-### Using murmuring-ctl
+### Using cairn-ctl
 
 ```bash
-murmuring-ctl upgrade
+cairn-ctl upgrade
 ```
 
 This command:
@@ -492,15 +492,15 @@ ansible-playbook -i inventory.ini deploy/ansible/update.yml
 ### Manual upgrade
 
 ```bash
-cd /opt/murmuring
+cd /opt/cairn
 
 # Backup first
-murmuring-ctl backup
+cairn-ctl backup
 
 # Pull and restart
 docker compose pull
 docker compose up -d --no-deps server
-docker compose exec -T server bin/murmuring eval "Murmuring.Release.migrate()"
+docker compose exec -T server bin/cairn eval "Cairn.Release.migrate()"
 docker compose up -d --no-deps sfu
 ```
 
@@ -509,7 +509,7 @@ docker compose up -d --no-deps sfu
 If an upgrade fails:
 
 ```bash
-murmuring-ctl rollback
+cairn-ctl rollback
 ```
 
 This restores the database from the most recent backup and restarts all services.
@@ -518,14 +518,14 @@ This restores the database from the most recent backup and restarts all services
 
 ## Directory Structure
 
-A production deployment at `/opt/murmuring`:
+A production deployment at `/opt/cairn`:
 
 ```
-/opt/murmuring/
+/opt/cairn/
 ├── .env                    # Configuration (mode 600)
 ├── docker-compose.yml      # Service definitions
 └── backups/
-    └── murmuring-backup-YYYYMMDD-HHMMSS/
+    └── cairn-backup-YYYYMMDD-HHMMSS/
         ├── database.pgdump       # PostgreSQL dump
         ├── uploads.tar.gz        # User file uploads
         └── keys.tar.gz           # Federation keys
@@ -540,7 +540,7 @@ A production deployment at `/opt/murmuring`:
 Check logs:
 
 ```bash
-murmuring-ctl logs server
+cairn-ctl logs server
 ```
 
 Common causes:
@@ -552,18 +552,18 @@ Common causes:
 
 ```bash
 # Check PostgreSQL health
-docker compose exec postgres pg_isready -U murmuring
+docker compose exec postgres pg_isready -U cairn
 
 # Check connection URL
-docker compose exec server bin/murmuring eval "IO.inspect(System.get_env(\"DATABASE_URL\"))"
+docker compose exec server bin/cairn eval "IO.inspect(System.get_env(\"DATABASE_URL\"))"
 ```
 
 ### Federation not working
 
 1. Verify federation is enabled: `FEDERATION_ENABLED=true`
-2. Check that `MURMURING_DOMAIN` is set and publicly resolvable
-3. Test well-known endpoint: `curl https://your.domain.com/.well-known/murmuring`
-4. Check federation logs: `murmuring-ctl logs server | grep federation`
+2. Check that `CAIRN_DOMAIN` is set and publicly resolvable
+3. Test well-known endpoint: `curl https://your.domain.com/.well-known/cairn`
+4. Check federation logs: `cairn-ctl logs server | grep federation`
 
 ### Voice/video issues
 

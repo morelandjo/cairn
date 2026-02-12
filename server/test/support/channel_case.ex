@@ -1,4 +1,4 @@
-defmodule MurmuringWeb.ChannelCase do
+defmodule CairnWeb.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -9,14 +9,14 @@ defmodule MurmuringWeb.ChannelCase do
   using do
     quote do
       import Phoenix.ChannelTest
-      import MurmuringWeb.ChannelCase
+      import CairnWeb.ChannelCase
 
-      @endpoint MurmuringWeb.Endpoint
+      @endpoint CairnWeb.Endpoint
     end
   end
 
   setup tags do
-    Murmuring.DataCase.setup_sandbox(tags)
+    Cairn.DataCase.setup_sandbox(tags)
     :ok
   end
 end

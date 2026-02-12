@@ -4,13 +4,13 @@ services:
     ports:
       - "5433:5432"
     environment:
-      POSTGRES_USER: murmuring
-      POSTGRES_PASSWORD: murmuring_dev
-      POSTGRES_DB: murmuring_dev
+      POSTGRES_USER: cairn
+      POSTGRES_PASSWORD: cairn_dev
+      POSTGRES_DB: cairn_dev
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U murmuring"]
+      test: ["CMD-SHELL", "pg_isready -U cairn"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -32,7 +32,7 @@ services:
     ports:
       - "7700:7700"
     environment:
-      MEILI_MASTER_KEY: murmuring_dev_key
+      MEILI_MASTER_KEY: cairn_dev_key
       MEILI_ENV: development
     volumes:
       - meilidata:/meili_data
@@ -49,13 +49,13 @@ services:
       - "3478:3478/udp"
       - "49152-49200:49152-49200/udp"
     environment:
-      TURN_REALM: murmuring.local
-      TURN_SECRET: murmuring_turn_dev
+      TURN_REALM: cairn.local
+      TURN_SECRET: cairn_turn_dev
     command: >
       turnserver
-      --realm=murmuring.local
+      --realm=cairn.local
       --use-auth-secret
-      --static-auth-secret=murmuring_turn_dev
+      --static-auth-secret=cairn_turn_dev
       --no-tls
       --no-dtls
       --listening-port=3478

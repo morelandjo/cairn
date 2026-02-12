@@ -12,29 +12,29 @@ import Config
 # If you use `mix release`, you need to explicitly enable the server
 # by passing the PHX_SERVER=true when you start it:
 #
-#     PHX_SERVER=true bin/murmuring start
+#     PHX_SERVER=true bin/cairn start
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
-  config :murmuring, MurmuringWeb.Endpoint, server: true
+  config :cairn, CairnWeb.Endpoint, server: true
 end
 
-config :murmuring, MurmuringWeb.Endpoint,
+config :cairn, CairnWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
 # JWT secret (required in prod, optional in dev/test)
 if jwt_secret = System.get_env("JWT_SECRET") do
-  config :murmuring, :jwt_secret, jwt_secret
+  config :cairn, :jwt_secret, jwt_secret
 end
 
 # Storage backend selection
 case System.get_env("STORAGE_BACKEND") do
   "s3" ->
-    config :murmuring, :storage_backend, Murmuring.Storage.S3Backend
+    config :cairn, :storage_backend, Cairn.Storage.S3Backend
 
-    config :murmuring, Murmuring.Storage.S3Backend,
-      bucket: System.get_env("S3_BUCKET") || "murmuring-uploads",
+    config :cairn, Cairn.Storage.S3Backend,
+      bucket: System.get_env("S3_BUCKET") || "cairn-uploads",
       endpoint: System.get_env("S3_ENDPOINT"),
       region: System.get_env("AWS_REGION", "us-east-1")
 
@@ -48,7 +48,7 @@ end
 
 # Meilisearch configuration from environment
 if meili_url = System.get_env("MEILI_URL") do
-  config :murmuring, :meilisearch,
+  config :cairn, :meilisearch,
     url: meili_url,
     master_key: System.get_env("MEILI_MASTER_KEY")
 end
@@ -58,7 +58,7 @@ end
 force_ssl_env = System.get_env("FORCE_SSL")
 
 if force_ssl_env != nil do
-  config :murmuring, :force_ssl, force_ssl_env != "false"
+  config :cairn, :force_ssl, force_ssl_env != "false"
 end
 
 # Federation configuration from environment
@@ -73,40 +73,40 @@ if federation_enabled do
     """)
   end
 
-  config :murmuring, :force_ssl, true
+  config :cairn, :force_ssl, true
 
-  config :murmuring, :federation,
+  config :cairn, :federation,
     enabled: true,
-    domain: System.get_env("MURMURING_DOMAIN") || "localhost",
+    domain: System.get_env("CAIRN_DOMAIN") || "localhost",
     node_key_path: System.get_env("NODE_KEY_PATH")
 end
 
-# Allow MURMURING_DOMAIN to be set even without federation (used for TURN, endpoint host, etc.)
-if domain = System.get_env("MURMURING_DOMAIN") do
-  config :murmuring, :domain, domain
+# Allow CAIRN_DOMAIN to be set even without federation (used for TURN, endpoint host, etc.)
+if domain = System.get_env("CAIRN_DOMAIN") do
+  config :cairn, :domain, domain
 end
 
 # SFU configuration from environment
 if sfu_url = System.get_env("SFU_URL") do
-  config :murmuring, :sfu_url, sfu_url
+  config :cairn, :sfu_url, sfu_url
 end
 
 if sfu_secret = System.get_env("SFU_AUTH_SECRET") do
-  config :murmuring, :sfu_auth_secret, sfu_secret
+  config :cairn, :sfu_auth_secret, sfu_secret
 end
 
 # TURN configuration from environment
 if turn_secret = System.get_env("TURN_SECRET") do
-  config :murmuring, :turn_secret, turn_secret
+  config :cairn, :turn_secret, turn_secret
 end
 
 if turn_urls = System.get_env("TURN_URLS") do
-  config :murmuring, :turn_urls, String.split(turn_urls, ",", trim: true)
+  config :cairn, :turn_urls, String.split(turn_urls, ",", trim: true)
 end
 
 # ALTCHA proof-of-work HMAC key (required in prod)
 if altcha_key = System.get_env("ALTCHA_HMAC_KEY") do
-  config :murmuring, :altcha_hmac_key, altcha_key
+  config :cairn, :altcha_hmac_key, altcha_key
 end
 
 if config_env() == :prod do
@@ -119,7 +119,7 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
-  config :murmuring, Murmuring.Repo,
+  config :cairn, Cairn.Repo,
     # ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
@@ -139,10 +139,10 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || System.get_env("MURMURING_DOMAIN") || "example.com"
-  prod_force_ssl = Application.get_env(:murmuring, :force_ssl, true)
+  host = System.get_env("PHX_HOST") || System.get_env("CAIRN_DOMAIN") || "example.com"
+  prod_force_ssl = Application.get_env(:cairn, :force_ssl, true)
 
-  config :murmuring, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
+  config :cairn, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
   url_config =
     if prod_force_ssl do
@@ -151,7 +151,7 @@ if config_env() == :prod do
       [host: host, port: String.to_integer(System.get_env("PORT", "4000")), scheme: "http"]
     end
 
-  config :murmuring, MurmuringWeb.Endpoint,
+  config :cairn, CairnWeb.Endpoint,
     url: url_config,
     http: [
       # Enable IPv6 and bind on all interfaces.
@@ -167,7 +167,7 @@ if config_env() == :prod do
   # To get SSL working, you will need to add the `https` key
   # to your endpoint configuration:
   #
-  #     config :murmuring, MurmuringWeb.Endpoint,
+  #     config :cairn, CairnWeb.Endpoint,
   #       https: [
   #         ...,
   #         port: 443,
@@ -189,7 +189,7 @@ if config_env() == :prod do
   # We also recommend setting `force_ssl` in your config/prod.exs,
   # ensuring no data is ever sent via http, always redirecting to https:
   #
-  #     config :murmuring, MurmuringWeb.Endpoint,
+  #     config :cairn, CairnWeb.Endpoint,
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
@@ -199,7 +199,7 @@ if config_env() == :prod do
   # In production you need to configure the mailer to use a different adapter.
   # Here is an example configuration for Mailgun:
   #
-  #     config :murmuring, Murmuring.Mailer,
+  #     config :cairn, Cairn.Mailer,
   #       adapter: Swoosh.Adapters.Mailgun,
   #       api_key: System.get_env("MAILGUN_API_KEY"),
   #       domain: System.get_env("MAILGUN_DOMAIN")

@@ -1,12 +1,12 @@
-defmodule Murmuring.Identity do
+defmodule Cairn.Identity do
   @moduledoc """
-  The Identity context — `did:murmuring` self-certifying identity with
+  The Identity context — `did:cairn` self-certifying identity with
   hash-chained operation log, rotation key support, and DID document resolution.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Identity.Operation
+  alias Cairn.Repo
+  alias Cairn.Identity.Operation
 
   @doc """
   Creates a DID for a user given their signing and rotation public keys.
@@ -18,7 +18,7 @@ defmodule Murmuring.Identity do
   """
   def create_did(user, rotation_private_key, opts \\ []) do
     handle = Keyword.get(opts, :handle, user.username)
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
     service = Keyword.get(opts, :service, Keyword.get(config, :domain, "localhost"))
 
     signing_key_mb = multibase_encode(user.identity_public_key)
@@ -36,10 +36,10 @@ defmodule Murmuring.Identity do
     canonical = Operation.canonical_json(payload)
     signature = :crypto.sign(:eddsa, :none, canonical, [rotation_private_key, :ed25519])
 
-    # DID = did:murmuring:<base58(SHA-256(canonical_json(signed_genesis_op)))>
+    # DID = did:cairn:<base58(SHA-256(canonical_json(signed_genesis_op)))>
     signed_data = canonical <> signature
     hash = :crypto.hash(:sha256, signed_data)
-    did = "did:murmuring:" <> base58_encode(hash)
+    did = "did:cairn:" <> base58_encode(hash)
 
     attrs = %{
       did: did,
@@ -220,7 +220,7 @@ defmodule Murmuring.Identity do
       "service" => [
         %{
           "id" => "#{did}#home",
-          "type" => "MurmuringPDS",
+          "type" => "CairnPDS",
           "serviceEndpoint" => "https://#{state.service}"
         }
       ]
@@ -277,7 +277,7 @@ defmodule Murmuring.Identity do
     canonical = Operation.canonical_json(genesis.payload)
     signed_data = canonical <> genesis.signature
     hash = :crypto.hash(:sha256, signed_data)
-    expected_did = "did:murmuring:" <> base58_encode(hash)
+    expected_did = "did:cairn:" <> base58_encode(hash)
 
     if did == expected_did do
       :ok

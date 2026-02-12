@@ -1,10 +1,10 @@
-defmodule Mix.Tasks.Murmuring.Restore do
+defmodule Mix.Tasks.Cairn.Restore do
   @moduledoc """
-  Restores a Murmuring backup.
+  Restores a Cairn backup.
 
   ## Usage
 
-      mix murmuring.restore /path/to/backup/murmuring-2026-02-11T...
+      mix cairn.restore /path/to/backup/cairn-2026-02-11T...
 
   Restores:
   - PostgreSQL database from dump
@@ -16,7 +16,7 @@ defmodule Mix.Tasks.Murmuring.Restore do
 
   require Logger
 
-  @shortdoc "Restore Murmuring from backup"
+  @shortdoc "Restore Cairn from backup"
 
   @impl Mix.Task
   def run([backup_path | _args]) do
@@ -31,13 +31,13 @@ defmodule Mix.Tasks.Murmuring.Restore do
     dump_path = Path.join(backup_path, "database.pgdump")
 
     if File.exists?(dump_path) do
-      db_config = Application.get_env(:murmuring, Murmuring.Repo, [])
+      db_config = Application.get_env(:cairn, Cairn.Repo, [])
 
       pg_args = [
         "-h", Keyword.get(db_config, :hostname, "localhost"),
         "-p", to_string(Keyword.get(db_config, :port, 5432)),
-        "-U", Keyword.get(db_config, :username, "murmuring"),
-        "-d", Keyword.get(db_config, :database, "murmuring"),
+        "-U", Keyword.get(db_config, :username, "cairn"),
+        "-d", Keyword.get(db_config, :database, "cairn"),
         "--clean", "--if-exists",
         dump_path
       ]
@@ -60,7 +60,7 @@ defmodule Mix.Tasks.Murmuring.Restore do
     uploads_archive = Path.join(backup_path, "uploads.tar.gz")
 
     if File.exists?(uploads_archive) do
-      upload_root = Application.get_env(:murmuring, Murmuring.Storage.LocalBackend, [])[:root]
+      upload_root = Application.get_env(:cairn, Cairn.Storage.LocalBackend, [])[:root]
       target = if upload_root, do: Path.dirname(upload_root), else: Path.expand("priv")
 
       case System.cmd("tar", ["xzf", uploads_archive, "-C", target], stderr_to_stdout: true) do
@@ -91,6 +91,6 @@ defmodule Mix.Tasks.Murmuring.Restore do
   end
 
   def run(_) do
-    Mix.shell().error("Usage: mix murmuring.restore /path/to/backup/directory")
+    Mix.shell().error("Usage: mix cairn.restore /path/to/backup/directory")
   end
 end

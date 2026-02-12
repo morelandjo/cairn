@@ -5,14 +5,14 @@ use tauri::{
 };
 
 pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
-    let open = MenuItem::with_id(app, "open", "Open Murmuring", true, None::<&str>)?;
+    let open = MenuItem::with_id(app, "open", "Open Cairn", true, None::<&str>)?;
     let mute = MenuItem::with_id(app, "mute_notifs", "Mute Notifications", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
     let menu = Menu::with_items(app, &[&open, &mute, &quit])?;
 
     TrayIconBuilder::new()
         .menu(&menu)
-        .tooltip("Murmuring")
+        .tooltip("Cairn")
         .on_menu_event(|app, event| match event.id.as_ref() {
             "open" => {
                 if let Some(window) = app.get_webview_window("main") {

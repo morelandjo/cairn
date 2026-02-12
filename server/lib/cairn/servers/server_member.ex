@@ -1,4 +1,4 @@
-defmodule Murmuring.Servers.ServerMember do
+defmodule Cairn.Servers.ServerMember do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -6,9 +6,9 @@ defmodule Murmuring.Servers.ServerMember do
   @foreign_key_type :binary_id
 
   schema "server_members" do
-    belongs_to :server, Murmuring.Servers.Server
-    belongs_to :user, Murmuring.Accounts.User
-    belongs_to :role, Murmuring.Accounts.Role
+    belongs_to :server, Cairn.Servers.Server
+    belongs_to :user, Cairn.Accounts.User
+    belongs_to :role, Cairn.Accounts.Role
 
     timestamps()
   end

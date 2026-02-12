@@ -1,7 +1,7 @@
 # Phase 9: Portable Cryptographic Identity
 
 **Status:** Complete
-**Goal:** Enable portable user identity across federated instances using self-certifying `did:murmuring` identifiers with hash-chained operation logs, so users can join servers on any federated instance without re-registering.
+**Goal:** Enable portable user identity across federated instances using self-certifying `did:cairn` identifiers with hash-chained operation logs, so users can join servers on any federated instance without re-registering.
 **Dependencies:** Phase 3.5 complete (federation infrastructure), Phase 8 complete (hardening/deployment).
 **Deliverable:** Users register once on their home instance and join servers on remote instances via federated auth tokens. DIDs are stable across key rotations, independently verifiable, and support key compromise recovery.
 
@@ -9,7 +9,7 @@
 
 ## Architecture Summary
 
-- **Identity** = `did:murmuring:<base58(SHA-256(genesis_op))>` -- stable, never changes
+- **Identity** = `did:cairn:<base58(SHA-256(genesis_op))>` -- stable, never changes
 - **Two key pairs**: signing key (daily use) + rotation key (identity operations only)
 - **Operation log** = hash-chained, signed operations (create, rotate_signing_key, rotate_rotation_key, update_handle, deactivate). Self-verifying, tamper-evident.
 - **Home instance** = where you register, authenticate, store DMs/settings, host operation log
@@ -25,11 +25,11 @@
 
 ### Batch 1: DID Foundation
 
-- `did:murmuring` specification with two key pairs (signing + rotation)
+- `did:cairn` specification with two key pairs (signing + rotation)
 - `did_operations` table with hash-chained, signed operation log
-- `Murmuring.Identity` context: `create_did/3`, `rotate_signing_key/3`, `resolve_did/1`, `verify_operation_chain/1`
+- `Cairn.Identity` context: `create_did/3`, `rotate_signing_key/3`, `resolve_did/1`, `verify_operation_chain/1`
 - DID document serving at `GET /.well-known/did/:did`
-- WebFinger resolution for `did:murmuring:...` resources
+- WebFinger resolution for `did:cairn:...` resources
 - DID claim in JWT tokens, DID in auth responses
 - `alsoKnownAs: [did]` in ActivityPub Person actor
 
@@ -60,7 +60,7 @@
 - Full `InboxHandler` implementation: `handle_create/2`, `handle_update/2`, `handle_delete/2`
 - Author resolution: by DID (preferred) or actor_uri (fallback)
 - DM guard: messages from DM channels never federated
-- ActivityPub extensions: `murmuring:channelId`, `murmuring:did`, `murmuring:homeInstance`, `murmuring:displayName`
+- ActivityPub extensions: `cairn:channelId`, `cairn:did`, `cairn:homeInstance`, `cairn:displayName`
 - Left-join queries in `Chat.list_messages/2` and `get_thread/2` for federated authors
 
 ### Batch 6: Client UX Polish
@@ -76,7 +76,7 @@
 
 ## Key Design Decisions
 
-1. **`did:murmuring` with operation chain** -- Self-certifying, supports key rotation, no centralized registry. Operation chain stored on home instance, federated to peers.
+1. **`did:cairn` with operation chain** -- Self-certifying, supports key rotation, no centralized registry. Operation chain stored on home instance, federated to peers.
 2. **Two key pairs (signing + rotation)** -- Signing key for daily E2EE. Rotation key for identity operations only. Recovery codes as ultimate fallback.
 3. **Node-signed auth tokens** -- Remote trusts the home node (already established via federation handshake). Avoids user-to-user key exchange for auth.
 4. **`federated_users` is a cache** -- Home instance is authoritative. Cache refreshes on activity.
@@ -93,7 +93,7 @@
 - 106 proto tests, 0 failures
 
 New test files:
-- `server/test/murmuring/identity_test.exs` -- genesis, rotation, chain verification, tamper detection
-- `server/test/murmuring/federation/inbox_handler_test.exs` -- create/update/delete with DID resolution
-- `server/test/murmuring/federation/message_federator_test.exs` -- DM guard, federation with DID
-- `server/test/murmuring/federation/activity_pub_test.exs` -- DID extension fields
+- `server/test/cairn/identity_test.exs` -- genesis, rotation, chain verification, tamper detection
+- `server/test/cairn/federation/inbox_handler_test.exs` -- create/update/delete with DID resolution
+- `server/test/cairn/federation/message_federator_test.exs` -- DM guard, federation with DID
+- `server/test/cairn/federation/activity_pub_test.exs` -- DID extension fields

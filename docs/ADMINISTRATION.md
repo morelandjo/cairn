@@ -2,72 +2,72 @@
 
 ## Overview
 
-This guide covers day-to-day administration of a Murmuring instance: user management, moderation, federation, monitoring, and maintenance. For initial installation and setup, see the [Server Installation Guide](SERVER.md).
+This guide covers day-to-day administration of a Cairn instance: user management, moderation, federation, monitoring, and maintenance. For initial installation and setup, see the [Server Installation Guide](SERVER.md).
 
 ### Admin Authentication
 
 Admin operations are performed through:
 
-1. **`murmuring-ctl` CLI** — shell commands on the server host
+1. **`cairn-ctl` CLI** — shell commands on the server host
 2. **Admin API** — HTTP endpoints under `/api/v1/admin/` requiring an authenticated admin user
 3. **Server settings UI** — web client interface for server owners and admins
 
-A user with the **Owner** or **Admin** role on a server can access moderation and management features for that server. Instance-level admin operations (federation, key rotation) require the `manage_server` permission or direct server access via `murmuring-ctl`.
+A user with the **Owner** or **Admin** role on a server can access moderation and management features for that server. Instance-level admin operations (federation, key rotation) require the `manage_server` permission or direct server access via `cairn-ctl`.
 
 ---
 
 ## Operator CLI
 
-The `murmuring-ctl` command manages a Murmuring deployment from the server host. It expects the deployment at `/opt/murmuring` by default (override with `MURMURING_DIR` environment variable).
+The `cairn-ctl` command manages a Cairn deployment from the server host. It expects the deployment at `/opt/cairn` by default (override with `CAIRN_DIR` environment variable).
 
 ### Commands
 
-#### `murmuring-ctl status`
+#### `cairn-ctl status`
 
 Shows the status of all Docker Compose services and performs a health check on the server.
 
 ```bash
-$ murmuring-ctl status
+$ cairn-ctl status
 # Shows: docker compose ps output + health check result
 ```
 
-#### `murmuring-ctl start`
+#### `cairn-ctl start`
 
 Starts all services.
 
 ```bash
-$ murmuring-ctl start
+$ cairn-ctl start
 # Runs: docker compose up -d
 ```
 
-#### `murmuring-ctl stop`
+#### `cairn-ctl stop`
 
 Stops all services without removing containers.
 
 ```bash
-$ murmuring-ctl stop
+$ cairn-ctl stop
 # Runs: docker compose stop
 ```
 
-#### `murmuring-ctl restart`
+#### `cairn-ctl restart`
 
 Restarts all services and shows status.
 
 ```bash
-$ murmuring-ctl restart
+$ cairn-ctl restart
 ```
 
-#### `murmuring-ctl logs [service]`
+#### `cairn-ctl logs [service]`
 
 Tails logs for all services, or a specific service.
 
 ```bash
-$ murmuring-ctl logs           # All services
-$ murmuring-ctl logs server    # Server only
-$ murmuring-ctl logs sfu       # SFU only
+$ cairn-ctl logs           # All services
+$ cairn-ctl logs server    # Server only
+$ cairn-ctl logs sfu       # SFU only
 ```
 
-#### `murmuring-ctl upgrade`
+#### `cairn-ctl upgrade`
 
 Performs a zero-downtime rolling upgrade:
 
@@ -80,20 +80,20 @@ Performs a zero-downtime rolling upgrade:
 7. Shows final status
 
 ```bash
-$ murmuring-ctl upgrade
+$ cairn-ctl upgrade
 ```
 
-#### `murmuring-ctl rollback`
+#### `cairn-ctl rollback`
 
 Restores the database from the most recent backup and restarts all services.
 
 ```bash
-$ murmuring-ctl rollback
+$ cairn-ctl rollback
 ```
 
-#### `murmuring-ctl backup`
+#### `cairn-ctl backup`
 
-Creates a full backup in `$DEPLOY_DIR/backups/murmuring-backup-YYYYMMDD-HHMMSS/`:
+Creates a full backup in `$DEPLOY_DIR/backups/cairn-backup-YYYYMMDD-HHMMSS/`:
 
 | File | Contents |
 |------|----------|
@@ -102,48 +102,48 @@ Creates a full backup in `$DEPLOY_DIR/backups/murmuring-backup-YYYYMMDD-HHMMSS/`
 | `keys.tar.gz` | Federation Ed25519 keys (mode 600) |
 
 ```bash
-$ murmuring-ctl backup
+$ cairn-ctl backup
 ```
 
-#### `murmuring-ctl restore <path>`
+#### `cairn-ctl restore <path>`
 
 Restores a database from a backup directory. Prompts for confirmation. Requires a manual restart afterward.
 
 ```bash
-$ murmuring-ctl restore /opt/murmuring/backups/murmuring-backup-20260211-143000
-$ murmuring-ctl restart
+$ cairn-ctl restore /opt/cairn/backups/cairn-backup-20260211-143000
+$ cairn-ctl restart
 ```
 
-#### `murmuring-ctl config [key] [value]`
+#### `cairn-ctl config [key] [value]`
 
 View or modify configuration:
 
 ```bash
-$ murmuring-ctl config                    # Show all config
-$ murmuring-ctl config MURMURING_DOMAIN   # Show single value
-$ murmuring-ctl config MURMURING_DOMAIN new.domain.com  # Update value
+$ cairn-ctl config                    # Show all config
+$ cairn-ctl config CAIRN_DOMAIN   # Show single value
+$ cairn-ctl config CAIRN_DOMAIN new.domain.com  # Update value
 ```
 
 Changes are written to `.env`. Restart services for changes to take effect.
 
-#### `murmuring-ctl user create <username> <password>`
+#### `cairn-ctl user create <username> <password>`
 
 Creates a new user account via the Elixir release eval.
 
 ```bash
-$ murmuring-ctl user create alice 'SecureP@ss123'
+$ cairn-ctl user create alice 'SecureP@ss123'
 ```
 
-#### `murmuring-ctl federation list`
+#### `cairn-ctl federation list`
 
 Lists all known federation nodes and their status.
 
 ```bash
-$ murmuring-ctl federation list
+$ cairn-ctl federation list
 # Output: domain [status] for each node
 ```
 
-#### `murmuring-ctl help`
+#### `cairn-ctl help`
 
 Shows all available commands with usage.
 
@@ -219,7 +219,7 @@ The previous key remains valid for a **7-day grace period** to allow remote node
 ### Creating Users
 
 ```bash
-murmuring-ctl user create <username> <password>
+cairn-ctl user create <username> <password>
 ```
 
 Users can also self-register through the client (rate limited to 3 registrations per hour per IP).
@@ -469,7 +469,7 @@ Rate limit state is stored in the `:http_rate_limiter` ETS table. Stale entries 
 Rate limiting can be disabled entirely (not recommended for production):
 
 ```elixir
-config :murmuring, :http_rate_limiting, false
+config :cairn, :http_rate_limiting, false
 ```
 
 ### Registration Bot Protection
@@ -481,7 +481,7 @@ Registration is protected by two additional layers beyond rate limiting:
 The HMAC key is configured via the `ALTCHA_HMAC_KEY` environment variable (generate with `openssl rand -base64 32`). PoW verification can be disabled in development/test:
 
 ```elixir
-config :murmuring, :require_pow, false
+config :cairn, :require_pow, false
 ```
 
 **Honeypot Field** — The registration form includes a hidden `website` field that is invisible to real users but auto-filled by naive bots. Any request with a non-empty `website` field is rejected.
@@ -528,7 +528,7 @@ Set in your `.env`:
 
 ```env
 FEDERATION_ENABLED=true
-MURMURING_DOMAIN=your.domain.com
+CAIRN_DOMAIN=your.domain.com
 ```
 
 Restart services for changes to take effect.
@@ -541,7 +541,7 @@ Restart services for changes to take effect.
 - The ActivityPub inbox/outbox pattern is used for message exchange
 - HLC (Hybrid Logical Clock) timestamps ensure consistent ordering across instances
 - Metadata (IP addresses, etc.) is stripped before delivery for privacy
-- **Portable identity**: Users have `did:murmuring` self-certifying identifiers with hash-chained operation logs. Users can join remote servers without re-registering via node-signed federated auth tokens.
+- **Portable identity**: Users have `did:cairn` self-certifying identifiers with hash-chained operation logs. Users can join remote servers without re-registering via node-signed federated auth tokens.
 - **Cross-instance DMs**: Users can DM users on remote instances. The DM channel lives on the initiator's instance only — messages are never replicated. A lightweight "DM hint" notification is delivered via federation so the recipient can accept or reject the request. DM messages themselves are never sent over ActivityPub.
 
 ### Well-Known Endpoints
@@ -549,12 +549,12 @@ Restart services for changes to take effect.
 The server automatically serves:
 
 ```
-GET /.well-known/murmuring    # Instance info
+GET /.well-known/cairn    # Instance info
 GET /.well-known/nodeinfo     # NodeInfo protocol
 GET /.well-known/did/:did     # DID document resolution
 ```
 
-The DID endpoint resolves `did:murmuring:...` identifiers to W3C DID documents by replaying the user's hash-chained operation log. Remote instances use this to verify user identity and detect impersonation.
+The DID endpoint resolves `did:cairn:...` identifiers to W3C DID documents by replaying the user's hash-chained operation log. Remote instances use this to verify user identity and detect impersonation.
 
 ### Key Rotation
 
@@ -565,7 +565,7 @@ Rotate the federation signing key:
 POST /api/v1/admin/federation/rotate-key
 
 # Via Elixir eval
-docker compose exec -T server bin/murmuring eval "Murmuring.Federation.NodeIdentity.rotate_key()"
+docker compose exec -T server bin/cairn eval "Cairn.Federation.NodeIdentity.rotate_key()"
 ```
 
 After rotation:
@@ -586,7 +586,7 @@ Blocking logs `federation.node_blocked` / `federation.node_unblocked` audit even
 
 ### Portable Identity (DID)
 
-Each user has a `did:murmuring:...` identifier derived from a hash of their genesis operation. The DID is stable across key rotations.
+Each user has a `did:cairn:...` identifier derived from a hash of their genesis operation. The DID is stable across key rotations.
 
 **User key structure:**
 - **Signing key** (Ed25519) — used for E2EE, message signing, daily operations
@@ -641,16 +641,16 @@ Metrics are exposed via PromEx in Prometheus text format.
 
 | Metric | Type | Description |
 |--------|------|-------------|
-| `murmuring_websocket_connections_total` | Gauge | Active WebSocket connections (polled every 5s) |
-| `murmuring_federation_nodes_active` | Gauge | Active federation nodes (polled every 5s) |
-| `murmuring_messages_sent_total` | Counter | Total messages sent |
-| `murmuring_federation_activities_total` | Counter | Federation activities (tags: `direction`, `type`) |
-| `murmuring_auth_login_total` | Counter | Login attempts (tags: `result`: success/failure) |
-| `murmuring_voice_joins_total` | Counter | Voice channel joins |
+| `cairn_websocket_connections_total` | Gauge | Active WebSocket connections (polled every 5s) |
+| `cairn_federation_nodes_active` | Gauge | Active federation nodes (polled every 5s) |
+| `cairn_messages_sent_total` | Counter | Total messages sent |
+| `cairn_federation_activities_total` | Counter | Federation activities (tags: `direction`, `type`) |
+| `cairn_auth_login_total` | Counter | Login attempts (tags: `result`: success/failure) |
+| `cairn_voice_joins_total` | Counter | Voice channel joins |
 
 ### Grafana Dashboard
 
-A pre-built Grafana dashboard is provided at `deploy/grafana/murmuring-overview.json`. Import it into your Grafana instance with a Prometheus datasource.
+A pre-built Grafana dashboard is provided at `deploy/grafana/cairn-overview.json`. Import it into your Grafana instance with a Prometheus datasource.
 
 **Dashboard panels:**
 
@@ -667,7 +667,7 @@ A pre-built Grafana dashboard is provided at `deploy/grafana/murmuring-overview.
 
 ### Structured Logging
 
-The server uses structured logging with the Elixir Logger. All HTTP requests include a **correlation ID** (via the `MurmuringWeb.Plugs.CorrelationId` plug) that is:
+The server uses structured logging with the Elixir Logger. All HTTP requests include a **correlation ID** (via the `CairnWeb.Plugs.CorrelationId` plug) that is:
 - Added to the `x-correlation-id` response header
 - Included in Logger metadata for request tracing
 - Propagated through async jobs
@@ -675,7 +675,7 @@ The server uses structured logging with the Elixir Logger. All HTTP requests inc
 Filter logs by correlation ID to trace a request across the system:
 
 ```bash
-murmuring-ctl logs server | grep "correlation_id=abc123"
+cairn-ctl logs server | grep "correlation_id=abc123"
 ```
 
 ---
@@ -783,7 +783,7 @@ Audit logs are automatically pruned after **90 days** by an Oban worker running 
 
 ```elixir
 # In runtime.exs or .env
-config :murmuring, :audit_retention_days, 90
+config :cairn, :audit_retention_days, 90
 ```
 
 ### IP Address Logging
@@ -791,7 +791,7 @@ config :murmuring, :audit_retention_days, 90
 IP logging is disabled by default for privacy. Enable it:
 
 ```elixir
-config :murmuring, :audit_log_ip, true
+config :cairn, :audit_log_ip, true
 ```
 
 ---
@@ -848,13 +848,13 @@ The CI pipeline runs:
 
 ### Automated Backups
 
-#### Using murmuring-ctl
+#### Using cairn-ctl
 
 ```bash
-murmuring-ctl backup
+cairn-ctl backup
 ```
 
-Creates a timestamped backup in `/opt/murmuring/backups/` containing:
+Creates a timestamped backup in `/opt/cairn/backups/` containing:
 - `database.pgdump` — PostgreSQL custom-format dump
 - `uploads.tar.gz` — all user-uploaded files
 - `keys.tar.gz` — federation Ed25519 keys (restricted permissions)
@@ -870,8 +870,8 @@ The Ansible playbook includes **automatic 30-day retention** — backups older t
 ### Restoring from Backup
 
 ```bash
-murmuring-ctl restore /opt/murmuring/backups/murmuring-backup-20260211-143000
-murmuring-ctl restart
+cairn-ctl restore /opt/cairn/backups/cairn-backup-20260211-143000
+cairn-ctl restart
 ```
 
 The restore command:
@@ -883,21 +883,21 @@ To restore uploads and keys manually:
 
 ```bash
 # Restore uploads
-docker compose exec -T server tar xzf - -C / < backups/murmuring-backup-YYYYMMDD-HHMMSS/uploads.tar.gz
+docker compose exec -T server tar xzf - -C / < backups/cairn-backup-YYYYMMDD-HHMMSS/uploads.tar.gz
 
 # Restore federation keys
-docker compose exec -T server tar xzf - -C / < backups/murmuring-backup-YYYYMMDD-HHMMSS/keys.tar.gz
+docker compose exec -T server tar xzf - -C / < backups/cairn-backup-YYYYMMDD-HHMMSS/keys.tar.gz
 ```
 
 ### Backup Recommendations
 
 - Schedule daily backups via cron:
   ```cron
-  0 3 * * * /opt/murmuring/murmuring-ctl backup
+  0 3 * * * /opt/cairn/cairn-ctl backup
   ```
 - Copy backups to offsite storage (S3, another server)
 - Test restore procedures periodically
-- The `murmuring-ctl upgrade` command creates an automatic backup before updating
+- The `cairn-ctl upgrade` command creates an automatic backup before updating
 - Keep federation keys secure — they are the instance's identity
 
 ---
@@ -914,7 +914,7 @@ Full-text search uses Meilisearch with a `messages` index.
 - Filterable attributes: `channel_id`, `author_id`
 - Sortable attributes: `inserted_at`
 
-The index is created automatically on first use via `Murmuring.Search.ensure_index()`.
+The index is created automatically on first use via `Cairn.Search.ensure_index()`.
 
 ### Reindexing
 
@@ -925,7 +925,7 @@ If search results are missing or corrupted, reindex by clearing and recreating t
 docker compose stop meilisearch
 
 # Remove data volume
-docker volume rm murmuring_meilidata
+docker volume rm cairn_meilidata
 
 # Restart — index will be recreated
 docker compose up -d meilisearch
@@ -947,7 +947,7 @@ Configure S3-compatible object storage:
 
 ```env
 STORAGE_BACKEND=s3
-S3_BUCKET=murmuring-uploads
+S3_BUCKET=cairn-uploads
 S3_ENDPOINT=https://s3.amazonaws.com
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=your-access-key
@@ -1088,14 +1088,14 @@ Returns public servers with name, description, member count, and tags.
 
 ### Server won't start after upgrade
 
-1. Check logs: `murmuring-ctl logs server`
-2. If migration failed, fix the issue and re-run: `docker compose exec -T server bin/murmuring eval "Murmuring.Release.migrate()"`
-3. If unfixable, rollback: `murmuring-ctl rollback`
+1. Check logs: `cairn-ctl logs server`
+2. If migration failed, fix the issue and re-run: `docker compose exec -T server bin/cairn eval "Cairn.Release.migrate()"`
+3. If unfixable, rollback: `cairn-ctl rollback`
 
 ### High memory usage
 
 1. Check BEAM memory: monitor `beam_vm_memory_total_bytes` metric
-2. Check PostgreSQL: `docker compose exec postgres psql -U murmuring -c "SELECT pg_size_pretty(pg_database_size('murmuring'))"`
+2. Check PostgreSQL: `docker compose exec postgres psql -U cairn -c "SELECT pg_size_pretty(pg_database_size('cairn'))"`
 3. Check Redis: `docker compose exec redis redis-cli info memory`
 4. Consider increasing container memory limits in `docker-compose.yml`
 
@@ -1114,7 +1114,7 @@ Adjust rate limits by modifying the `RateLimiter` plug configuration. The defaul
 
 Audit logs are automatically pruned after 90 days. If disk usage is still high:
 1. Reduce retention: set `audit_retention_days` to a lower value
-2. Manually prune: `docker compose exec -T server bin/murmuring eval "Murmuring.Audit.prune(30)"`
+2. Manually prune: `docker compose exec -T server bin/cairn eval "Cairn.Audit.prune(30)"`
 
 ### Search not returning results
 
@@ -1130,5 +1130,5 @@ To trace a specific request through the system, find the correlation ID from:
 - Server logs (grep for `correlation_id=`)
 
 ```bash
-murmuring-ctl logs server | grep "correlation_id=<id>"
+cairn-ctl logs server | grep "correlation_id=<id>"
 ```

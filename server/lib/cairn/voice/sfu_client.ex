@@ -1,12 +1,12 @@
-defmodule Murmuring.Voice.SfuClient do
-  @behaviour Murmuring.Voice.SfuClientBehaviour
+defmodule Cairn.Voice.SfuClient do
+  @behaviour Cairn.Voice.SfuClientBehaviour
 
   defp base_url do
-    Application.get_env(:murmuring, :sfu_url, "http://localhost:4001")
+    Application.get_env(:cairn, :sfu_url, "http://localhost:4001")
   end
 
   defp auth_secret do
-    Application.get_env(:murmuring, :sfu_auth_secret, "dev-sfu-secret")
+    Application.get_env(:cairn, :sfu_auth_secret, "dev-sfu-secret")
   end
 
   defp headers do

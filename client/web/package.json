@@ -12,7 +12,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@murmuring/proto": "file:../../proto",
+    "@cairn/proto": "file:../../proto",
     "altcha": "^1.1.0",
     "libsodium-wrappers-sumo": "^0.8.2",
     "mediasoup-client": "^3.18.6",

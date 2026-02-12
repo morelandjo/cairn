@@ -1,8 +1,8 @@
 /**
- * Moderation API endpoints — delegates to @murmuring/proto.
+ * Moderation API endpoints — delegates to @cairn/proto.
  */
 
-import { moderationApi } from "@murmuring/proto";
+import { moderationApi } from "@cairn/proto";
 import { client } from "./client";
 
 export type {
@@ -11,7 +11,7 @@ export type {
   ModLogEntry,
   MessageReport,
   AutoModRule,
-} from "@murmuring/proto/api";
+} from "@cairn/proto/api";
 
 export function muteUser(
   serverId: string,

@@ -9,7 +9,7 @@
 
 ## What Changed
 
-The protocol spec (Section 3.2) defines a `MurmuringServer` entity — a Discord-style server/guild that owns channels, roles, and members. Before Phase 3, channels were flat top-level entities with no parent container. This phase introduced the server hierarchy and restructured everything around it.
+The protocol spec (Section 3.2) defines a `CairnServer` entity — a Discord-style server/guild that owns channels, roles, and members. Before Phase 3, channels were flat top-level entities with no parent container. This phase introduced the server hierarchy and restructured everything around it.
 
 ---
 
@@ -40,7 +40,7 @@ Used raw SQL with `Ecto.UUID.dump/1` for binary UUID encoding in the data migrat
 
 ## Server Modules
 
-### `Murmuring.Servers` (context)
+### `Cairn.Servers` (context)
 
 CRUD operations for servers with automatic setup:
 
@@ -51,11 +51,11 @@ CRUD operations for servers with automatic setup:
 - `create_role/1`, `update_role/2`, `delete_role/1`, `list_server_roles/1`
 - `assign_role/3`, `unassign_role/2`
 
-### `Murmuring.Servers.Server` (schema)
+### `Cairn.Servers.Server` (schema)
 
 Fields: `name`, `description`, `icon_key`, `creator_id`. Has many channels, roles, server_members.
 
-### `Murmuring.Servers.ServerMember` (schema)
+### `Cairn.Servers.ServerMember` (schema)
 
 Fields: `server_id`, `user_id`, `role_id`. Belongs to server, user, role.
 
@@ -63,7 +63,7 @@ Fields: `server_id`, `user_id`, `role_id`. Belongs to server, user, role.
 
 ## Per-Server Roles & Permissions
 
-### `Murmuring.Servers.Permissions`
+### `Cairn.Servers.Permissions`
 
 15 protocol-defined permission keys:
 
@@ -92,7 +92,7 @@ Resolution logic:
 - @everyone role (priority 0) is always included as base permissions
 - Additive: permissions OR'd across all assigned roles
 
-### `MurmuringWeb.Plugs.ServerAuth`
+### `CairnWeb.Plugs.ServerAuth`
 
 Plug that extracts server from route/channel, calls `Permissions.has_permission?/3`, returns 403 on denial. DMs bypass permission checks entirely.
 
@@ -107,13 +107,13 @@ Applied to:
 
 ## Channel & Invite Refactor
 
-### `Murmuring.Chat.Channel` (modified)
+### `Cairn.Chat.Channel` (modified)
 
 - Added `belongs_to :server` association
 - Validation: `server_id` required for non-DM channels, NULL for DMs
 - CHECK constraint enforced at DB level
 
-### `Murmuring.Chat` (modified)
+### `Cairn.Chat` (modified)
 
 New server-scoped queries:
 - `list_server_channels(server_id)` — all channels in a server
@@ -121,13 +121,13 @@ New server-scoped queries:
 - `create_channel/1` — now requires `server_id` for non-DM channels
 - `create_server_invite/1` — server-level invites (channel_id=nil)
 
-### `Murmuring.Accounts.InviteLink` (modified)
+### `Cairn.Accounts.InviteLink` (modified)
 
 - Added optional `server_id` field
 - Server-level invites: `server_id` set, `channel_id` nil
 - Server invite usage → adds user to server with @everyone role
 
-### `Murmuring.Accounts.Role` (modified)
+### `Cairn.Accounts.Role` (modified)
 
 - Added `belongs_to :server` association
 - `server_id` required on all roles
@@ -137,7 +137,7 @@ New server-scoped queries:
 
 ## Server API Endpoints
 
-### `MurmuringWeb.ServerController`
+### `CairnWeb.ServerController`
 
 | Method | Path | Description |
 |---|---|---|
@@ -188,9 +188,9 @@ type PermissionKey = "send_messages" | "read_messages" | ... (15 total)
 
 | Test File | Tests | Description |
 |---|---|---|
-| `test/murmuring/servers_test.exs` | 16 | Server CRUD, membership, role management |
-| `test/murmuring/servers/permissions_test.exs` | 8 | Permission resolution, creator bypass, @everyone base |
-| `test/murmuring_web/controllers/server_controller_test.exs` | 14 | All REST endpoints, auth, permission enforcement |
+| `test/cairn/servers_test.exs` | 16 | Server CRUD, membership, role management |
+| `test/cairn/servers/permissions_test.exs` | 8 | Permission resolution, creator bypass, @everyone base |
+| `test/cairn_web/controllers/server_controller_test.exs` | 14 | All REST endpoints, auth, permission enforcement |
 
 All existing tests continued to pass (channels updated to include `server_id` in 4 test files).
 

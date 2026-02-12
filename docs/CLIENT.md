@@ -2,15 +2,15 @@
 
 ## Overview
 
-Murmuring is available on three platforms:
+Cairn is available on three platforms:
 
 | Platform | Technology | Distribution |
 |----------|-----------|-------------|
-| **Web** | React + Vite | Served by the Murmuring server (no install needed) |
+| **Web** | React + Vite | Served by the Cairn server (no install needed) |
 | **Desktop** | Tauri v2 (wraps web client) | GitHub Releases (macOS, Windows, Linux) |
 | **Mobile** | React Native + Expo | App Store (iOS) / Google Play (Android) |
 
-All clients share the same core protocol library (`@murmuring/proto`) for API calls, encryption, and type definitions.
+All clients share the same core protocol library (`@cairn/proto`) for API calls, encryption, and type definitions.
 
 ---
 
@@ -52,7 +52,7 @@ Permissions: Microphone (voice calls), Camera (video calls), Notifications, Face
 
 ### Web
 
-No installation required. Navigate to your server's URL in a supported browser (e.g., `https://murmuring.example.com`).
+No installation required. Navigate to your server's URL in a supported browser (e.g., `https://cairn.example.com`).
 
 ### Desktop
 
@@ -75,7 +75,7 @@ Open the server URL directly in your browser. If the server serves the SPA (sing
 ### Desktop & Mobile
 
 1. Launch the app
-2. Enter the server URL (e.g., `https://murmuring.example.com`)
+2. Enter the server URL (e.g., `https://cairn.example.com`)
 3. The app verifies the connection
 4. Proceed to login or registration
 
@@ -89,7 +89,7 @@ Open the server URL directly in your browser. If the server serves the SPA (sing
 2. Enter a username (unique), display name (optional), and password (8+ characters)
 3. After registration, **recovery codes** are displayed — save these in a secure location. They are needed to recover your account if you lose access to your 2FA device, and to rotate your rotation key in case of key compromise.
 4. You are automatically logged in
-5. Your cryptographic identity (`did:murmuring:...`) is generated automatically from your signing and rotation keys. This DID is permanent and survives key rotations.
+5. Your cryptographic identity (`did:cairn:...`) is generated automatically from your signing and rotation keys. This DID is permanent and survives key rotations.
 
 ### Login
 
@@ -108,7 +108,7 @@ Sessions are automatically restored on app launch. If your access token expires,
 
 ### Two-Factor Authentication
 
-Murmuring supports two 2FA methods:
+Cairn supports two 2FA methods:
 
 - **TOTP** (Time-based One-Time Password) — works with any authenticator app (Google Authenticator, Authy, etc.)
 - **WebAuthn** — hardware security keys (YubiKey, etc.) or platform authenticators (Touch ID, Windows Hello)
@@ -150,7 +150,7 @@ Join via:
 
 ### Joining Remote Servers
 
-When you join a server on a different Murmuring instance:
+When you join a server on a different Cairn instance:
 
 1. Click the globe icon in the server sidebar or follow a federated invite link
 2. Your home instance issues a federated authentication token
@@ -304,7 +304,7 @@ Mobile voice uses `react-native-webrtc` with the `ReactNativeUnifiedPlan` handle
 
 ## End-to-End Encryption
 
-Murmuring provides end-to-end encryption for private channels and 1:1 messages, ensuring the server cannot read message content.
+Cairn provides end-to-end encryption for private channels and 1:1 messages, ensuring the server cannot read message content.
 
 ### MLS (Messaging Layer Security)
 
@@ -330,7 +330,7 @@ Back up your encryption keys to the server for recovery on new devices:
 
 ### Safety Numbers
 
-Verify a contact's identity by comparing safety numbers. Open the **Safety Number** dialog for a user to see a visual representation of their public key and their DID (`did:murmuring:...`). DIDs work for cross-instance verification — the same DID identifies a user regardless of which instance you're viewing them from.
+Verify a contact's identity by comparing safety numbers. Open the **Safety Number** dialog for a user to see a visual representation of their public key and their DID (`did:cairn:...`). DIDs work for cross-instance verification — the same DID identifies a user regardless of which instance you're viewing them from.
 
 ### Mobile Limitations
 
@@ -374,7 +374,7 @@ Configure per-server and per-channel notification settings:
 ### Security
 
 - **Two-Factor Authentication:** Enable/disable TOTP and WebAuthn
-- **Cryptographic Identity (DID):** View your `did:murmuring:...` identifier (click to copy)
+- **Cryptographic Identity (DID):** View your `did:cairn:...` identifier (click to copy)
 - **Key Rotation:** Rotate your signing key (DID stays the same). Use if you suspect key compromise.
 - **Key Backup:** Backup and restore encryption keys (including rotation key)
 - **Key Package Status:** View MLS key package count
@@ -443,7 +443,7 @@ Enable offline mode in mobile settings.
 
 ## Federation & Portable Identity
 
-Murmuring uses portable cryptographic identity (`did:murmuring`) so you can participate across multiple instances with a single account.
+Cairn uses portable cryptographic identity (`did:cairn`) so you can participate across multiple instances with a single account.
 
 ### How It Works
 
@@ -471,7 +471,7 @@ For rotation key compromise, use your recovery codes to rotate the rotation key 
 
 ### Cross-Instance DMs
 
-You can send direct messages to users on other Murmuring instances:
+You can send direct messages to users on other Cairn instances:
 
 #### Sending a DM (Initiator)
 

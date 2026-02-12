@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.InviteController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.InviteController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Chat
+  alias Cairn.Chat
 
   def create(conn, %{"channel_id" => channel_id} = params) do
     user_id = conn.assigns.current_user.id

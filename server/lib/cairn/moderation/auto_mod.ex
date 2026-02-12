@@ -1,4 +1,4 @@
-defmodule Murmuring.Moderation.AutoMod do
+defmodule Cairn.Moderation.AutoMod do
   @moduledoc """
   Auto-moderation engine. Runs synchronously before message creation.
   Checks content against server-specific rules.
@@ -6,8 +6,8 @@ defmodule Murmuring.Moderation.AutoMod do
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Moderation.AutoModRule
+  alias Cairn.Repo
+  alias Cairn.Moderation.AutoModRule
 
   def check_message(server_id, content) when is_binary(content) do
     rules = get_enabled_rules(server_id)

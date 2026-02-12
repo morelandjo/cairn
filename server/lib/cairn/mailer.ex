@@ -1,3 +1,3 @@
-defmodule Murmuring.Mailer do
-  use Swoosh.Mailer, otp_app: :murmuring
+defmodule Cairn.Mailer do
+  use Swoosh.Mailer, otp_app: :cairn
 end

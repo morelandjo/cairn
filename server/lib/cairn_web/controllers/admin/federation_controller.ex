@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.Admin.FederationController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.Admin.FederationController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Federation
+  alias Cairn.Federation
 
   def index(conn, _params) do
     nodes = Federation.list_nodes()
@@ -110,21 +110,21 @@ defmodule MurmuringWeb.Admin.FederationController do
   end
 
   def rotate_key(conn, _params) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
 
     if Keyword.get(config, :enabled, false) do
-      :ok = Murmuring.Federation.NodeIdentity.rotate_key()
+      :ok = Cairn.Federation.NodeIdentity.rotate_key()
 
-      Murmuring.Audit.log("federation.key_rotated",
+      Cairn.Audit.log("federation.key_rotated",
         actor_id: conn.assigns.current_user.id,
-        metadata: %{new_node_id: Murmuring.Federation.NodeIdentity.node_id()}
+        metadata: %{new_node_id: Cairn.Federation.NodeIdentity.node_id()}
       )
 
       json(conn, %{
         ok: true,
-        node_id: Murmuring.Federation.NodeIdentity.node_id(),
-        public_key: Murmuring.Federation.NodeIdentity.public_key_base64(),
-        previous_public_key: Murmuring.Federation.NodeIdentity.previous_public_key_base64(),
+        node_id: Cairn.Federation.NodeIdentity.node_id(),
+        public_key: Cairn.Federation.NodeIdentity.public_key_base64(),
+        previous_public_key: Cairn.Federation.NodeIdentity.previous_public_key_base64(),
         message: "Key rotated. Previous key available for 7-day grace period."
       })
     else

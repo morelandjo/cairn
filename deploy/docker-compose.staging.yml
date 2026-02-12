@@ -7,7 +7,7 @@ services:
   # It will be created in Phase 1. For now, build it manually or
   # replace with a local build context once the Dockerfile lands.
   node-a:
-    image: murmuring-server:latest  # will be built in Phase 1
+    image: cairn-server:latest  # will be built in Phase 1
     ports:
       - "4000:4000"
     environment:
@@ -15,11 +15,11 @@ services:
       PHX_HOST: localhost
       PHX_PORT: "4000"
       SECRET_KEY_BASE: "staging-secret-key-base-replace-me-with-64-bytes-of-random-hex!!"
-      DATABASE_URL: "ecto://murmuring:murmuring_staging@postgres:5432/murmuring_node_a"
+      DATABASE_URL: "ecto://cairn:cairn_staging@postgres:5432/cairn_node_a"
       REDIS_URL: "redis://redis-a:6379/0"
       MEILI_URL: "http://meilisearch:7700"
-      MEILI_MASTER_KEY: murmuring_staging_key
-      RELEASE_NODE: "murmuring@node-a"
+      MEILI_MASTER_KEY: cairn_staging_key
+      RELEASE_NODE: "cairn@node-a"
       RELEASE_DISTRIBUTION: name
     depends_on:
       postgres:
@@ -35,10 +35,10 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - murmuring-staging
+      - cairn-staging
 
   node-b:
-    image: murmuring-server:latest  # will be built in Phase 1
+    image: cairn-server:latest  # will be built in Phase 1
     ports:
       - "4002:4000"
     environment:
@@ -46,11 +46,11 @@ services:
       PHX_HOST: localhost
       PHX_PORT: "4000"
       SECRET_KEY_BASE: "staging-secret-key-base-replace-me-with-64-bytes-of-random-hex!!"
-      DATABASE_URL: "ecto://murmuring:murmuring_staging@postgres:5432/murmuring_node_b"
+      DATABASE_URL: "ecto://cairn:cairn_staging@postgres:5432/cairn_node_b"
       REDIS_URL: "redis://redis-b:6379/0"
       MEILI_URL: "http://meilisearch:7700"
-      MEILI_MASTER_KEY: murmuring_staging_key
-      RELEASE_NODE: "murmuring@node-b"
+      MEILI_MASTER_KEY: cairn_staging_key
+      RELEASE_NODE: "cairn@node-b"
       RELEASE_DISTRIBUTION: name
     depends_on:
       postgres:
@@ -66,25 +66,25 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - murmuring-staging
+      - cairn-staging
 
   # ---------- PostgreSQL (shared, two databases) ----------
   postgres:
     image: postgres:18-alpine
     environment:
-      POSTGRES_USER: murmuring
-      POSTGRES_PASSWORD: murmuring_staging
-      POSTGRES_DB: murmuring_staging
+      POSTGRES_USER: cairn
+      POSTGRES_PASSWORD: cairn_staging
+      POSTGRES_DB: cairn_staging
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init-staging-dbs.sql:/docker-entrypoint-initdb.d/init-staging-dbs.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U murmuring"]
+      test: ["CMD-SHELL", "pg_isready -U cairn"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - murmuring-staging
+      - cairn-staging
 
   # ---------- Redis (one per node) ----------
   redis-a:
@@ -97,7 +97,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - murmuring-staging
+      - cairn-staging
 
   redis-b:
     image: redis:8-alpine
@@ -109,13 +109,13 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - murmuring-staging
+      - cairn-staging
 
   # ---------- Meilisearch (shared) ----------
   meilisearch:
     image: getmeili/meilisearch:v1.13
     environment:
-      MEILI_MASTER_KEY: murmuring_staging_key
+      MEILI_MASTER_KEY: cairn_staging_key
       MEILI_ENV: development
     volumes:
       - meilidata:/meili_data
@@ -125,7 +125,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - murmuring-staging
+      - cairn-staging
 
 volumes:
   pgdata:
@@ -134,5 +134,5 @@ volumes:
   meilidata:
 
 networks:
-  murmuring-staging:
-    name: murmuring-staging
+  cairn-staging:
+    name: cairn-staging

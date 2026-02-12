@@ -8,7 +8,7 @@
 
 ## Motivation
 
-Murmuring is a privacy-first platform, but today new channels default to unencrypted. Public channels exist because of practical limitations — mobile can't run MLS, the server can't search ciphertext, bots can't participate in MLS groups, and new members can't read history from before they joined. This roadmap identifies each blocker and lays out what's needed to resolve it, moving toward an architecture where encryption is the default for all channels.
+Cairn is a privacy-first platform, but today new channels default to unencrypted. Public channels exist because of practical limitations — mobile can't run MLS, the server can't search ciphertext, bots can't participate in MLS groups, and new members can't read history from before they joined. This roadmap identifies each blocker and lays out what's needed to resolve it, moving toward an architecture where encryption is the default for all channels.
 
 ---
 

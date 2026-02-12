@@ -1,19 +1,19 @@
-defmodule MurmuringWeb.FederationController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.FederationController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Federation.NodeIdentity
+  alias Cairn.Federation.NodeIdentity
 
   @protocol_version "0.1.0"
   @supported_versions ["0.1.0"]
 
   @doc """
-  GET /.well-known/murmuring-federation
+  GET /.well-known/cairn-federation
 
   Returns the node's federation metadata: node_id, domain, public_key,
   protocol version, inbox URL, and privacy manifest reference.
   """
   def federation_info(conn, _params) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
     domain = Keyword.get(config, :domain, "localhost")
 
     if Keyword.get(config, :enabled, false) do
@@ -48,7 +48,7 @@ defmodule MurmuringWeb.FederationController do
   federation policies. Operators can customize via config.
   """
   def privacy_manifest(conn, _params) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
 
     if Keyword.get(config, :enabled, false) do
       privacy = Keyword.get(config, :privacy_manifest, %{})
@@ -81,14 +81,14 @@ defmodule MurmuringWeb.FederationController do
   ActivityPub actor URI. 404 for unknown users.
   """
   def webfinger(conn, %{"resource" => resource}) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
 
     if Keyword.get(config, :enabled, false) do
       domain = Keyword.get(config, :domain, "localhost")
 
       case parse_resource(resource, domain) do
         {:ok, :acct, username} ->
-          case Murmuring.Accounts.get_user_by_username(username) do
+          case Cairn.Accounts.get_user_by_username(username) do
             nil ->
               conn
               |> put_status(404)
@@ -110,7 +110,7 @@ defmodule MurmuringWeb.FederationController do
           end
 
         {:ok, :did, did} ->
-          case Murmuring.Accounts.get_user_by_did(did) do
+          case Cairn.Accounts.get_user_by_did(did) do
             nil ->
               conn
               |> put_status(404)
@@ -128,7 +128,7 @@ defmodule MurmuringWeb.FederationController do
                     href: "https://#{domain}/users/#{user.username}"
                   },
                   %{
-                    rel: "https://murmuring.dev/ns/did",
+                    rel: "https://cairn.chat/ns/did",
                     type: "application/json",
                     href: "https://#{domain}/.well-known/did/#{did}"
                   }
@@ -139,7 +139,7 @@ defmodule MurmuringWeb.FederationController do
         {:error, :invalid_resource} ->
           conn
           |> put_status(400)
-          |> json(%{error: "Invalid resource format. Expected acct:user@domain or did:murmuring:..."})
+          |> json(%{error: "Invalid resource format. Expected acct:user@domain or did:cairn:..."})
 
         {:error, :wrong_domain} ->
           conn
@@ -163,9 +163,9 @@ defmodule MurmuringWeb.FederationController do
   GET /.well-known/did/:did — Resolves a DID to its DID document.
   """
   def resolve_did(conn, %{"did" => did_suffix}) do
-    did = "did:murmuring:" <> did_suffix
+    did = "did:cairn:" <> did_suffix
 
-    case Murmuring.Identity.resolve_did(did) do
+    case Cairn.Identity.resolve_did(did) do
       {:ok, document} ->
         conn
         |> put_resp_header("content-type", "application/did+json")
@@ -187,9 +187,9 @@ defmodule MurmuringWeb.FederationController do
   GET /.well-known/did/:did/operations — Returns the raw operation chain for a DID.
   """
   def did_operations(conn, %{"did" => did_suffix}) do
-    did = "did:murmuring:" <> did_suffix
+    did = "did:cairn:" <> did_suffix
 
-    case Murmuring.Identity.get_operations_for_api(did) do
+    case Cairn.Identity.get_operations_for_api(did) do
       [] ->
         conn
         |> put_status(404)
@@ -220,16 +220,16 @@ defmodule MurmuringWeb.FederationController do
   Used for cross-instance DM key exchange (node-to-node).
   """
   def user_keys_by_did(conn, %{"did" => did_suffix}) do
-    did = "did:murmuring:" <> did_suffix
+    did = "did:cairn:" <> did_suffix
 
-    case Murmuring.Accounts.get_user_by_did(did) do
+    case Cairn.Accounts.get_user_by_did(did) do
       nil ->
         conn
         |> put_status(404)
         |> json(%{error: "User not found for DID"})
 
       user ->
-        case Murmuring.Keys.get_key_bundle(user.id) do
+        case Cairn.Keys.get_key_bundle(user.id) do
           {:ok, bundle} ->
             response = %{
               did: did,
@@ -280,7 +280,7 @@ defmodule MurmuringWeb.FederationController do
             {:error, :invalid_resource}
         end
 
-      String.starts_with?(resource, "did:murmuring:") ->
+      String.starts_with?(resource, "did:cairn:") ->
         {:ok, :did, resource}
 
       true ->

@@ -1,18 +1,18 @@
-defmodule MurmuringWeb.FederationControllerTest do
-  use MurmuringWeb.ConnCase
+defmodule CairnWeb.FederationControllerTest do
+  use CairnWeb.ConnCase
 
-  alias Murmuring.Federation.NodeIdentity
+  alias Cairn.Federation.NodeIdentity
 
   setup do
     # Start NodeIdentity with a temp key for these tests
-    tmp_dir = Path.join(System.tmp_dir!(), "murmuring_fed_ctrl_test")
+    tmp_dir = Path.join(System.tmp_dir!(), "cairn_fed_ctrl_test")
     File.mkdir_p!(tmp_dir)
     key_path = Path.join(tmp_dir, "test_#{:erlang.unique_integer([:positive, :monotonic])}.key")
 
     # Enable federation in config for tests
-    original_config = Application.get_env(:murmuring, :federation, [])
+    original_config = Application.get_env(:cairn, :federation, [])
 
-    Application.put_env(:murmuring, :federation,
+    Application.put_env(:cairn, :federation,
       enabled: true,
       domain: "test.example.com"
     )
@@ -37,16 +37,16 @@ defmodule MurmuringWeb.FederationControllerTest do
           if Process.alive?(pid), do: GenServer.stop(pid)
       end
 
-      Application.put_env(:murmuring, :federation, original_config)
+      Application.put_env(:cairn, :federation, original_config)
       File.rm_rf!(tmp_dir)
     end)
 
     :ok
   end
 
-  describe "GET /.well-known/murmuring-federation" do
+  describe "GET /.well-known/cairn-federation" do
     test "returns federation metadata", %{conn: conn} do
-      conn = get(conn, "/.well-known/murmuring-federation")
+      conn = get(conn, "/.well-known/cairn-federation")
       body = json_response(conn, 200)
 
       assert body["node_id"]
@@ -60,9 +60,9 @@ defmodule MurmuringWeb.FederationControllerTest do
     end
 
     test "returns 404 when federation disabled", %{conn: conn} do
-      Application.put_env(:murmuring, :federation, enabled: false, domain: "test.example.com")
+      Application.put_env(:cairn, :federation, enabled: false, domain: "test.example.com")
 
-      conn = get(conn, "/.well-known/murmuring-federation")
+      conn = get(conn, "/.well-known/cairn-federation")
       body = json_response(conn, 404)
       assert body["error"] =~ "not enabled"
     end
@@ -82,7 +82,7 @@ defmodule MurmuringWeb.FederationControllerTest do
     end
 
     test "returns 404 when federation disabled", %{conn: conn} do
-      Application.put_env(:murmuring, :federation, enabled: false)
+      Application.put_env(:cairn, :federation, enabled: false)
 
       conn = get(conn, "/.well-known/privacy-manifest")
       assert json_response(conn, 404)
@@ -93,7 +93,7 @@ defmodule MurmuringWeb.FederationControllerTest do
     test "resolves existing user", %{conn: conn} do
       # Create a user
       {:ok, {user, _recovery_codes}} =
-        Murmuring.Accounts.register_user(%{
+        Cairn.Accounts.register_user(%{
           username: "feduser",
           password: "TestPassword123!",
           display_name: "Fed User"
@@ -145,7 +145,7 @@ defmodule MurmuringWeb.FederationControllerTest do
     end
 
     test "returns 404 when federation disabled", %{conn: conn} do
-      Application.put_env(:murmuring, :federation, enabled: false)
+      Application.put_env(:cairn, :federation, enabled: false)
 
       conn =
         get(conn, "/.well-known/webfinger", %{

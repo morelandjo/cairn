@@ -1,8 +1,8 @@
-defmodule MurmuringWeb.BotController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.BotController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Bots
-  alias Murmuring.Servers.Permissions
+  alias Cairn.Bots
+  alias Cairn.Servers.Permissions
 
   # POST /api/v1/servers/:server_id/bots
   def create(conn, %{"server_id" => server_id} = _params) do

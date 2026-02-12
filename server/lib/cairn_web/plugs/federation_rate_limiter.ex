@@ -1,11 +1,11 @@
-defmodule MurmuringWeb.Plugs.FederationRateLimiter do
+defmodule CairnWeb.Plugs.FederationRateLimiter do
   @moduledoc """
   Plug that rate-limits federation inbox requests per remote node domain.
   Returns 429 Too Many Requests when the limit is exceeded.
   """
 
   import Plug.Conn
-  alias Murmuring.Federation.FederationRateLimiter
+  alias Cairn.Federation.FederationRateLimiter
 
   def init(opts), do: opts
 

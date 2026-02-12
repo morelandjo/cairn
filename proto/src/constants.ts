@@ -1,5 +1,5 @@
 /**
- * Murmuring Protocol Constants
+ * Cairn Protocol Constants
  */
 
 import type { ProtocolVersion } from "./types.js";
@@ -15,14 +15,14 @@ export const PROTOCOL_VERSION: ProtocolVersion = {
 export const PROTOCOL_VERSION_STRING = `${PROTOCOL_VERSION.major}.${PROTOCOL_VERSION.minor}.${PROTOCOL_VERSION.patch}`;
 
 /** Protocol name identifier */
-export const PROTOCOL_NAME = "murmuring";
+export const PROTOCOL_NAME = "cairn";
 
 /** Namespace URI for ActivityPub extensions */
-export const MURMURING_NS = "https://murmuring.dev/ns#";
+export const CAIRN_NS = "https://cairn.chat/ns#";
 
 /** Well-known endpoint paths */
 export const WELL_KNOWN = {
-  FEDERATION: "/.well-known/murmuring-federation",
+  FEDERATION: "/.well-known/cairn-federation",
   PRIVACY_MANIFEST: "/.well-known/privacy-manifest",
   WEBFINGER: "/.well-known/webfinger",
 } as const;

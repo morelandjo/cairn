@@ -1,15 +1,15 @@
-defmodule MurmuringWeb.TotpController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.TotpController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Accounts
-  alias Murmuring.Auth
+  alias Cairn.Accounts
+  alias Cairn.Auth
 
   def enable(conn, _params) do
     secret = NimbleTOTP.secret()
 
     uri =
-      NimbleTOTP.otpauth_uri("murmuring:#{conn.assigns.current_user.username}", secret,
-        issuer: "Murmuring"
+      NimbleTOTP.otpauth_uri("cairn:#{conn.assigns.current_user.username}", secret,
+        issuer: "Cairn"
       )
 
     conn

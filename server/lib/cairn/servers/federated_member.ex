@@ -1,4 +1,4 @@
-defmodule Murmuring.Servers.FederatedMember do
+defmodule Cairn.Servers.FederatedMember do
   @moduledoc """
   Schema for federated user membership in a local server.
   """
@@ -10,9 +10,9 @@ defmodule Murmuring.Servers.FederatedMember do
   @foreign_key_type :binary_id
 
   schema "federated_members" do
-    belongs_to :server, Murmuring.Servers.Server
-    belongs_to :federated_user, Murmuring.Federation.FederatedUser
-    belongs_to :role, Murmuring.Accounts.Role
+    belongs_to :server, Cairn.Servers.Server
+    belongs_to :federated_user, Cairn.Federation.FederatedUser
+    belongs_to :role, Cairn.Accounts.Role
 
     timestamps()
   end

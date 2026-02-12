@@ -1,11 +1,11 @@
 /**
- * Search API — delegates to @murmuring/proto.
+ * Search API — delegates to @cairn/proto.
  */
 
-import { searchApi } from "@murmuring/proto";
+import { searchApi } from "@cairn/proto";
 import { client } from "./client.ts";
 
-export type { SearchResult } from "@murmuring/proto/api";
+export type { SearchResult } from "@cairn/proto/api";
 
 export function searchMessages(
   serverId: string,

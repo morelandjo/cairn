@@ -78,12 +78,12 @@ export default function ServerConnect({ onConnect }: ServerConnectProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Murmuring</Text>
+      <Text style={styles.title}>Cairn</Text>
       <Text style={styles.subtitle}>Connect to a server</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="murmuring.example.com"
+        placeholder="cairn.example.com"
         placeholderTextColor="#666"
         value={url}
         onChangeText={setUrl}

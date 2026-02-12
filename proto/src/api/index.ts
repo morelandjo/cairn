@@ -1,5 +1,5 @@
 /**
- * Shared API client — platform-agnostic HTTP client for the Murmuring API.
+ * Shared API client — platform-agnostic HTTP client for the Cairn API.
  */
 
 export { ApiClient, apiClient } from "./client.js";

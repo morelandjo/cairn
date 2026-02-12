@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.Sanitizer do
+defmodule Cairn.Chat.Sanitizer do
   @moduledoc """
   Sanitizes message content: strips HTML, blocks dangerous URIs,
   enforces length limits, and strips bidi overrides.

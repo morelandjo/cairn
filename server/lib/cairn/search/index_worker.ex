@@ -1,8 +1,8 @@
-defmodule Murmuring.Search.IndexWorker do
+defmodule Cairn.Search.IndexWorker do
   use Oban.Worker, queue: :search, max_attempts: 3
 
-  alias Murmuring.Chat
-  alias Murmuring.Search
+  alias Cairn.Chat
+  alias Cairn.Search
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"message_id" => message_id}}) do
@@ -12,7 +12,7 @@ defmodule Murmuring.Search.IndexWorker do
 
       message ->
         # Only index public, non-encrypted, non-deleted messages
-        message = Murmuring.Repo.preload(message, [:channel])
+        message = Cairn.Repo.preload(message, [:channel])
 
         if message.channel.type == "public" and
              is_nil(message.encrypted_content) and

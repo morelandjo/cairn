@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.NodeIdentity do
+defmodule Cairn.Federation.NodeIdentity do
   @moduledoc """
   Manages the node's Ed25519 signing key pair for federation.
 
@@ -159,8 +159,8 @@ defmodule Murmuring.Federation.NodeIdentity do
   # ── Private ──
 
   defp default_key_path do
-    Application.get_env(:murmuring, :federation, [])
-    |> Keyword.get(:node_key_path, Path.join(:code.priv_dir(:murmuring), "keys/node_ed25519.key"))
+    Application.get_env(:cairn, :federation, [])
+    |> Keyword.get(:node_key_path, Path.join(:code.priv_dir(:cairn), "keys/node_ed25519.key"))
   end
 
   defp load_previous_key(path) do

@@ -1,5 +1,5 @@
-defmodule MurmuringWeb.Presence do
+defmodule CairnWeb.Presence do
   use Phoenix.Presence,
-    otp_app: :murmuring,
-    pubsub_server: Murmuring.PubSub
+    otp_app: :cairn,
+    pubsub_server: Cairn.PubSub
 end

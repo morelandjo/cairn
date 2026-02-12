@@ -1,7 +1,7 @@
-defmodule Murmuring.Moderation.UnbanWorker do
+defmodule Cairn.Moderation.UnbanWorker do
   use Oban.Worker, queue: :moderation, max_attempts: 3
 
-  alias Murmuring.Moderation
+  alias Cairn.Moderation
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"ban_id" => ban_id}}) do

@@ -1,4 +1,4 @@
-defmodule Murmuring.Moderation.AutoModRule do
+defmodule Cairn.Moderation.AutoModRule do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,7 +10,7 @@ defmodule Murmuring.Moderation.AutoModRule do
     field :enabled, :boolean, default: true
     field :config, :map, default: %{}
 
-    belongs_to :server, Murmuring.Servers.Server
+    belongs_to :server, Cairn.Servers.Server
 
     timestamps()
   end

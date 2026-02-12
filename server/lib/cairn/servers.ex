@@ -1,12 +1,12 @@
-defmodule Murmuring.Servers do
+defmodule Cairn.Servers do
   @moduledoc """
   The Servers context — server/guild CRUD and membership management.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Servers.{Server, ServerMember, MemberRole, ChannelPermissionOverride}
-  alias Murmuring.Accounts.Role
+  alias Cairn.Repo
+  alias Cairn.Servers.{Server, ServerMember, MemberRole, ChannelPermissionOverride}
+  alias Cairn.Accounts.Role
 
   # Server CRUD
 
@@ -137,7 +137,7 @@ defmodule Murmuring.Servers do
   # Membership
 
   def add_member(server_id, user_id, role_id \\ nil) do
-    if Murmuring.Moderation.is_banned?(server_id, user_id) do
+    if Cairn.Moderation.is_banned?(server_id, user_id) do
       {:error, :banned}
     else
       role_id = role_id || get_everyone_role_id(server_id)
@@ -353,7 +353,7 @@ defmodule Murmuring.Servers do
 
   # ── Federated Members ──
 
-  alias Murmuring.Servers.FederatedMember
+  alias Cairn.Servers.FederatedMember
 
   def add_federated_member(server_id, federated_user_id, role_id \\ nil) do
     role_id = role_id || get_everyone_role_id(server_id)

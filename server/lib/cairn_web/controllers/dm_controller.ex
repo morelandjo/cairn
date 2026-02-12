@@ -1,9 +1,9 @@
-defmodule MurmuringWeb.DmController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.DmController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Chat
-  alias Murmuring.Federation
-  alias Murmuring.Federation.DmHintWorker
+  alias Cairn.Chat
+  alias Cairn.Federation
+  alias Cairn.Federation.DmHintWorker
 
   @max_requests_per_hour 10
   @max_pending_per_recipient 5
@@ -139,7 +139,7 @@ defmodule MurmuringWeb.DmController do
               {:ok, updated} ->
                 # Notify the sender via PubSub
                 Phoenix.PubSub.broadcast(
-                  Murmuring.PubSub,
+                  Cairn.PubSub,
                   "user:#{request.sender_id}",
                   {:dm_request_response, %{
                     request_id: updated.id,
@@ -203,7 +203,7 @@ defmodule MurmuringWeb.DmController do
   # ── Private ──
 
   defp validate_did_format(did) do
-    if String.starts_with?(did, "did:murmuring:") do
+    if String.starts_with?(did, "did:cairn:") do
       :ok
     else
       {:error, "Invalid DID format"}
@@ -271,7 +271,7 @@ defmodule MurmuringWeb.DmController do
   end
 
   defp deliver_dm_hint(sender, channel, recipient_did, recipient_instance) do
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
 
     # Only deliver hints when federation is enabled
     if Keyword.get(config, :enabled, false) do
@@ -282,12 +282,12 @@ defmodule MurmuringWeb.DmController do
         "type" => "Invite",
         "actor" => "https://#{domain}/users/#{sender.username}",
         "object" => %{
-          "type" => "murmuring:DmHint",
-          "murmuring:channelId" => channel.id,
-          "murmuring:senderDid" => sender.did,
-          "murmuring:senderUsername" => sender.username,
-          "murmuring:senderDisplayName" => sender.display_name,
-          "murmuring:recipientDid" => recipient_did
+          "type" => "cairn:DmHint",
+          "cairn:channelId" => channel.id,
+          "cairn:senderDid" => sender.did,
+          "cairn:senderUsername" => sender.username,
+          "cairn:senderDisplayName" => sender.display_name,
+          "cairn:recipientDid" => recipient_did
         },
         "target" => "https://#{recipient_instance}/users/#{extract_did_suffix(recipient_did)}"
       }
@@ -298,11 +298,11 @@ defmodule MurmuringWeb.DmController do
     end
   end
 
-  defp extract_did_suffix("did:murmuring:" <> suffix), do: suffix
+  defp extract_did_suffix("did:cairn:" <> suffix), do: suffix
   defp extract_did_suffix(did), do: did
 
   defp get_sender_did(sender_id) do
-    case Murmuring.Accounts.get_user(sender_id) do
+    case Cairn.Accounts.get_user(sender_id) do
       nil -> nil
       user -> user.did
     end

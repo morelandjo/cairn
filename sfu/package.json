@@ -1,7 +1,7 @@
 {
-  "name": "@murmuring/sfu",
+  "name": "@cairn/sfu",
   "version": "0.1.0",
-  "description": "Murmuring SFU (Selective Forwarding Unit) for voice/video",
+  "description": "Cairn SFU (Selective Forwarding Unit) for voice/video",
   "license": "AGPL-3.0",
   "type": "module",
   "main": "./dist/index.js",

@@ -1,8 +1,8 @@
-defmodule Murmuring.Federation.HttpSignaturesTest do
+defmodule Cairn.Federation.HttpSignaturesTest do
   use ExUnit.Case, async: true
 
-  alias Murmuring.Federation.HttpSignatures
-  alias Murmuring.Federation.ContentDigest
+  alias Cairn.Federation.HttpSignatures
+  alias Cairn.Federation.ContentDigest
 
   setup do
     {public_key, private_key} = :crypto.generate_key(:eddsa, :ed25519)

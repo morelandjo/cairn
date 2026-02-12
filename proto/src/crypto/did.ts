@@ -1,5 +1,5 @@
 /**
- * DID (Decentralized Identifier) operations for did:murmuring method.
+ * DID (Decentralized Identifier) operations for did:cairn method.
  *
  * Provides client-side creation/verification of the self-certifying
  * DID operation chain. Uses libsodium for Ed25519 signing/verification.
@@ -140,7 +140,7 @@ export async function createGenesisOperation(
     rotationKeyPair.privateKey,
   );
 
-  // DID = did:murmuring:<base58(SHA-256(canonical + signature))>
+  // DID = did:cairn:<base58(SHA-256(canonical + signature))>
   const signedData = new Uint8Array(
     s.from_string(canonical).length + signature.length,
   );
@@ -148,7 +148,7 @@ export async function createGenesisOperation(
   signedData.set(signature, s.from_string(canonical).length);
 
   const hash = await crypto.subtle.digest("SHA-256", signedData);
-  const did = "did:murmuring:" + base58Encode(new Uint8Array(hash));
+  const did = "did:cairn:" + base58Encode(new Uint8Array(hash));
 
   return { did, operation: { payload, signature } };
 }
@@ -202,7 +202,7 @@ export async function computeDid(
   signedData.set(signature, canonicalBytes.length);
 
   const hash = await crypto.subtle.digest("SHA-256", signedData);
-  return "did:murmuring:" + base58Encode(new Uint8Array(hash));
+  return "did:cairn:" + base58Encode(new Uint8Array(hash));
 }
 
 /**

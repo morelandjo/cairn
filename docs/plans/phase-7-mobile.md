@@ -14,7 +14,7 @@
 - [ ] **7.1** Expo project setup (`client/mobile/`):
   - Expo SDK (latest stable) with development build (not Expo Go — need native modules)
   - Dependencies: expo-router (navigation), expo-secure-store, react-native-webrtc, sodium-react-native
-  - Shared `@murmuring/proto` linked as dependency
+  - Shared `@cairn/proto` linked as dependency
   - Build: EAS Build for iOS and Android
 
 ### Mobile UI

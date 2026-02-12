@@ -5,7 +5,7 @@
  * Frame format: [IV 12 bytes] [AES-128-GCM encrypted payload] [GCM tag 16 bytes]
  */
 
-const VOICE_KEY_INFO = new TextEncoder().encode("murmuring-voice-key");
+const VOICE_KEY_INFO = new TextEncoder().encode("cairn-voice-key");
 const IV_LENGTH = 12;
 const TAG_LENGTH = 16;
 const KEY_LENGTH = 16; // AES-128

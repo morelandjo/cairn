@@ -1,13 +1,13 @@
 /**
- * MLS API — delegates to @murmuring/proto.
+ * MLS API — delegates to @cairn/proto.
  * Note: MLS WASM not supported on mobile (Hermes), but API calls still work
  * for compatibility. Private channels show warning instead.
  */
 
-import { mlsApi } from "@murmuring/proto";
+import { mlsApi } from "@cairn/proto";
 import { client } from "./client";
 
-export type { MlsProtocolMessage } from "@murmuring/proto/api";
+export type { MlsProtocolMessage } from "@cairn/proto/api";
 
 export function uploadKeyPackages(packages: string[]) {
   return mlsApi.uploadKeyPackages(client, packages);

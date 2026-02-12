@@ -1,13 +1,13 @@
-defmodule Murmuring.Federation.MessageFederatorTest do
-  use Murmuring.DataCase, async: false
+defmodule Cairn.Federation.MessageFederatorTest do
+  use Cairn.DataCase, async: false
 
-  alias Murmuring.{Chat, Federation}
-  alias Murmuring.Federation.MessageFederator
-  alias Murmuring.Federation.NodeIdentity
+  alias Cairn.{Chat, Federation}
+  alias Cairn.Federation.MessageFederator
+  alias Cairn.Federation.NodeIdentity
 
   setup do
     # Start NodeIdentity for signing in delivery worker
-    tmp_dir = Path.join(System.tmp_dir!(), "murmuring_msg_fed_test")
+    tmp_dir = Path.join(System.tmp_dir!(), "cairn_msg_fed_test")
     File.mkdir_p!(tmp_dir)
     key_path = Path.join(tmp_dir, "test_#{:erlang.unique_integer([:positive, :monotonic])}.key")
 
@@ -31,22 +31,22 @@ defmodule Murmuring.Federation.MessageFederatorTest do
 
     # Create a server and channel for federation tests
     {:ok, {user, _codes}} =
-      Murmuring.Accounts.register_user(%{
+      Cairn.Accounts.register_user(%{
         username: "fed_msg_user_#{:erlang.unique_integer([:positive])}",
         password: "TestPassword123!",
         display_name: "Fed Msg User"
       })
 
     {:ok, server} =
-      Murmuring.Servers.create_server(%{name: "Fed Server", creator_id: user.id})
+      Cairn.Servers.create_server(%{name: "Fed Server", creator_id: user.id})
 
     {:ok, channel} =
       Chat.create_channel(%{name: "general", type: "public", server_id: server.id})
 
     # Enable federation in config
-    original_config = Application.get_env(:murmuring, :federation, [])
+    original_config = Application.get_env(:cairn, :federation, [])
 
-    Application.put_env(:murmuring, :federation,
+    Application.put_env(:cairn, :federation,
       enabled: true,
       domain: "local.example.com"
     )
@@ -57,7 +57,7 @@ defmodule Murmuring.Federation.MessageFederatorTest do
         pid when is_pid(pid) -> if Process.alive?(pid), do: GenServer.stop(pid)
       end
 
-      Application.put_env(:murmuring, :federation, original_config)
+      Application.put_env(:cairn, :federation, original_config)
       File.rm_rf!(tmp_dir)
     end)
 
@@ -97,7 +97,7 @@ defmodule Murmuring.Federation.MessageFederatorTest do
   end
 
   test "does nothing when federation disabled", %{channel: channel} do
-    Application.put_env(:murmuring, :federation, enabled: false)
+    Application.put_env(:cairn, :federation, enabled: false)
 
     message = %{
       id: Ecto.UUID.generate(),

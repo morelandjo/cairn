@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.AddFederatedDmSupport do
+defmodule Cairn.Repo.Migrations.AddFederatedDmSupport do
   use Ecto.Migration
 
   def change do

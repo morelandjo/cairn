@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.SsrfGuard do
+defmodule Cairn.Chat.SsrfGuard do
   @moduledoc """
   SSRF protection: blocks requests to private/internal IP addresses.
   Resolves hostname before allowing fetch.

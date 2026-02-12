@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.FederationActivity do
+defmodule Cairn.Federation.FederationActivity do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -17,7 +17,7 @@ defmodule Murmuring.Federation.FederationActivity do
     field :status, :string, default: "pending"
     field :error, :string
 
-    belongs_to :federated_node, Murmuring.Federation.FederatedNode
+    belongs_to :federated_node, Cairn.Federation.FederatedNode
 
     timestamps()
   end

@@ -1,4 +1,4 @@
-defmodule Murmuring.RateLimiter do
+defmodule Cairn.RateLimiter do
   @moduledoc """
   ETS-based token bucket rate limiter.
   Configurable per-action limits with burst support.

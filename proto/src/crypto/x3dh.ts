@@ -22,7 +22,7 @@ import { ensureSodium } from "./keys.js";
 import type { IdentityKeyPair, KeyBundle } from "../types.js";
 
 /** Info string used in HKDF derivation */
-const HKDF_INFO = "murmuring-x3dh-v1";
+const HKDF_INFO = "cairn-x3dh-v1";
 
 /** Length of the derived shared secret in bytes */
 const SHARED_SECRET_LENGTH = 32;

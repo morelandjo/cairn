@@ -1,5 +1,5 @@
 /**
- * Message encryption helpers for the Murmuring protocol.
+ * Message encryption helpers for the Cairn protocol.
  *
  * Provides high-level encrypt/decrypt functions that use the Double Ratchet
  * to produce EncryptedPayload objects conforming to the wire format.

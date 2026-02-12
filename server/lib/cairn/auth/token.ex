@@ -1,4 +1,4 @@
-defmodule Murmuring.Auth.Token do
+defmodule Cairn.Auth.Token do
   @moduledoc """
   JWT token configuration using Joken.
   """
@@ -10,7 +10,7 @@ defmodule Murmuring.Auth.Token do
 
   @impl true
   def token_config do
-    default_claims(default_exp: @access_token_ttl, iss: "murmuring", aud: "murmuring")
+    default_claims(default_exp: @access_token_ttl, iss: "cairn", aud: "cairn")
   end
 
   def access_token_ttl, do: @access_token_ttl
@@ -47,7 +47,7 @@ defmodule Murmuring.Auth.Token do
   end
 
   defp signer do
-    secret = Application.get_env(:murmuring, :jwt_secret, "dev_jwt_secret_change_me")
+    secret = Application.get_env(:cairn, :jwt_secret, "dev_jwt_secret_change_me")
     Joken.Signer.create("HS256", secret)
   end
 end

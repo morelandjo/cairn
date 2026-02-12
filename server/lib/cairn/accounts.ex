@@ -1,11 +1,11 @@
-defmodule Murmuring.Accounts do
+defmodule Cairn.Accounts do
   @moduledoc """
   The Accounts context — user registration, lookup, and password verification.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Accounts.{User, RecoveryCode}
+  alias Cairn.Repo
+  alias Cairn.Accounts.{User, RecoveryCode}
 
   def register_user(attrs) do
     Repo.transaction(fn ->

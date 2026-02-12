@@ -1,14 +1,14 @@
-defmodule Murmuring.Keys do
+defmodule Cairn.Keys do
   @moduledoc """
   The Keys context — manages X3DH key bundles for end-to-end encryption.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Accounts.User
-  alias Murmuring.Keys.OneTimePrekey
-  alias Murmuring.Keys.MlsKeyPackage
-  alias Murmuring.Keys.KeyBackup
+  alias Cairn.Repo
+  alias Cairn.Accounts.User
+  alias Cairn.Keys.OneTimePrekey
+  alias Cairn.Keys.MlsKeyPackage
+  alias Cairn.Keys.KeyBackup
 
   @doc "Upload a key bundle: identity key, signed prekey, and one-time prekeys"
   def upload_key_bundle(%User{} = user, %{

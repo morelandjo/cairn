@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.PinnedMessage do
+defmodule Cairn.Chat.PinnedMessage do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -6,9 +6,9 @@ defmodule Murmuring.Chat.PinnedMessage do
   @foreign_key_type :binary_id
 
   schema "pinned_messages" do
-    belongs_to :message, Murmuring.Chat.Message
-    belongs_to :channel, Murmuring.Chat.Channel
-    belongs_to :pinned_by, Murmuring.Accounts.User
+    belongs_to :message, Cairn.Chat.Message
+    belongs_to :channel, Cairn.Chat.Channel
+    belongs_to :pinned_by, Cairn.Accounts.User
 
     timestamps()
   end

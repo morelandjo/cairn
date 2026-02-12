@@ -1,4 +1,4 @@
-defmodule Murmuring.Storage do
+defmodule Cairn.Storage do
   @moduledoc """
   Storage behaviour and dispatcher for file backends.
 
@@ -17,5 +17,5 @@ defmodule Murmuring.Storage do
   def exists?(key), do: backend().exists?(key)
 
   defp backend,
-    do: Application.get_env(:murmuring, :storage_backend, Murmuring.Storage.LocalBackend)
+    do: Application.get_env(:cairn, :storage_backend, Cairn.Storage.LocalBackend)
 end

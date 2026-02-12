@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.DeliveryWorker do
+defmodule Cairn.Federation.DeliveryWorker do
   @moduledoc """
   Oban worker for delivering ActivityPub activities to remote inboxes.
   Uses exponential backoff with a max of 72 hours.
@@ -9,10 +9,10 @@ defmodule Murmuring.Federation.DeliveryWorker do
     max_attempts: 15
 
   require Logger
-  alias Murmuring.Federation
-  alias Murmuring.Federation.NodeIdentity
-  alias Murmuring.Federation.HttpSignatures
-  alias Murmuring.Federation.MetadataStripper
+  alias Cairn.Federation
+  alias Cairn.Federation.NodeIdentity
+  alias Cairn.Federation.HttpSignatures
+  alias Cairn.Federation.MetadataStripper
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: args}) do

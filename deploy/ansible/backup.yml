@@ -1,15 +1,15 @@
 ---
-# Murmuring Backup Playbook
+# Cairn Backup Playbook
 # Usage: ansible-playbook -i inventory.ini backup.yml
 
-- name: Backup Murmuring
-  hosts: murmuring
+- name: Backup Cairn
+  hosts: cairn
   become: true
-  become_user: murmuring
+  become_user: cairn
 
   vars:
-    deploy_dir: /opt/murmuring
-    backup_dir: /opt/murmuring/backups
+    deploy_dir: /opt/cairn
+    backup_dir: /opt/cairn/backups
     retain_days: 30
 
   tasks:
@@ -21,12 +21,12 @@
 
     - name: Generate backup filename
       set_fact:
-        backup_name: "murmuring-backup-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"
+        backup_name: "cairn-backup-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"
 
     - name: Dump PostgreSQL
       command: >
         docker compose exec -T postgres
-        pg_dump -U murmuring -Fc murmuring
+        pg_dump -U cairn -Fc cairn
       args:
         chdir: "{{ deploy_dir }}"
       register: pgdump

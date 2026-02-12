@@ -1,7 +1,7 @@
-defmodule Murmuring.ServersTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.ServersTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.{Accounts, Servers}
+  alias Cairn.{Accounts, Servers}
 
   defp create_user(attrs \\ %{}) do
     username = Map.get(attrs, :username, "user_#{System.unique_integer([:positive])}")

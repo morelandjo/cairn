@@ -1,4 +1,4 @@
-defmodule Murmuring.Moderation.MessageReport do
+defmodule Cairn.Moderation.MessageReport do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -11,10 +11,10 @@ defmodule Murmuring.Moderation.MessageReport do
     field :status, :string, default: "pending"
     field :resolution_action, :string
 
-    belongs_to :message, Murmuring.Chat.Message
-    belongs_to :reporter, Murmuring.Accounts.User
-    belongs_to :server, Murmuring.Servers.Server
-    belongs_to :resolved_by, Murmuring.Accounts.User
+    belongs_to :message, Cairn.Chat.Message
+    belongs_to :reporter, Cairn.Accounts.User
+    belongs_to :server, Cairn.Servers.Server
+    belongs_to :resolved_by, Cairn.Accounts.User
 
     timestamps()
   end

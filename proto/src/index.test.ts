@@ -3,7 +3,7 @@ import {
   PROTOCOL_VERSION,
   PROTOCOL_VERSION_STRING,
   PROTOCOL_NAME,
-  MURMURING_NS,
+  CAIRN_NS,
   WELL_KNOWN,
   LIMITS,
   CIPHERSUITES,
@@ -12,7 +12,7 @@ import {
 
 describe("protocol constants", () => {
   it("has correct protocol name", () => {
-    expect(PROTOCOL_NAME).toBe("murmuring");
+    expect(PROTOCOL_NAME).toBe("cairn");
   });
 
   it("has correct protocol version", () => {
@@ -21,11 +21,11 @@ describe("protocol constants", () => {
   });
 
   it("has correct namespace URI", () => {
-    expect(MURMURING_NS).toBe("https://murmuring.dev/ns#");
+    expect(CAIRN_NS).toBe("https://cairn.chat/ns#");
   });
 
   it("defines well-known endpoints", () => {
-    expect(WELL_KNOWN.FEDERATION).toBe("/.well-known/murmuring-federation");
+    expect(WELL_KNOWN.FEDERATION).toBe("/.well-known/cairn-federation");
     expect(WELL_KNOWN.PRIVACY_MANIFEST).toBe("/.well-known/privacy-manifest");
     expect(WELL_KNOWN.WEBFINGER).toBe("/.well-known/webfinger");
   });

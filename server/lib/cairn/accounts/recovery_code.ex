@@ -1,4 +1,4 @@
-defmodule Murmuring.Accounts.RecoveryCode do
+defmodule Cairn.Accounts.RecoveryCode do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -9,7 +9,7 @@ defmodule Murmuring.Accounts.RecoveryCode do
     field :code_hash, :string
     field :used_at, :utc_datetime
 
-    belongs_to :user, Murmuring.Accounts.User
+    belongs_to :user, Cairn.Accounts.User
 
     timestamps()
   end

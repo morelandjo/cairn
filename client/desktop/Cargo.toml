@@ -1,12 +1,12 @@
 [package]
-name = "murmuring-desktop"
+name = "cairn-desktop"
 version = "0.1.0"
-description = "Murmuring Desktop Client"
+description = "Cairn Desktop Client"
 edition = "2021"
 license = "AGPL-3.0"
 
 [lib]
-name = "murmuring_desktop_lib"
+name = "cairn_desktop_lib"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]

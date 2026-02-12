@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.Reaction do
+defmodule Cairn.Chat.Reaction do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,8 +8,8 @@ defmodule Murmuring.Chat.Reaction do
   schema "reactions" do
     field :emoji, :string
 
-    belongs_to :message, Murmuring.Chat.Message
-    belongs_to :user, Murmuring.Accounts.User
+    belongs_to :message, Cairn.Chat.Message
+    belongs_to :user, Cairn.Accounts.User
 
     timestamps()
   end

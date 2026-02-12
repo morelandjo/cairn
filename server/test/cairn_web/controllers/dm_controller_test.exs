@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.DmControllerTest do
-  use MurmuringWeb.ConnCase, async: true
+defmodule CairnWeb.DmControllerTest do
+  use CairnWeb.ConnCase, async: true
 
-  alias Murmuring.{Accounts, Auth, Chat, Federation}
+  alias Cairn.{Accounts, Auth, Chat, Federation}
 
   @valid_password "secure_password_123"
 
@@ -15,7 +15,7 @@ defmodule MurmuringWeb.DmControllerTest do
     # Give user a DID (did_changeset requires rotation_public_key)
     {:ok, user} =
       Accounts.update_user_did(user, %{
-        did: "did:murmuring:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}",
+        did: "did:cairn:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}",
         rotation_public_key: :crypto.strong_rand_bytes(32)
       })
 
@@ -31,7 +31,7 @@ defmodule MurmuringWeb.DmControllerTest do
   describe "POST /api/v1/dm/federated" do
     test "creates a federated DM request", %{conn: conn} do
       recipient_did =
-        "did:murmuring:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
+        "did:cairn:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
 
       conn =
         post(conn, "/api/v1/dm/federated", %{
@@ -68,7 +68,7 @@ defmodule MurmuringWeb.DmControllerTest do
 
     test "rejects duplicate request", %{conn: conn} do
       recipient_did =
-        "did:murmuring:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
+        "did:cairn:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
 
       conn1 =
         post(conn, "/api/v1/dm/federated", %{
@@ -92,7 +92,7 @@ defmodule MurmuringWeb.DmControllerTest do
     test "enforces rate limit", %{conn: conn, user: user} do
       # Create 10 requests (the max)
       for i <- 1..10 do
-        did = "did:murmuring:ratelimit#{i}#{:crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)}"
+        did = "did:cairn:ratelimit#{i}#{:crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)}"
 
         {:ok, fu} =
           Federation.get_or_create_federated_user(%{
@@ -119,7 +119,7 @@ defmodule MurmuringWeb.DmControllerTest do
       conn =
         post(conn, "/api/v1/dm/federated", %{
           recipient_did:
-            "did:murmuring:overflow#{:crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)}",
+            "did:cairn:overflow#{:crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)}",
           recipient_instance: "remote.example.com"
         })
 
@@ -129,7 +129,7 @@ defmodule MurmuringWeb.DmControllerTest do
 
     test "rejects when recipient is blocked", %{conn: conn, user: user} do
       blocked_did =
-        "did:murmuring:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
+        "did:cairn:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
 
       Chat.block_dm_sender(user.id, blocked_did)
 
@@ -186,7 +186,7 @@ defmodule MurmuringWeb.DmControllerTest do
 
   describe "GET /api/v1/dm/requests/sent" do
     test "lists sent DM requests", %{conn: conn, user: user} do
-      did = "did:murmuring:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
+      did = "did:cairn:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
 
       {:ok, fu} =
         Federation.get_or_create_federated_user(%{
@@ -290,7 +290,7 @@ defmodule MurmuringWeb.DmControllerTest do
 
       {:ok, sender} =
         Accounts.update_user_did(sender, %{
-          did: "did:murmuring:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}",
+          did: "did:cairn:#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}",
           rotation_public_key: :crypto.strong_rand_bytes(32)
         })
 

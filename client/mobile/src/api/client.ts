@@ -1,8 +1,8 @@
 /**
- * HTTP client — wraps @murmuring/proto ApiClient with absolute base URL.
+ * HTTP client — wraps @cairn/proto ApiClient with absolute base URL.
  */
 
-import { ApiClient } from "@murmuring/proto";
+import { ApiClient } from "@cairn/proto";
 import { getApiBaseUrl } from "../lib/config";
 
 export const client = new ApiClient({ baseUrl: getApiBaseUrl() });

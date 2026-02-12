@@ -1,8 +1,8 @@
-defmodule Murmuring.Chat.LinkPreviewWorker do
+defmodule Cairn.Chat.LinkPreviewWorker do
   use Oban.Worker, queue: :search, max_attempts: 2
 
-  alias Murmuring.Chat.{LinkPreview, SsrfGuard}
-  alias Murmuring.Repo
+  alias Cairn.Chat.{LinkPreview, SsrfGuard}
+  alias Cairn.Repo
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"url" => url, "channel_id" => channel_id}}) do
@@ -87,7 +87,7 @@ defmodule Murmuring.Chat.LinkPreviewWorker do
 
   defp broadcast_preview(channel_id, preview) do
     Phoenix.PubSub.broadcast(
-      Murmuring.PubSub,
+      Cairn.PubSub,
       "channel:#{channel_id}",
       {:link_preview,
        %{

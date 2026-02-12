@@ -1,8 +1,8 @@
-defmodule Murmuring.ExportTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.ExportTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.{Accounts, Export, Servers}
-  alias Murmuring.Chat
+  alias Cairn.{Accounts, Export, Servers}
+  alias Cairn.Chat
 
   @valid_password "secure_password_123"
 
@@ -64,7 +64,7 @@ defmodule Murmuring.ExportTest do
 
     {:ok, data} = Export.export_portability_data(user.id)
     assert data.version == "1.0"
-    assert data.platform == "murmuring"
+    assert data.platform == "cairn"
     assert data.user.username == user.username
   end
 
@@ -72,7 +72,7 @@ defmodule Murmuring.ExportTest do
     user = create_user("exportjob")
 
     {:ok, job} = Export.request_export(user.id)
-    assert job.worker == "Murmuring.Export.DataExportWorker"
+    assert job.worker == "Cairn.Export.DataExportWorker"
     assert job.args["user_id"] == user.id
   end
 end

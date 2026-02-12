@@ -1,8 +1,8 @@
-defmodule Murmuring.NotificationsTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.NotificationsTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.{Accounts, Notifications, Servers}
-  alias Murmuring.Chat
+  alias Cairn.{Accounts, Notifications, Servers}
+  alias Cairn.Chat
 
   @valid_password "secure_password_123"
 

@@ -2,13 +2,13 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Murmuring, please report it responsibly.
+If you discover a security vulnerability in Cairn, please report it responsibly.
 
 **Do NOT open a public issue.**
 
 ### How to Report
 
-Email: **security@murmuring.dev**
+Email: **security@cairn.chat**
 
 Include:
 - A description of the vulnerability
@@ -58,4 +58,4 @@ We maintain a hall of fame for security researchers who responsibly disclose vul
 
 ## Security Architecture
 
-For details on Murmuring's security architecture, trust model, and threat mitigations, see [docs/security/threat-model.md](docs/security/threat-model.md).
+For details on Cairn's security architecture, trust model, and threat mitigations, see [docs/security/threat-model.md](docs/security/threat-model.md).

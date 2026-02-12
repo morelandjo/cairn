@@ -10,7 +10,7 @@ Use **openmls 0.8.0** compiled to WASM via `wasm-bindgen` for MLS (RFC 9420) gro
 
 ## Context
 
-Murmuring needs group end-to-end encryption for private channels. The MLS protocol (RFC 9420) is the IETF standard for scalable group key agreement. We need an implementation that:
+Cairn needs group end-to-end encryption for private channels. The MLS protocol (RFC 9420) is the IETF standard for scalable group key agreement. We need an implementation that:
 
 1. Runs in the browser (WASM)
 2. Is RFC 9420 compliant

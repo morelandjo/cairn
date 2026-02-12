@@ -1,11 +1,11 @@
-defmodule MurmuringWeb.VoiceChannel do
-  use MurmuringWeb, :channel
+defmodule CairnWeb.VoiceChannel do
+  use CairnWeb, :channel
 
-  alias Murmuring.{Chat, Voice, Moderation, RateLimiter}
-  alias Murmuring.Servers.Permissions
+  alias Cairn.{Chat, Voice, Moderation, RateLimiter}
+  alias Cairn.Servers.Permissions
 
   defp sfu_client do
-    Application.get_env(:murmuring, :sfu_client, Murmuring.Voice.SfuClient)
+    Application.get_env(:cairn, :sfu_client, Cairn.Voice.SfuClient)
   end
 
   @impl true

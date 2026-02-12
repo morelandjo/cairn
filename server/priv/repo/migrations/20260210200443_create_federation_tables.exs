@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.CreateFederationTables do
+defmodule Cairn.Repo.Migrations.CreateFederationTables do
   use Ecto.Migration
 
   def change do

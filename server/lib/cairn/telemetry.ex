@@ -1,6 +1,6 @@
-defmodule Murmuring.Telemetry do
+defmodule Cairn.Telemetry do
   @moduledoc """
-  Custom telemetry handlers for Murmuring.
+  Custom telemetry handlers for Cairn.
 
   Attaches handlers for slow queries, request logging,
   and provides a foundation for Prometheus export in Phase 6.
@@ -12,14 +12,14 @@ defmodule Murmuring.Telemetry do
 
   def setup do
     :telemetry.attach(
-      "murmuring-slow-queries",
-      [:murmuring, :repo, :query],
+      "cairn-slow-queries",
+      [:cairn, :repo, :query],
       &__MODULE__.handle_slow_query/4,
       %{}
     )
 
     :telemetry.attach(
-      "murmuring-request-stop",
+      "cairn-request-stop",
       [:phoenix, :endpoint, :stop],
       &__MODULE__.handle_request_stop/4,
       %{}

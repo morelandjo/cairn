@@ -1,5 +1,5 @@
-defmodule MurmuringWeb.WebauthnController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.WebauthnController do
+  use CairnWeb, :controller
 
   @rp_id "localhost"
 
@@ -16,7 +16,7 @@ defmodule MurmuringWeb.WebauthnController do
     |> put_session(:webauthn_challenge, challenge)
     |> json(%{
       challenge: Base.url_encode64(challenge.bytes, padding: false),
-      rp: %{id: @rp_id, name: "Murmuring"},
+      rp: %{id: @rp_id, name: "Cairn"},
       user: %{
         id: Base.url_encode64(user.id, padding: false),
         name: user.username,

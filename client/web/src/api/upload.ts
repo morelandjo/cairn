@@ -1,11 +1,11 @@
 /**
- * File upload API — delegates to @murmuring/proto.
+ * File upload API — delegates to @cairn/proto.
  */
 
-import { uploadApi } from "@murmuring/proto";
+import { uploadApi } from "@cairn/proto";
 import { client } from "./client.ts";
 
-export type { UploadResponse } from "@murmuring/proto/api";
+export type { UploadResponse } from "@cairn/proto/api";
 
 export function uploadFile(file: File) {
   const formData = new FormData();

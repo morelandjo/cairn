@@ -1,4 +1,4 @@
-defmodule MurmuringWeb.Plugs.AdminAuth do
+defmodule CairnWeb.Plugs.AdminAuth do
   @moduledoc """
   Plug that verifies the current user has admin privileges.
 
@@ -10,7 +10,7 @@ defmodule MurmuringWeb.Plugs.AdminAuth do
   """
 
   import Plug.Conn
-  alias Murmuring.Repo
+  alias Cairn.Repo
 
   def init(opts), do: opts
 
@@ -29,7 +29,7 @@ defmodule MurmuringWeb.Plugs.AdminAuth do
 
   defp is_admin?(user_id) do
     # Check configured admin user ID first
-    config = Application.get_env(:murmuring, :federation, [])
+    config = Application.get_env(:cairn, :federation, [])
 
     case Keyword.get(config, :admin_user_id) do
       nil ->
@@ -37,7 +37,7 @@ defmodule MurmuringWeb.Plugs.AdminAuth do
         import Ecto.Query
 
         Repo.exists?(
-          from s in Murmuring.Servers.Server,
+          from s in Cairn.Servers.Server,
             where: s.creator_id == ^user_id,
             order_by: [asc: s.inserted_at],
             limit: 1

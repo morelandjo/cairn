@@ -1,4 +1,4 @@
-defmodule Murmuring.Bots.Webhook do
+defmodule Cairn.Bots.Webhook do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,9 +10,9 @@ defmodule Murmuring.Bots.Webhook do
     field :token, :string
     field :avatar_key, :string
 
-    belongs_to :server, Murmuring.Servers.Server
-    belongs_to :channel, Murmuring.Chat.Channel
-    belongs_to :creator, Murmuring.Accounts.User
+    belongs_to :server, Cairn.Servers.Server
+    belongs_to :channel, Cairn.Chat.Channel
+    belongs_to :creator, Cairn.Accounts.User
 
     timestamps()
   end

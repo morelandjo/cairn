@@ -1,8 +1,8 @@
-defmodule Murmuring.Chat.Message do
+defmodule Cairn.Chat.Message do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:id, Murmuring.Types.UUIDv7, autogenerate: true}
+  @primary_key {:id, Cairn.Types.UUIDv7, autogenerate: true}
   @foreign_key_type :binary_id
 
   schema "messages" do
@@ -16,10 +16,10 @@ defmodule Murmuring.Chat.Message do
     field :hlc_counter, :integer, default: 0
     field :hlc_node, :string
 
-    belongs_to :channel, Murmuring.Chat.Channel
-    belongs_to :author, Murmuring.Accounts.User
-    belongs_to :federated_author, Murmuring.Federation.FederatedUser
-    belongs_to :reply_to, Murmuring.Chat.Message
+    belongs_to :channel, Cairn.Chat.Channel
+    belongs_to :author, Cairn.Accounts.User
+    belongs_to :federated_author, Cairn.Federation.FederatedUser
+    belongs_to :reply_to, Cairn.Chat.Message
 
     timestamps()
   end

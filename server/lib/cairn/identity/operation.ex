@@ -1,4 +1,4 @@
-defmodule Murmuring.Identity.Operation do
+defmodule Cairn.Identity.Operation do
   @moduledoc """
   Ecto schema for DID operation chain entries.
 
@@ -23,7 +23,7 @@ defmodule Murmuring.Identity.Operation do
     field :signature, :binary
     field :prev_hash, :string
 
-    belongs_to :user, Murmuring.Accounts.User
+    belongs_to :user, Cairn.Accounts.User
 
     timestamps(updated_at: false)
   end

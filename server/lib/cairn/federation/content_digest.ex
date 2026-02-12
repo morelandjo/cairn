@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.ContentDigest do
+defmodule Cairn.Federation.ContentDigest do
   @moduledoc """
   Implements Content-Digest header per RFC 9530.
   Uses SHA-256 for body integrity verification.

@@ -1,4 +1,4 @@
-defmodule Murmuring.Auth.PasswordValidator do
+defmodule Cairn.Auth.PasswordValidator do
   @moduledoc """
   Validates passwords against common password lists and policy rules.
   Uses an ETS table loaded at startup with a bundled 10k common passwords list.
@@ -55,7 +55,7 @@ defmodule Murmuring.Auth.PasswordValidator do
   end
 
   defp load_passwords do
-    path = Application.app_dir(:murmuring, "priv/data/common_passwords.txt")
+    path = Application.app_dir(:cairn, "priv/data/common_passwords.txt")
 
     if File.exists?(path) do
       path

@@ -40,5 +40,5 @@ pub fn run() {
             updater::check_for_update,
         ])
         .run(tauri::generate_context!())
-        .expect("error running Murmuring desktop");
+        .expect("error running Cairn desktop");
 }

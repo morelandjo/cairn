@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.MlsGroupInfo do
+defmodule Cairn.Chat.MlsGroupInfo do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -9,7 +9,7 @@ defmodule Murmuring.Chat.MlsGroupInfo do
     field :data, :binary
     field :epoch, :integer
 
-    belongs_to :channel, Murmuring.Chat.Channel
+    belongs_to :channel, Cairn.Chat.Channel
 
     timestamps()
   end

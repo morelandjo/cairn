@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.DmBlock do
+defmodule Cairn.Chat.DmBlock do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,7 +8,7 @@ defmodule Murmuring.Chat.DmBlock do
   schema "dm_blocks" do
     field :blocked_did, :string
 
-    belongs_to :user, Murmuring.Accounts.User
+    belongs_to :user, Cairn.Accounts.User
 
     timestamps()
   end
@@ -17,7 +17,7 @@ defmodule Murmuring.Chat.DmBlock do
     dm_block
     |> cast(attrs, [:user_id, :blocked_did])
     |> validate_required([:user_id, :blocked_did])
-    |> validate_format(:blocked_did, ~r/^did:murmuring:/)
+    |> validate_format(:blocked_did, ~r/^did:cairn:/)
     |> unique_constraint([:user_id, :blocked_did])
   end
 end

@@ -61,7 +61,7 @@ function ServerRedirect() {
 
   return (
     <div className="welcome-screen">
-      <h2>Welcome to Murmuring</h2>
+      <h2>Welcome to Cairn</h2>
       <p>
         {servers.length === 0 && channels.length === 0
           ? "No servers yet. Create one from the sidebar!"
@@ -88,7 +88,7 @@ function ChannelRedirect() {
 
   return (
     <div className="welcome-screen">
-      <h2>Welcome to Murmuring</h2>
+      <h2>Welcome to Cairn</h2>
       <p>
         {channels.length === 0
           ? "No channels yet. Create one from the sidebar!"

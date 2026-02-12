@@ -1,4 +1,4 @@
-import { supportsInsertableStreams } from "@murmuring/proto";
+import { supportsInsertableStreams } from "@cairn/proto";
 
 interface VoiceE2EWarningProps {
   onConsent: () => void;

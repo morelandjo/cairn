@@ -1,5 +1,5 @@
 /**
- * Key generation functions for the Murmuring E2EE protocol.
+ * Key generation functions for the Cairn E2EE protocol.
  *
  * Uses libsodium for all cryptographic operations:
  * - Ed25519 for identity keys (signing)

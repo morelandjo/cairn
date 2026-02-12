@@ -1,12 +1,12 @@
-defmodule MurmuringWeb do
+defmodule CairnWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, components, channels, and so on.
 
   This can be used in your application as:
 
-      use MurmuringWeb, :controller
-      use MurmuringWeb, :html
+      use CairnWeb, :controller
+      use CairnWeb, :html
 
   The definitions below will be executed for every controller,
   component, etc, so keep them short and clean, focused
@@ -39,7 +39,7 @@ defmodule MurmuringWeb do
     quote do
       use Phoenix.Controller, formats: [:html, :json]
 
-      use Gettext, backend: MurmuringWeb.Gettext
+      use Gettext, backend: CairnWeb.Gettext
 
       import Plug.Conn
 
@@ -50,9 +50,9 @@ defmodule MurmuringWeb do
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,
-        endpoint: MurmuringWeb.Endpoint,
-        router: MurmuringWeb.Router,
-        statics: MurmuringWeb.static_paths()
+        endpoint: CairnWeb.Endpoint,
+        router: CairnWeb.Router,
+        statics: CairnWeb.static_paths()
     end
   end
 

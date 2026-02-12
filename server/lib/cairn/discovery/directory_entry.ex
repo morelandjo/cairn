@@ -1,4 +1,4 @@
-defmodule Murmuring.Discovery.DirectoryEntry do
+defmodule Cairn.Discovery.DirectoryEntry do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -11,7 +11,7 @@ defmodule Murmuring.Discovery.DirectoryEntry do
     field :member_count, :integer, default: 0
     field :listed_at, :utc_datetime
 
-    belongs_to :server, Murmuring.Servers.Server
+    belongs_to :server, Cairn.Servers.Server
 
     timestamps()
   end

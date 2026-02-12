@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.ChannelMember do
+defmodule Cairn.Chat.ChannelMember do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,9 +8,9 @@ defmodule Murmuring.Chat.ChannelMember do
   schema "channel_members" do
     field :role, :string, default: "member"
 
-    belongs_to :channel, Murmuring.Chat.Channel
-    belongs_to :user, Murmuring.Accounts.User
-    belongs_to :federated_user, Murmuring.Federation.FederatedUser
+    belongs_to :channel, Cairn.Chat.Channel
+    belongs_to :user, Cairn.Accounts.User
+    belongs_to :federated_user, Cairn.Federation.FederatedUser
 
     timestamps()
   end

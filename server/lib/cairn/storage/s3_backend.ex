@@ -1,4 +1,4 @@
-defmodule Murmuring.Storage.S3Backend do
+defmodule Cairn.Storage.S3Backend do
   @moduledoc """
   S3-compatible storage backend using ExAws.
 
@@ -6,7 +6,7 @@ defmodule Murmuring.Storage.S3Backend do
   scheme as the local backend (sharded by first 2 chars of hash).
   """
 
-  @behaviour Murmuring.Storage
+  @behaviour Cairn.Storage
 
   @impl true
   def put(key, data, content_type) do
@@ -59,12 +59,12 @@ defmodule Murmuring.Storage.S3Backend do
   end
 
   defp bucket do
-    config = Application.get_env(:murmuring, Murmuring.Storage.S3Backend, [])
+    config = Application.get_env(:cairn, Cairn.Storage.S3Backend, [])
     Keyword.fetch!(config, :bucket)
   end
 
   defp ex_aws_config do
-    config = Application.get_env(:murmuring, Murmuring.Storage.S3Backend, [])
+    config = Application.get_env(:cairn, Cairn.Storage.S3Backend, [])
 
     base = [region: Keyword.get(config, :region, "us-east-1")]
 

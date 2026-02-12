@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMlsStore } from "../stores/mlsStore.ts";
 import { useAuthStore } from "../stores/authStore.ts";
-import { exportKeys, importKeys } from "@murmuring/proto";
+import { exportKeys, importKeys } from "@cairn/proto";
 import { apiFetch } from "../api/client.ts";
 import * as mlsApi from "../api/mls.ts";
 

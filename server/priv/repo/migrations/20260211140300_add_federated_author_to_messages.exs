@@ -1,4 +1,4 @@
-defmodule Murmuring.Repo.Migrations.AddFederatedAuthorToMessages do
+defmodule Cairn.Repo.Migrations.AddFederatedAuthorToMessages do
   use Ecto.Migration
 
   def change do

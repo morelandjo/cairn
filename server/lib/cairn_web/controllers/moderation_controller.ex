@@ -1,8 +1,8 @@
-defmodule MurmuringWeb.ModerationController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.ModerationController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Moderation
-  alias Murmuring.Servers.Permissions
+  alias Cairn.Moderation
+  alias Cairn.Servers.Permissions
 
   # POST /api/v1/servers/:server_id/mutes
   def mute(conn, %{"server_id" => server_id, "user_id" => target_user_id} = params) do
@@ -155,8 +155,8 @@ defmodule MurmuringWeb.ModerationController do
   def report_message(conn, %{"message_id" => message_id} = params) do
     user_id = conn.assigns.current_user.id
 
-    message = Murmuring.Chat.get_message!(message_id)
-    channel = Murmuring.Chat.get_channel!(message.channel_id)
+    message = Cairn.Chat.get_message!(message_id)
+    channel = Cairn.Chat.get_channel!(message.channel_id)
 
     case Moderation.create_report(%{
            message_id: message_id,

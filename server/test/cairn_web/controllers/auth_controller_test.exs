@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.AuthControllerTest do
-  use MurmuringWeb.ConnCase, async: true
+defmodule CairnWeb.AuthControllerTest do
+  use CairnWeb.ConnCase, async: true
 
-  alias Murmuring.Accounts
+  alias Cairn.Accounts
 
   @valid_password "secure_password_123"
 
@@ -234,8 +234,8 @@ defmodule MurmuringWeb.AuthControllerTest do
     end
 
     test "rejects registration when PoW is required but missing", %{conn: conn} do
-      original = Application.get_env(:murmuring, :require_pow)
-      Application.put_env(:murmuring, :require_pow, true)
+      original = Application.get_env(:cairn, :require_pow)
+      Application.put_env(:cairn, :require_pow, true)
 
       conn =
         post(conn, "/api/v1/auth/register", %{
@@ -245,14 +245,14 @@ defmodule MurmuringWeb.AuthControllerTest do
 
       assert %{"error" => "proof of work required"} = json_response(conn, 422)
 
-      Application.put_env(:murmuring, :require_pow, original || false)
+      Application.put_env(:cairn, :require_pow, original || false)
     end
 
     test "accepts registration with valid PoW solution", %{conn: conn} do
-      original = Application.get_env(:murmuring, :require_pow)
-      Application.put_env(:murmuring, :require_pow, true)
+      original = Application.get_env(:cairn, :require_pow)
+      Application.put_env(:cairn, :require_pow, true)
 
-      hmac_key = Application.fetch_env!(:murmuring, :altcha_hmac_key)
+      hmac_key = Application.fetch_env!(:cairn, :altcha_hmac_key)
 
       challenge =
         Altcha.create_challenge(%Altcha.ChallengeOptions{
@@ -288,12 +288,12 @@ defmodule MurmuringWeb.AuthControllerTest do
 
       assert %{"user" => %{"username" => "powvaliduser"}} = json_response(conn, 201)
 
-      Application.put_env(:murmuring, :require_pow, original || false)
+      Application.put_env(:cairn, :require_pow, original || false)
     end
 
     test "rejects registration with invalid PoW solution", %{conn: conn} do
-      original = Application.get_env(:murmuring, :require_pow)
-      Application.put_env(:murmuring, :require_pow, true)
+      original = Application.get_env(:cairn, :require_pow)
+      Application.put_env(:cairn, :require_pow, true)
 
       payload =
         Base.encode64(
@@ -315,7 +315,7 @@ defmodule MurmuringWeb.AuthControllerTest do
 
       assert %{"error" => "invalid proof of work"} = json_response(conn, 422)
 
-      Application.put_env(:murmuring, :require_pow, original || false)
+      Application.put_env(:cairn, :require_pow, original || false)
     end
   end
 
@@ -326,7 +326,7 @@ defmodule MurmuringWeb.AuthControllerTest do
         "password" => @valid_password
       })
 
-    {:ok, tokens} = Murmuring.Auth.generate_tokens(user)
+    {:ok, tokens} = Cairn.Auth.generate_tokens(user)
     {user, Map.put(tokens, :recovery_codes, recovery_codes)}
   end
 end

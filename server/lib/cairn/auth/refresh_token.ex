@@ -1,4 +1,4 @@
-defmodule Murmuring.Auth.RefreshToken do
+defmodule Cairn.Auth.RefreshToken do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,7 +10,7 @@ defmodule Murmuring.Auth.RefreshToken do
     field :expires_at, :utc_datetime
     field :revoked_at, :utc_datetime
 
-    belongs_to :user, Murmuring.Accounts.User
+    belongs_to :user, Cairn.Accounts.User
 
     timestamps()
   end

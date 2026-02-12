@@ -5,7 +5,7 @@
 
 import * as SQLite from "expo-sqlite";
 
-const DB_NAME = "murmuring_cache.db";
+const DB_NAME = "cairn_cache.db";
 const MAX_CACHED_PER_CHANNEL = 100;
 
 let db: SQLite.SQLiteDatabase | null = null;

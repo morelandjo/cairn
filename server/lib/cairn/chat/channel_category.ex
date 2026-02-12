@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.ChannelCategory do
+defmodule Cairn.Chat.ChannelCategory do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -9,8 +9,8 @@ defmodule Murmuring.Chat.ChannelCategory do
     field :name, :string
     field :position, :integer, default: 0
 
-    belongs_to :server, Murmuring.Servers.Server
-    has_many :channels, Murmuring.Chat.Channel, foreign_key: :category_id
+    belongs_to :server, Cairn.Servers.Server
+    has_many :channels, Cairn.Chat.Channel, foreign_key: :category_id
 
     timestamps()
   end

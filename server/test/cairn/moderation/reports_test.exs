@@ -1,7 +1,7 @@
-defmodule Murmuring.Moderation.ReportsTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.Moderation.ReportsTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.{Accounts, Chat, Moderation, Servers}
+  alias Cairn.{Accounts, Chat, Moderation, Servers}
 
   @valid_password "secure_password_123"
 

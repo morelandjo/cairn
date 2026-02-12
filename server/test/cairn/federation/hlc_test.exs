@@ -1,7 +1,7 @@
-defmodule Murmuring.Federation.HLCTest do
+defmodule Cairn.Federation.HLCTest do
   use ExUnit.Case, async: true
 
-  alias Murmuring.Federation.HLC
+  alias Cairn.Federation.HLC
 
   setup do
     {:ok, pid} =

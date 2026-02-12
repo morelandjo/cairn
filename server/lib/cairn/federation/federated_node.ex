@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.FederatedNode do
+defmodule Cairn.Federation.FederatedNode do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -16,7 +16,7 @@ defmodule Murmuring.Federation.FederatedNode do
     field :privacy_manifest, :map, default: %{}
     field :status, :string, default: "pending"
 
-    has_many :activities, Murmuring.Federation.FederationActivity
+    has_many :activities, Cairn.Federation.FederationActivity
 
     timestamps()
   end

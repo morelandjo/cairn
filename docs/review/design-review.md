@@ -1,4 +1,4 @@
-# Murmuring — Design Review
+# Cairn — Design Review
 
 **Reviewed:** 2026-02-09
 **Source:** `federated-platform-plan.docx`
@@ -46,7 +46,7 @@ The most critical structural problem was the deferral of MLS group encryption to
 |---|-------|----------|------------|-------|
 | 4 | **No bot/webhook/integration system** — Platform has no way for external services to interact with it | Significant | Add incoming webhooks + bot user accounts with scoped permissions | 4 |
 | 5 | **No invite system** — No mechanism for users to invite others to a server | Significant | Invite links with codes, expiration, max uses | 1 |
-| 6 | **No account portability** — Users cannot migrate between nodes | Significant | RESOLVED: `did:murmuring` portable cryptographic identity with self-certifying DID, hash-chained operation log, federated auth tokens, and cross-instance server joining (Phase 9). Users register once on their home instance and join servers on any federated instance without re-registering. | 9 |
+| 6 | **No account portability** — Users cannot migrate between nodes | Significant | RESOLVED: `did:cairn` portable cryptographic identity with self-certifying DID, hash-chained operation log, federated auth tokens, and cross-instance server joining (Phase 9). Users register once on their home instance and join servers on any federated instance without re-registering. | 9 |
 | 7 | **HTTP Signatures spec deprecated** — Design references draft-cavage which is superseded | Significant | Use RFC 9421 (HTTP Message Signatures) instead | 3 |
 | 8 | **No monitoring/observability** — No logging, health checks, or metrics specified | Moderate | Structured JSON logging, `/health` endpoint, Phoenix Telemetry in Phase 0/1. Prometheus + Grafana in Phase 6. | 0, 1, 6 |
 | 9 | **No message formatting spec** — No specification for how messages are formatted/rendered | Moderate | Markdown subset (bold, italic, strikethrough, code, links, mentions, blockquotes) defined in protocol spec | 0, 1 |
@@ -121,7 +121,7 @@ Use this to track which issues have been addressed during implementation:
 - [x] #3 — CSAM/legal compliance (Phase 3)
 - [x] #4 — Bot/webhook system (Phase 4)
 - [x] #5 — Invite system (Phase 1)
-- [x] #6 — Account portability (Phase 9: `did:murmuring` portable identity)
+- [x] #6 — Account portability (Phase 9: `did:cairn` portable identity)
 - [x] #7 — RFC 9421 HTTP Signatures (Phase 3.5)
 - [x] #8 — Monitoring/observability (Phase 0/1/8)
 - [x] #9 — Message formatting spec (Phase 0/1)

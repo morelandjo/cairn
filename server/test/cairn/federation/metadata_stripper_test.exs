@@ -1,7 +1,7 @@
-defmodule Murmuring.Federation.MetadataStripperTest do
+defmodule Cairn.Federation.MetadataStripperTest do
   use ExUnit.Case, async: true
 
-  alias Murmuring.Federation.MetadataStripper
+  alias Cairn.Federation.MetadataStripper
 
   test "strips sensitive top-level keys" do
     activity = %{

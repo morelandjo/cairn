@@ -1,4 +1,4 @@
-defmodule MurmuringWeb.UserChannel do
+defmodule CairnWeb.UserChannel do
   @moduledoc """
   Personal notification channel for user-scoped events:
   - DM request received
@@ -6,7 +6,7 @@ defmodule MurmuringWeb.UserChannel do
   - Future: other user-scoped notifications
   """
 
-  use MurmuringWeb, :channel
+  use CairnWeb, :channel
 
   @impl true
   def join("user:" <> user_id, _params, socket) do
@@ -16,7 +16,7 @@ defmodule MurmuringWeb.UserChannel do
     else
       if socket.assigns.user_id == user_id do
         # Subscribe to PubSub for this user (for cross-process broadcasts)
-        Phoenix.PubSub.subscribe(Murmuring.PubSub, "user:#{user_id}")
+        Phoenix.PubSub.subscribe(Cairn.PubSub, "user:#{user_id}")
         {:ok, socket}
       else
         {:error, %{reason: "unauthorized"}}

@@ -1,7 +1,7 @@
-defmodule Murmuring.VoiceTest do
-  use Murmuring.DataCase, async: true
+defmodule Cairn.VoiceTest do
+  use Cairn.DataCase, async: true
 
-  alias Murmuring.{Accounts, Voice, Chat, Servers}
+  alias Cairn.{Accounts, Voice, Chat, Servers}
 
   @valid_password "secure_password_123"
 
@@ -43,7 +43,7 @@ defmodule Murmuring.VoiceTest do
       # Set max_participants to 1
       channel
       |> Ecto.Changeset.change(%{max_participants: 1})
-      |> Murmuring.Repo.update!()
+      |> Cairn.Repo.update!()
 
       {:ok, {u1, _}} =
         Accounts.register_user(%{

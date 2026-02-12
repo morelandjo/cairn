@@ -1,10 +1,10 @@
-# Murmuring Protocol Specification
+# Cairn Protocol Specification
 
-**Protocol Name:** `murmuring`
+**Protocol Name:** `cairn`
 **Version:** `0.1.0`
 **Status:** Draft
 **Date:** 2026-02-09
-**Authors:** Murmuring Contributors
+**Authors:** Cairn Contributors
 
 ---
 
@@ -27,9 +27,9 @@
 
 ### 1.1 Purpose
 
-This document specifies the Murmuring protocol, a federated communication protocol designed for privacy-first, decentralized group communication. Murmuring provides functionality comparable to centralized platforms such as Discord -- text channels, voice chat, roles, moderation -- while guaranteeing that no single entity controls the network and that private communications are end-to-end encrypted by default.
+This document specifies the Cairn protocol, a federated communication protocol designed for privacy-first, decentralized group communication. Cairn provides functionality comparable to centralized platforms such as Discord -- text channels, voice chat, roles, moderation -- while guaranteeing that no single entity controls the network and that private communications are end-to-end encrypted by default.
 
-This specification is the normative reference for all Murmuring server and client implementations. Implementors MUST conform to this document to achieve interoperability within the Murmuring federation.
+This specification is the normative reference for all Cairn server and client implementations. Implementors MUST conform to this document to achieve interoperability within the Cairn federation.
 
 ### 1.2 Design Principles
 
@@ -49,7 +49,7 @@ The following principles govern every protocol decision. When ambiguity arises, 
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 
-A conforming Murmuring server MUST implement all normative requirements in Sections 3 through 8. A conforming Murmuring client MUST implement all requirements in Sections 5, 6, and 9.
+A conforming Cairn server MUST implement all normative requirements in Sections 3 through 8. A conforming Cairn client MUST implement all requirements in Sections 5, 6, and 9.
 
 ### 1.4 Notation
 
@@ -61,15 +61,15 @@ JSON examples in this document use relaxed formatting for readability. Actual im
 
 | Term | Definition |
 |------|-----------|
-| **Node** | A single Murmuring server instance, identified by its domain name and Ed25519 public key. A node hosts users, channels, and messages. Synonymous with "instance" in other federated systems. |
-| **Server** (Murmuring Server) | A logical community hosted on a node, analogous to a Discord "server" or "guild." A single node MAY host multiple Murmuring Servers. Each server has its own channels, roles, and membership. |
+| **Node** | A single Cairn server instance, identified by its domain name and Ed25519 public key. A node hosts users, channels, and messages. Synonymous with "instance" in other federated systems. |
+| **Server** (Cairn Server) | A logical community hosted on a node, analogous to a Discord "server" or "guild." A single node MAY host multiple Cairn Servers. Each server has its own channels, roles, and membership. |
 | **Channel** | A named communication stream within a server. Channels have a type (`public`, `private`, or `dm`) and an optional encryption status. |
-| **Actor** | An entity with an ActivityPub identity, identified by a URI. In Murmuring, actors are users, servers, and bots. Each actor has an inbox for receiving activities and an outbox for publishing them. |
+| **Actor** | An entity with an ActivityPub identity, identified by a URI. In Cairn, actors are users, servers, and bots. Each actor has an inbox for receiving activities and an outbox for publishing them. |
 | **HLC (Hybrid Logical Clock)** | A timestamp mechanism that combines physical wall-clock time with a logical counter and node identifier. HLCs provide causal ordering of events across distributed nodes without requiring synchronized clocks. See [Appendix A](#appendix-a-hybrid-logical-clock-algorithm). |
-| **MLS (Messaging Layer Security)** | A protocol for group key agreement defined in [RFC 9420](https://www.rfc-editor.org/rfc/rfc9420). Murmuring uses MLS for end-to-end encrypted group channels. MLS provides forward secrecy and post-compromise security with efficient O(log n) group operations. |
-| **X3DH (Extended Triple Diffie-Hellman)** | A key agreement protocol used to establish a shared secret between two parties who may not be online simultaneously. Used in Murmuring for DM session initiation. |
+| **MLS (Messaging Layer Security)** | A protocol for group key agreement defined in [RFC 9420](https://www.rfc-editor.org/rfc/rfc9420). Cairn uses MLS for end-to-end encrypted group channels. MLS provides forward secrecy and post-compromise security with efficient O(log n) group operations. |
+| **X3DH (Extended Triple Diffie-Hellman)** | A key agreement protocol used to establish a shared secret between two parties who may not be online simultaneously. Used in Cairn for DM session initiation. |
 | **Double Ratchet** | A key management algorithm that provides forward secrecy and break-in recovery for ongoing message sessions. Used for DM encryption after the X3DH handshake. |
-| **DID (Decentralized Identifier)** | A self-certifying identifier in the form `did:murmuring:<base58(SHA-256(genesis_op))>`. Derived from a user's genesis operation and stable across key rotations. Enables portable identity across instances. |
+| **DID (Decentralized Identifier)** | A self-certifying identifier in the form `did:cairn:<base58(SHA-256(genesis_op))>`. Derived from a user's genesis operation and stable across key rotations. Enables portable identity across instances. |
 | **Operation Chain** | A hash-linked, signed sequence of DID operations (create, rotate_signing_key, rotate_rotation_key, update_handle, deactivate). Each operation references the SHA-256 hash of the previous operation. Signed by the rotation key. Tamper-evident and independently verifiable. |
 | **Signing Key** | An Ed25519 key pair used for daily operations: E2EE, message signing, MLS credentials. This is the existing identity key. Can be rotated without changing the DID. |
 | **Rotation Key** | An Ed25519 key pair used exclusively for DID operations (key rotation, handle changes, deactivation). Generated at registration. Stored in encrypted key backup. Recovery codes can rotate this key as a last resort. |
@@ -86,38 +86,38 @@ JSON examples in this document use relaxed formatting for readability. Actual im
 
 ## 3. ActivityPub Extensions
 
-Murmuring extends the [ActivityPub](https://www.w3.org/TR/activitypub/) protocol and [Activity Streams 2.0](https://www.w3.org/TR/activitystreams-core/) vocabulary with custom types specific to real-time group communication. All Murmuring-specific types and properties are defined under the namespace `https://murmuring.dev/ns#`.
+Cairn extends the [ActivityPub](https://www.w3.org/TR/activitypub/) protocol and [Activity Streams 2.0](https://www.w3.org/TR/activitystreams-core/) vocabulary with custom types specific to real-time group communication. All Cairn-specific types and properties are defined under the namespace `https://cairn.chat/ns#`.
 
 ### 3.1 JSON-LD Context
 
-All Murmuring ActivityPub documents MUST include both the standard Activity Streams context and the Murmuring namespace in their `@context` field:
+All Cairn ActivityPub documents MUST include both the standard Activity Streams context and the Cairn namespace in their `@context` field:
 
 ```json
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
     {
-      "murmuring": "https://murmuring.dev/ns#",
-      "MurmuringServer": "murmuring:MurmuringServer",
-      "MurmuringChannel": "murmuring:MurmuringChannel",
-      "MurmuringMessage": "murmuring:MurmuringMessage",
-      "MurmuringRole": "murmuring:MurmuringRole",
-      "MurmuringReaction": "murmuring:MurmuringReaction",
-      "hlcTimestamp": "murmuring:hlcTimestamp",
-      "channelType": "murmuring:channelType",
-      "encryptedContent": "murmuring:encryptedContent",
-      "nonce": "murmuring:nonce",
-      "mlsEpoch": "murmuring:mlsEpoch",
-      "permissions": "murmuring:permissions",
-      "rolePriority": "murmuring:rolePriority",
-      "protocolVersion": "murmuring:protocolVersion",
-      "privacyManifest": "murmuring:privacyManifest",
-      "emoji": "murmuring:emoji",
-      "signature": "murmuring:signature",
-      "did": "murmuring:did",
-      "homeInstance": "murmuring:homeInstance",
-      "displayName": "murmuring:displayName",
-      "channelId": "murmuring:channelId"
+      "cairn": "https://cairn.chat/ns#",
+      "CairnServer": "cairn:CairnServer",
+      "CairnChannel": "cairn:CairnChannel",
+      "CairnMessage": "cairn:CairnMessage",
+      "CairnRole": "cairn:CairnRole",
+      "CairnReaction": "cairn:CairnReaction",
+      "hlcTimestamp": "cairn:hlcTimestamp",
+      "channelType": "cairn:channelType",
+      "encryptedContent": "cairn:encryptedContent",
+      "nonce": "cairn:nonce",
+      "mlsEpoch": "cairn:mlsEpoch",
+      "permissions": "cairn:permissions",
+      "rolePriority": "cairn:rolePriority",
+      "protocolVersion": "cairn:protocolVersion",
+      "privacyManifest": "cairn:privacyManifest",
+      "emoji": "cairn:emoji",
+      "signature": "cairn:signature",
+      "did": "cairn:did",
+      "homeInstance": "cairn:homeInstance",
+      "displayName": "cairn:displayName",
+      "channelId": "cairn:channelId"
     }
   ]
 }
@@ -129,12 +129,12 @@ Implementations MAY use the compact form by referencing a published context docu
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://murmuring.dev/ns/v1"
+    "https://cairn.chat/ns/v1"
   ]
 }
 ```
 
-### 3.2 MurmuringServer
+### 3.2 CairnServer
 
 Represents a logical community (guild/server) hosted on a node. Extends the ActivityStreams `Group` type.
 
@@ -142,7 +142,7 @@ Represents a logical community (guild/server) hosted on a node. Extends the Acti
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `type` | String | MUST | `"MurmuringServer"` |
+| `type` | String | MUST | `"CairnServer"` |
 | `id` | URI | MUST | Globally unique URI for this server |
 | `name` | String | MUST | Display name of the server |
 | `summary` | String | SHOULD | Description of the server |
@@ -150,7 +150,7 @@ Represents a logical community (guild/server) hosted on a node. Extends the Acti
 | `published` | DateTime | MUST | ISO 8601 creation timestamp |
 | `attributedTo` | URI | MUST | URI of the hosting node's actor |
 | `followers` | URI | MUST | Collection URI for members |
-| `protocolVersion` | String | MUST | Murmuring protocol version (e.g., `"0.1.0"`) |
+| `protocolVersion` | String | MUST | Cairn protocol version (e.g., `"0.1.0"`) |
 
 **Example:**
 
@@ -158,9 +158,9 @@ Represents a logical community (guild/server) hosted on a node. Extends the Acti
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://murmuring.dev/ns/v1"
+    "https://cairn.chat/ns/v1"
   ],
-  "type": "MurmuringServer",
+  "type": "CairnServer",
   "id": "https://node-a.example.com/servers/550e8400-e29b-41d4-a716-446655440000",
   "name": "Elixir Developers",
   "summary": "A community for Elixir and Erlang developers",
@@ -176,7 +176,7 @@ Represents a logical community (guild/server) hosted on a node. Extends the Acti
 }
 ```
 
-### 3.3 MurmuringChannel
+### 3.3 CairnChannel
 
 Represents a communication channel within a server. A channel may be public (plaintext, visible to all members), private (end-to-end encrypted via MLS, invite-only), or a DM (end-to-end encrypted via X3DH/Double Ratchet, exactly two members).
 
@@ -184,12 +184,12 @@ Represents a communication channel within a server. A channel may be public (pla
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `type` | String | MUST | `"MurmuringChannel"` |
+| `type` | String | MUST | `"CairnChannel"` |
 | `id` | URI | MUST | Globally unique URI for this channel |
 | `name` | String | MUST | Channel display name (e.g., `"general"`) |
 | `summary` | String | MAY | Channel topic/description |
 | `channelType` | String | MUST | One of: `"public"`, `"private"`, `"dm"` |
-| `context` | URI | MUST | URI of the parent `MurmuringServer` |
+| `context` | URI | MUST | URI of the parent `CairnServer` |
 | `published` | DateTime | MUST | ISO 8601 creation timestamp |
 | `attributedTo` | URI | MUST | URI of the channel creator |
 | `followers` | URI | MUST | Collection URI for channel members/subscribers |
@@ -201,9 +201,9 @@ Represents a communication channel within a server. A channel may be public (pla
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://murmuring.dev/ns/v1"
+    "https://cairn.chat/ns/v1"
   ],
-  "type": "MurmuringChannel",
+  "type": "CairnChannel",
   "id": "https://node-a.example.com/channels/7c9e6679-7425-40de-944b-e07fc1f90ae7",
   "name": "general",
   "summary": "General discussion for the community",
@@ -216,7 +216,7 @@ Represents a communication channel within a server. A channel may be public (pla
 }
 ```
 
-### 3.4 MurmuringMessage
+### 3.4 CairnMessage
 
 Represents a message within a channel. Extends the ActivityStreams `Note` type. For public channels, the `content` field holds plaintext. For encrypted channels, `content` MUST be `null` and `encryptedContent` MUST hold the ciphertext.
 
@@ -224,10 +224,10 @@ Represents a message within a channel. Extends the ActivityStreams `Note` type. 
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `type` | String | MUST | `"MurmuringMessage"` |
+| `type` | String | MUST | `"CairnMessage"` |
 | `id` | URI | MUST | Globally unique URI for this message |
 | `attributedTo` | URI | MUST | URI of the message author |
-| `context` | URI | MUST | URI of the parent `MurmuringChannel` |
+| `context` | URI | MUST | URI of the parent `CairnChannel` |
 | `content` | String or null | MUST | Plaintext content (public channels) or `null` (encrypted channels) |
 | `encryptedContent` | String or null | Conditional | Base64url-encoded ciphertext. MUST be present when the channel is encrypted. MUST be `null` or absent for public channels. |
 | `nonce` | String or null | Conditional | Base64url-encoded encryption nonce. MUST accompany `encryptedContent`. |
@@ -237,10 +237,10 @@ Represents a message within a channel. Extends the ActivityStreams `Note` type. 
 | `hlcTimestamp` | Object | MUST | Hybrid Logical Clock timestamp (see Section 5) |
 | `signature` | String | MUST | Base64url-encoded Ed25519 signature over the canonical message fields |
 | `protocolVersion` | String | MUST | Protocol version (e.g., `"0.1.0"`) |
-| `murmuring:channelId` | String | SHOULD | Channel UUID for routing on the receiving node |
-| `murmuring:did` | String | SHOULD | Author's `did:murmuring:...` identifier for cross-instance identity verification |
-| `murmuring:homeInstance` | String | SHOULD | Author's home instance domain |
-| `murmuring:displayName` | String | MAY | Author's display name at time of sending |
+| `cairn:channelId` | String | SHOULD | Channel UUID for routing on the receiving node |
+| `cairn:did` | String | SHOULD | Author's `did:cairn:...` identifier for cross-instance identity verification |
+| `cairn:homeInstance` | String | SHOULD | Author's home instance domain |
+| `cairn:displayName` | String | MAY | Author's display name at time of sending |
 
 **Example (public channel message):**
 
@@ -248,9 +248,9 @@ Represents a message within a channel. Extends the ActivityStreams `Note` type. 
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://murmuring.dev/ns/v1"
+    "https://cairn.chat/ns/v1"
   ],
-  "type": "MurmuringMessage",
+  "type": "CairnMessage",
   "id": "https://node-a.example.com/messages/a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "attributedTo": "https://node-a.example.com/users/alice",
   "context": "https://node-a.example.com/channels/7c9e6679-7425-40de-944b-e07fc1f90ae7",
@@ -276,9 +276,9 @@ Represents a message within a channel. Extends the ActivityStreams `Note` type. 
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://murmuring.dev/ns/v1"
+    "https://cairn.chat/ns/v1"
   ],
-  "type": "MurmuringMessage",
+  "type": "CairnMessage",
   "id": "https://node-a.example.com/messages/b2c3d4e5-f6a7-8901-bcde-f12345678901",
   "attributedTo": "https://node-a.example.com/users/alice",
   "context": "https://node-a.example.com/channels/encrypted-channel-uuid",
@@ -298,7 +298,7 @@ Represents a message within a channel. Extends the ActivityStreams `Note` type. 
 }
 ```
 
-### 3.5 MurmuringRole
+### 3.5 CairnRole
 
 Represents a permission role within a server. Roles are ordered by priority and their permissions are additive (higher-priority roles override lower-priority ones).
 
@@ -306,10 +306,10 @@ Represents a permission role within a server. Roles are ordered by priority and 
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `type` | String | MUST | `"MurmuringRole"` |
+| `type` | String | MUST | `"CairnRole"` |
 | `id` | URI | MUST | Globally unique URI for this role |
 | `name` | String | MUST | Display name (e.g., `"Moderator"`) |
-| `context` | URI | MUST | URI of the parent `MurmuringServer` |
+| `context` | URI | MUST | URI of the parent `CairnServer` |
 | `rolePriority` | Integer | MUST | Priority for permission resolution (higher number = higher priority) |
 | `permissions` | Object | MUST | Map of permission keys to boolean values |
 
@@ -339,9 +339,9 @@ Represents a permission role within a server. Roles are ordered by priority and 
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://murmuring.dev/ns/v1"
+    "https://cairn.chat/ns/v1"
   ],
-  "type": "MurmuringRole",
+  "type": "CairnRole",
   "id": "https://node-a.example.com/servers/550e8400-e29b-41d4-a716-446655440000/roles/moderator",
   "name": "Moderator",
   "context": "https://node-a.example.com/servers/550e8400-e29b-41d4-a716-446655440000",
@@ -366,7 +366,7 @@ Represents a permission role within a server. Roles are ordered by priority and 
 }
 ```
 
-### 3.6 MurmuringReaction
+### 3.6 CairnReaction
 
 Represents an emoji reaction on a message. Extends the ActivityStreams `Like` type with an `emoji` property.
 
@@ -374,7 +374,7 @@ Represents an emoji reaction on a message. Extends the ActivityStreams `Like` ty
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `type` | String | MUST | `"MurmuringReaction"` |
+| `type` | String | MUST | `"CairnReaction"` |
 | `id` | URI | MUST | Globally unique URI for this reaction |
 | `actor` | URI | MUST | URI of the user who reacted |
 | `object` | URI | MUST | URI of the message being reacted to |
@@ -387,9 +387,9 @@ Represents an emoji reaction on a message. Extends the ActivityStreams `Like` ty
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://murmuring.dev/ns/v1"
+    "https://cairn.chat/ns/v1"
   ],
-  "type": "MurmuringReaction",
+  "type": "CairnReaction",
   "id": "https://node-a.example.com/reactions/c3d4e5f6-a7b8-9012-cdef-123456789012",
   "actor": "https://node-a.example.com/users/bob",
   "object": "https://node-a.example.com/messages/a1b2c3d4-e5f6-7890-abcd-ef1234567890",
@@ -400,20 +400,20 @@ Represents an emoji reaction on a message. Extends the ActivityStreams `Like` ty
 
 ### 3.7 Activity Wrapping
 
-All Murmuring objects are transmitted between nodes wrapped in standard ActivityPub activities. The wrapping follows the ActivityPub specification:
+All Cairn objects are transmitted between nodes wrapped in standard ActivityPub activities. The wrapping follows the ActivityPub specification:
 
 | Action | Activity Type | Object |
 |--------|--------------|--------|
-| New message | `Create` | `MurmuringMessage` |
-| Edit message | `Update` | `MurmuringMessage` (with updated content) |
-| Delete message | `Delete` | `Tombstone` with `formerType: "MurmuringMessage"` |
-| Add reaction | `Create` | `MurmuringReaction` |
-| Remove reaction | `Delete` | `Tombstone` with `formerType: "MurmuringReaction"` |
-| Join channel | `Follow` | `MurmuringChannel` |
+| New message | `Create` | `CairnMessage` |
+| Edit message | `Update` | `CairnMessage` (with updated content) |
+| Delete message | `Delete` | `Tombstone` with `formerType: "CairnMessage"` |
+| Add reaction | `Create` | `CairnReaction` |
+| Remove reaction | `Delete` | `Tombstone` with `formerType: "CairnReaction"` |
+| Join channel | `Follow` | `CairnChannel` |
 | Approve join | `Accept` | Original `Follow` activity |
 | Reject join | `Reject` | Original `Follow` activity |
 | Leave channel | `Undo` | Original `Follow` activity |
-| DM hint (cross-instance) | `Invite` | `murmuring:DmHint` |
+| DM hint (cross-instance) | `Invite` | `cairn:DmHint` |
 
 **Example (Create activity wrapping a message):**
 
@@ -421,7 +421,7 @@ All Murmuring objects are transmitted between nodes wrapped in standard Activity
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://murmuring.dev/ns/v1"
+    "https://cairn.chat/ns/v1"
   ],
   "type": "Create",
   "id": "https://node-a.example.com/activities/d4e5f6a7-b8c9-0123-def4-567890123456",
@@ -431,7 +431,7 @@ All Murmuring objects are transmitted between nodes wrapped in standard Activity
     "https://node-b.example.com/channels/7c9e6679-7425-40de-944b-e07fc1f90ae7/subscribers"
   ],
   "object": {
-    "type": "MurmuringMessage",
+    "type": "CairnMessage",
     "id": "https://node-a.example.com/messages/a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "attributedTo": "https://node-a.example.com/users/alice",
     "context": "https://node-a.example.com/channels/7c9e6679-7425-40de-944b-e07fc1f90ae7",
@@ -456,17 +456,17 @@ When a user initiates a cross-instance DM, their home instance delivers a lightw
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://murmuring.dev/ns/v1"
+    "https://cairn.chat/ns/v1"
   ],
   "type": "Invite",
   "actor": "https://instance-a.example.com/users/alice",
   "object": {
-    "type": "murmuring:DmHint",
-    "murmuring:channelId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "murmuring:senderDid": "did:murmuring:alice123...",
-    "murmuring:senderUsername": "alice",
-    "murmuring:senderDisplayName": "Alice",
-    "murmuring:recipientDid": "did:murmuring:bob456..."
+    "type": "cairn:DmHint",
+    "cairn:channelId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "cairn:senderDid": "did:cairn:alice123...",
+    "cairn:senderUsername": "alice",
+    "cairn:senderDisplayName": "Alice",
+    "cairn:recipientDid": "did:cairn:bob456..."
   },
   "target": "https://instance-b.example.com/users/bob"
 }
@@ -474,12 +474,12 @@ When a user initiates a cross-instance DM, their home instance delivers a lightw
 
 | Property | Type | Requirement | Description |
 |----------|------|-------------|-------------|
-| `type` | string | MUST | `"murmuring:DmHint"` |
-| `murmuring:channelId` | UUID | MUST | Channel ID on the initiator's instance |
-| `murmuring:senderDid` | string | MUST | Sender's `did:murmuring:...` identifier |
-| `murmuring:senderUsername` | string | MUST | Sender's username |
-| `murmuring:senderDisplayName` | string | MAY | Sender's display name |
-| `murmuring:recipientDid` | string | MUST | Recipient's `did:murmuring:...` identifier |
+| `type` | string | MUST | `"cairn:DmHint"` |
+| `cairn:channelId` | UUID | MUST | Channel ID on the initiator's instance |
+| `cairn:senderDid` | string | MUST | Sender's `did:cairn:...` identifier |
+| `cairn:senderUsername` | string | MUST | Sender's username |
+| `cairn:senderDisplayName` | string | MAY | Sender's display name |
+| `cairn:recipientDid` | string | MUST | Recipient's `did:cairn:...` identifier |
 
 The receiving instance MUST:
 1. Resolve the `recipientDid` to a local user
@@ -492,11 +492,11 @@ DM **messages** are NEVER delivered via federation. Only the hint (request) cros
 
 ## 4. Federation Handshake
 
-Federation is the process by which two Murmuring nodes establish a trust relationship and begin exchanging activities. All federation is opt-in: a node MUST explicitly initiate or accept federation with another node.
+Federation is the process by which two Cairn nodes establish a trust relationship and begin exchanging activities. All federation is opt-in: a node MUST explicitly initiate or accept federation with another node.
 
 ### 4.1 Node Identity
 
-Each Murmuring node MUST generate the following cryptographic material on first boot:
+Each Cairn node MUST generate the following cryptographic material on first boot:
 
 1. **Ed25519 signing key pair** -- Used to sign all outbound federated activities and to authenticate the node's identity. The private key MUST be stored securely and MUST NOT be transmitted over the network.
 
@@ -504,7 +504,7 @@ Each Murmuring node MUST generate the following cryptographic material on first 
 
 The node's **identity** is the combination of its domain name and its Ed25519 public key. Changing either of these values constitutes a new node identity from the perspective of federated peers.
 
-### 4.1.1 User Identity (`did:murmuring`)
+### 4.1.1 User Identity (`did:cairn`)
 
 Each user has a portable cryptographic identity represented as a Decentralized Identifier (DID). The DID is self-certifying — its value is derived from cryptographic material, not assigned by any authority.
 
@@ -527,7 +527,7 @@ Each user has a portable cryptographic identity represented as a Decentralized I
    }
    ```
 2. Sign the genesis operation with the rotation key.
-3. Compute `DID = did:murmuring:<base58(SHA-256(canonical_json(signed_genesis_op)))>`.
+3. Compute `DID = did:cairn:<base58(SHA-256(canonical_json(signed_genesis_op)))>`.
 4. The DID never changes, regardless of key rotations.
 
 **Operation chain:**
@@ -548,15 +548,15 @@ Each operation is signed by the **current rotation key** at the time of signing.
 ```json
 {
   "@context": ["https://www.w3.org/ns/did/v1"],
-  "id": "did:murmuring:7xK9...",
+  "id": "did:cairn:7xK9...",
   "verificationMethod": [{
-    "id": "did:murmuring:7xK9...#signing",
+    "id": "did:cairn:7xK9...#signing",
     "type": "Ed25519VerificationKey2020",
     "publicKeyMultibase": "z6Mk..."
   }],
-  "authentication": ["did:murmuring:7xK9...#signing"],
+  "authentication": ["did:cairn:7xK9...#signing"],
   "service": [{
-    "type": "MurmuringPDS",
+    "type": "CairnPDS",
     "serviceEndpoint": "https://home.instance.com"
   }]
 }
@@ -577,7 +577,7 @@ When a user wants to join a server on a remote instance, their home instance iss
 ```json
 {
   "type": "federated_auth",
-  "did": "did:murmuring:7xK9...",
+  "did": "did:cairn:7xK9...",
   "username": "alice",
   "display_name": "Alice",
   "home_instance": "instance-a.com",
@@ -595,10 +595,10 @@ Wire format: `base64url(payload).base64url(node_ed25519_signature)`. Signed by t
 
 ### 4.2 Well-Known Federation Endpoint
 
-Every Murmuring node MUST serve a JSON document at the well-known federation URL:
+Every Cairn node MUST serve a JSON document at the well-known federation URL:
 
 ```
-GET /.well-known/murmuring-federation
+GET /.well-known/cairn-federation
 ```
 
 The response MUST have `Content-Type: application/json` and MUST contain the following fields:
@@ -609,10 +609,10 @@ The response MUST have `Content-Type: application/json` and MUST contain the fol
   "domain": "node-a.example.com",
   "public_key": "MCowBQYDK2VwAyEAGb1gauf46Lv4SISaOmlBCPLbmGxLoAMMNjNFBjntbmQ=",
   "public_key_algorithm": "ed25519",
-  "protocol_name": "murmuring",
+  "protocol_name": "cairn",
   "protocol_version": "0.1.0",
   "supported_versions": ["0.1.0"],
-  "software": "murmuring",
+  "software": "cairn",
   "software_version": "0.1.0",
   "inbox": "https://node-a.example.com/inbox",
   "privacy_manifest_url": "https://node-a.example.com/.well-known/privacy-manifest",
@@ -644,7 +644,7 @@ The response MUST have `Content-Type: application/json` and MUST contain the fol
 | `domain` | String | MUST | Fully qualified domain name of this node |
 | `public_key` | String | MUST | Base64-encoded Ed25519 public key |
 | `public_key_algorithm` | String | MUST | MUST be `"ed25519"` |
-| `protocol_name` | String | MUST | MUST be `"murmuring"` |
+| `protocol_name` | String | MUST | MUST be `"cairn"` |
 | `protocol_version` | String | MUST | Current protocol version (semver) |
 | `supported_versions` | Array | MUST | All protocol versions this node supports |
 | `software` | String | SHOULD | Software implementation name |
@@ -657,7 +657,7 @@ Implementations MUST serve this endpoint over HTTPS. The endpoint MUST NOT requi
 
 ### 4.3 WebFinger
 
-Murmuring nodes MUST implement the WebFinger protocol ([RFC 7033](https://www.rfc-editor.org/rfc/rfc7033)) for user discovery. Remote nodes use WebFinger to resolve a `username@domain` identifier to an ActivityPub actor URI.
+Cairn nodes MUST implement the WebFinger protocol ([RFC 7033](https://www.rfc-editor.org/rfc/rfc7033)) for user discovery. Remote nodes use WebFinger to resolve a `username@domain` identifier to an ActivityPub actor URI.
 
 **Request:**
 
@@ -690,19 +690,19 @@ GET /.well-known/webfinger?resource=acct:alice@node-a.example.com
 
 The `self` link with type `application/activity+json` MUST be present and MUST point to the user's ActivityPub actor document. Nodes MUST respond with `404 Not Found` for unknown users. Nodes MUST NOT enumerate users (i.e., the endpoint MUST NOT accept wildcard queries).
 
-WebFinger also supports `did:murmuring:...` resources. When the `resource` parameter is a DID, the node MUST resolve it to the corresponding actor URI:
+WebFinger also supports `did:cairn:...` resources. When the `resource` parameter is a DID, the node MUST resolve it to the corresponding actor URI:
 
 **Request:**
 
 ```
-GET /.well-known/webfinger?resource=did:murmuring:7xK9abc123...
+GET /.well-known/webfinger?resource=did:cairn:7xK9abc123...
 ```
 
 **Response:**
 
 ```json
 {
-  "subject": "did:murmuring:7xK9abc123...",
+  "subject": "did:cairn:7xK9abc123...",
   "aliases": [
     "https://node-a.example.com/users/alice"
   ],
@@ -736,13 +736,13 @@ The complete federation handshake between two nodes proceeds as follows:
 ```
 Node A (initiator)                          Node B (responder)
       |                                            |
-      |  1. GET /.well-known/murmuring-federation  |
+      |  1. GET /.well-known/cairn-federation  |
       |------------------------------------------->|
       |<-------------------------------------------|
       |     (Node B's identity + privacy manifest) |
       |                                            |
       |  2. Verify TLS certificate                 |
-      |  3. Verify protocol_name == "murmuring"    |
+      |  3. Verify protocol_name == "cairn"    |
       |  4. Negotiate protocol version             |
       |  5. Validate privacy manifest              |
       |                                            |
@@ -752,7 +752,7 @@ Node A (initiator)                          Node B (responder)
       |                                            |
       |         7. Node B verifies HTTP Signature  |
       |         8. Node B fetches Node A's         |
-      |            /.well-known/murmuring-federation
+      |            /.well-known/cairn-federation
       |<-------------------------------------------|
       |         9. Node B validates Node A         |
       |                                            |
@@ -768,7 +768,7 @@ Node A (initiator)                          Node B (responder)
 
 1. Node A fetches Node B's well-known federation document.
 2. Node A verifies that Node B's TLS certificate is valid for the claimed domain.
-3. Node A verifies that `protocol_name` is `"murmuring"`.
+3. Node A verifies that `protocol_name` is `"cairn"`.
 4. Node A computes the intersection of `supported_versions` between both nodes and selects the highest common version. If no common version exists, federation MUST be rejected.
 5. Node A evaluates Node B's privacy manifest against local policy. If the manifest does not meet the node operator's minimum requirements, federation MAY be rejected.
 6. Node A sends a `Follow` activity to Node B's inbox, requesting federation. This activity is signed with Node A's Ed25519 private key using HTTP Message Signatures ([RFC 9421](https://www.rfc-editor.org/rfc/rfc9421)).
@@ -783,7 +783,7 @@ Node A (initiator)                          Node B (responder)
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://murmuring.dev/ns/v1"
+    "https://cairn.chat/ns/v1"
   ],
   "type": "Follow",
   "id": "https://node-a.example.com/activities/federation-follow-uuid",
@@ -799,7 +799,7 @@ Node A (initiator)                          Node B (responder)
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://murmuring.dev/ns/v1"
+    "https://cairn.chat/ns/v1"
   ],
   "type": "Accept",
   "id": "https://node-b.example.com/activities/federation-accept-uuid",
@@ -846,7 +846,7 @@ The message envelope defines the exact set of fields that accompany every messag
 
 ### 5.1 Included Fields
 
-Every Murmuring message envelope MUST contain the following fields:
+Every Cairn message envelope MUST contain the following fields:
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -907,9 +907,9 @@ The following JSON Schema defines the message envelope:
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://murmuring.dev/schemas/message-envelope/0.1.0",
-  "title": "Murmuring Message Envelope",
-  "description": "The canonical message format for the Murmuring protocol v0.1.0",
+  "$id": "https://cairn.chat/schemas/message-envelope/0.1.0",
+  "title": "Cairn Message Envelope",
+  "description": "The canonical message format for the Cairn protocol v0.1.0",
   "type": "object",
   "required": [
     "id",
@@ -1015,7 +1015,7 @@ This produces a total order that is consistent across all nodes in the federatio
 
 ## 6. End-to-End Encryption
 
-Murmuring uses layered end-to-end encryption:
+Cairn uses layered end-to-end encryption:
 
 - **DMs**: X3DH key agreement followed by the Double Ratchet algorithm.
 - **Private group channels**: MLS (Messaging Layer Security, [RFC 9420](https://www.rfc-editor.org/rfc/rfc9420)).
@@ -1107,7 +1107,7 @@ For **cross-instance DMs**, the initiator's instance fetches the recipient's key
 GET /api/v1/federation/users/:did/keys
 ```
 
-This endpoint is authenticated via HTTP Signatures (node-to-node) and returns the same key bundle format. The `:did` parameter is the recipient's `did:murmuring:...` identifier.
+This endpoint is authenticated via HTTP Signatures (node-to-node) and returns the same key bundle format. The `:did` parameter is the recipient's `did:cairn:...` identifier.
 
 **Response:**
 
@@ -1134,7 +1134,7 @@ The Extended Triple Diffie-Hellman (X3DH) protocol is used to establish a shared
 
 - **Curve**: X25519
 - **Hash**: SHA-256
-- **Info string**: `"murmuring-x3dh-v1"`
+- **Info string**: `"cairn-x3dh-v1"`
 
 #### Protocol Steps
 
@@ -1148,7 +1148,7 @@ The Extended Triple Diffie-Hellman (X3DH) protocol is used to establish a shared
    - `DH2 = X25519(EK_A_priv, IK_B_x25519)` -- Alice's ephemeral key with Bob's identity key (converted to X25519)
    - `DH3 = X25519(EK_A_priv, SPK_B)` -- Alice's ephemeral key with Bob's signed prekey
    - `DH4 = X25519(EK_A_priv, OPK_B)` -- Alice's ephemeral key with Bob's one-time prekey (if available)
-5. Alice computes the shared secret: `SK = HKDF(DH1 || DH2 || DH3 || DH4, salt=0, info="murmuring-x3dh-v1")`, truncated to 32 bytes.
+5. Alice computes the shared secret: `SK = HKDF(DH1 || DH2 || DH3 || DH4, salt=0, info="cairn-x3dh-v1")`, truncated to 32 bytes.
 6. Alice initializes the Double Ratchet with `SK` and sends the initial message containing:
    - Alice's identity public key `IK_A`
    - Alice's ephemeral public key `EK_A_pub`
@@ -1178,7 +1178,7 @@ Private group channels use the Messaging Layer Security protocol ([RFC 9420](htt
 
 #### MLS Ciphersuite
 
-Murmuring implementations MUST support the following MLS ciphersuite:
+Cairn implementations MUST support the following MLS ciphersuite:
 
 ```
 MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519
@@ -1345,7 +1345,7 @@ DELETE /api/v1/users/me/key-backup  -- Delete backup
 
 ## 7. Privacy Manifest
 
-Each Murmuring node MUST publish a privacy manifest -- a machine-readable JSON document describing the node's data handling practices. This manifest is used during federation handshakes (Section 4.5) to allow nodes to evaluate each other's privacy posture and for users to make informed decisions about joining federated channels.
+Each Cairn node MUST publish a privacy manifest -- a machine-readable JSON document describing the node's data handling practices. This manifest is used during federation handshakes (Section 4.5) to allow nodes to evaluate each other's privacy posture and for users to make informed decisions about joining federated channels.
 
 ### 7.1 Endpoint
 
@@ -1355,16 +1355,16 @@ The privacy manifest MUST be served at:
 GET /.well-known/privacy-manifest
 ```
 
-The response MUST have `Content-Type: application/json`. The endpoint MUST NOT require authentication. A copy of the manifest is also included inline in the `/.well-known/murmuring-federation` response (Section 4.2).
+The response MUST have `Content-Type: application/json`. The endpoint MUST NOT require authentication. A copy of the manifest is also included inline in the `/.well-known/cairn-federation` response (Section 4.2).
 
 ### 7.2 Schema
 
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://murmuring.dev/schemas/privacy-manifest/1.0",
-  "title": "Murmuring Privacy Manifest",
-  "description": "Machine-readable privacy policy for a Murmuring node",
+  "$id": "https://cairn.chat/schemas/privacy-manifest/1.0",
+  "title": "Cairn Privacy Manifest",
+  "description": "Machine-readable privacy policy for a Cairn node",
   "type": "object",
   "required": ["version", "logging", "retention", "federation"],
   "properties": {
@@ -1530,7 +1530,7 @@ Nodes SHOULD re-fetch the privacy manifests of their federated peers periodicall
 
 ### 8.1 Version Format
 
-The Murmuring protocol uses [Semantic Versioning 2.0.0](https://semver.org/):
+The Cairn protocol uses [Semantic Versioning 2.0.0](https://semver.org/):
 
 ```
 MAJOR.MINOR.PATCH
@@ -1548,7 +1548,7 @@ While the major version is `0`, the protocol is considered unstable. Minor versi
 
 Every node advertises its protocol version in two places:
 
-1. **`/.well-known/murmuring-federation`**: The `protocol_version` field contains the node's current (preferred) version. The `supported_versions` array lists all versions the node can operate with.
+1. **`/.well-known/cairn-federation`**: The `protocol_version` field contains the node's current (preferred) version. The `supported_versions` array lists all versions the node can operate with.
 
 2. **Message envelope**: Every message includes a `protocolVersion` field (Section 5.1).
 
@@ -1598,7 +1598,7 @@ All federated activities MUST include the protocol version in the JSON-LD contex
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://murmuring.dev/ns/v1"
+    "https://cairn.chat/ns/v1"
   ],
   "protocolVersion": "0.1.0",
   "type": "Create",
@@ -1612,7 +1612,7 @@ If the `protocolVersion` field is missing, the receiving node SHOULD assume the 
 
 ## 9. Message Formatting
 
-Murmuring messages support a safe subset of Markdown for text formatting, along with mentions and emoji. Clients MUST render formatted content according to this section. Servers MUST NOT modify message content beyond what is described in Section 9.5 (sanitization).
+Cairn messages support a safe subset of Markdown for text formatting, along with mentions and emoji. Clients MUST render formatted content according to this section. Servers MUST NOT modify message content beyond what is described in Section 9.5 (sanitization).
 
 ### 9.1 Markdown Subset
 
@@ -1625,7 +1625,7 @@ The following Markdown constructs MUST be supported:
 | `~~text~~` | ~~Strikethrough~~ | `~~deleted~~` |
 | `` `text` `` | `Inline code` | `` `variable` `` |
 | ` ```lang\ncode\n``` ` | Code block with syntax highlighting | See below |
-| `[text](url)` | Hyperlink | `[Murmuring](https://murmuring.dev)` |
+| `[text](url)` | Hyperlink | `[Cairn](https://cairn.chat)` |
 | `> text` | Blockquote | `> quoted text` |
 | `- item` or `* item` | Unordered list | `- first item` |
 | `1. item` | Ordered list | `1. first item` |
@@ -1740,7 +1740,7 @@ Implementations MUST enforce the following sanitization rules on message content
 
 4. **No `vbscript:` URIs.** Same treatment as `javascript:`.
 
-5. **Scheme allowlist for links.** Hyperlinks (both explicit Markdown and auto-detected) MUST only use the following schemes: `https`, `http`, `mailto`, `tel`, `murmuring` (protocol-specific deep links). All other schemes MUST be rejected or rendered as plain text.
+5. **Scheme allowlist for links.** Hyperlinks (both explicit Markdown and auto-detected) MUST only use the following schemes: `https`, `http`, `mailto`, `tel`, `cairn` (protocol-specific deep links). All other schemes MUST be rejected or rendered as plain text.
 
 6. **Maximum message length.** Messages MUST NOT exceed 4000 Unicode codepoints for the `content` field. Implementations SHOULD reject longer messages at the API level.
 
@@ -1837,7 +1837,7 @@ Messages with HLC timestamps that exceed the drift limit MUST be rejected by the
 
 ### Appendix B: HTTP Message Signatures (RFC 9421)
 
-Murmuring uses [RFC 9421 (HTTP Message Signatures)](https://www.rfc-editor.org/rfc/rfc9421) for authenticating federated HTTP requests. This replaces the deprecated `draft-cavage-http-signatures`.
+Cairn uses [RFC 9421 (HTTP Message Signatures)](https://www.rfc-editor.org/rfc/rfc9421) for authenticating federated HTTP requests. This replaces the deprecated `draft-cavage-http-signatures`.
 
 #### Signing Parameters
 
@@ -1870,14 +1870,14 @@ Murmuring uses [RFC 9421 (HTTP Message Signatures)](https://www.rfc-editor.org/r
    Date: Tue, 09 Feb 2026 14:30:00 GMT
    Content-Type: application/activity+json
    Content-Digest: sha-256=:X48E9qOokqqrvdts8nOJRJN3OWDUoyWxBf7kbu9DBPE=:
-   Signature-Input: murmuring=("@method" "@target-uri" "@authority" "content-type" "content-digest" "date");created=1739108400;keyid="a1b2c3d4e5f6a7b8";alg="ed25519"
-   Signature: murmuring=:bWVzc2FnZSBzaWduYXR1cmUgZXhhbXBsZQ==:
+   Signature-Input: cairn=("@method" "@target-uri" "@authority" "content-type" "content-digest" "date");created=1739108400;keyid="a1b2c3d4e5f6a7b8";alg="ed25519"
+   Signature: cairn=:bWVzc2FnZSBzaWduYXR1cmUgZXhhbXBsZQ==:
    ```
 
 #### Verification Process
 
 1. Receiving node extracts the `Signature-Input` header to determine covered components and key ID.
-2. Receiving node looks up the public key for the given `keyid` (from cached federation data or by fetching `/.well-known/murmuring-federation`).
+2. Receiving node looks up the public key for the given `keyid` (from cached federation data or by fetching `/.well-known/cairn-federation`).
 3. Receiving node reconstructs the signature base string from the request.
 4. Receiving node verifies the Ed25519 signature against the reconstructed base string.
 5. Receiving node checks that the `date` header is within 300 seconds of the current time (replay protection).
@@ -1954,7 +1954,7 @@ This appendix provides a quick reference for all endpoints and their wire format
 
 | Method | Path | Content-Type | Auth Required |
 |--------|------|-------------|---------------|
-| GET | `/.well-known/murmuring-federation` | `application/json` | No |
+| GET | `/.well-known/cairn-federation` | `application/json` | No |
 | GET | `/.well-known/webfinger` | `application/jrd+json` | No |
 | GET | `/.well-known/privacy-manifest` | `application/json` | No |
 | GET | `/.well-known/did/:did` | `application/json` | No |
@@ -2023,8 +2023,8 @@ This appendix provides a quick reference for all endpoints and their wire format
 | Version | Date | Changes |
 |---------|------|---------|
 | `0.1.0` | 2026-02-09 | Initial draft specification |
-| `0.1.1` | 2026-02-11 | Added `did:murmuring` portable identity (Section 4.1.1), federated auth tokens, DID operation chain, DM guard, ActivityPub DID extension fields (`murmuring:did`, `murmuring:homeInstance`, `murmuring:channelId`, `murmuring:displayName`), federated access endpoints, WebFinger DID resolution |
-| `0.1.2` | 2026-02-11 | Cross-instance encrypted DMs: `Invite`/`murmuring:DmHint` activity type (Section 3.7), federated key bundle endpoint (`GET /api/v1/federation/users/:did/keys`), DM request endpoints, consent-first DM flow, anti-spam (rate limits, DID block list) |
+| `0.1.1` | 2026-02-11 | Added `did:cairn` portable identity (Section 4.1.1), federated auth tokens, DID operation chain, DM guard, ActivityPub DID extension fields (`cairn:did`, `cairn:homeInstance`, `cairn:channelId`, `cairn:displayName`), federated access endpoints, WebFinger DID resolution |
+| `0.1.2` | 2026-02-11 | Cross-instance encrypted DMs: `Invite`/`cairn:DmHint` activity type (Section 3.7), federated key bundle endpoint (`GET /api/v1/federation/users/:did/keys`), DM request endpoints, consent-first DM flow, anti-spam (rate limits, DID block list) |
 
 ---
 

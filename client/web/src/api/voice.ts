@@ -1,11 +1,11 @@
 /**
- * Voice/Video configuration — delegates to @murmuring/proto.
+ * Voice/Video configuration — delegates to @cairn/proto.
  */
 
-import { voiceApi } from "@murmuring/proto";
+import { voiceApi } from "@cairn/proto";
 import { client } from "./client.ts";
 
-export type { IceServerConfig } from "@murmuring/proto/api";
+export type { IceServerConfig } from "@cairn/proto/api";
 
 export function getIceServers() {
   return voiceApi.getIceServers(client);

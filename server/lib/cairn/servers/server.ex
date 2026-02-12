@@ -1,4 +1,4 @@
-defmodule Murmuring.Servers.Server do
+defmodule Cairn.Servers.Server do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,11 +10,11 @@ defmodule Murmuring.Servers.Server do
     field :description, :string
     field :icon_key, :string
 
-    belongs_to :creator, Murmuring.Accounts.User
-    has_many :channels, Murmuring.Chat.Channel
-    has_many :roles, Murmuring.Accounts.Role
-    has_many :server_members, Murmuring.Servers.ServerMember
-    has_many :invite_links, Murmuring.Accounts.InviteLink
+    belongs_to :creator, Cairn.Accounts.User
+    has_many :channels, Cairn.Chat.Channel
+    has_many :roles, Cairn.Accounts.Role
+    has_many :server_members, Cairn.Servers.ServerMember
+    has_many :invite_links, Cairn.Accounts.InviteLink
 
     timestamps()
   end

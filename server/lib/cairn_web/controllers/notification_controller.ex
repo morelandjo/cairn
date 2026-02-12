@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.NotificationController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.NotificationController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Notifications
+  alias Cairn.Notifications
 
   # GET /api/v1/users/me/notification-preferences
   def index(conn, _params) do

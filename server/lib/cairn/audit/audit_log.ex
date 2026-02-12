@@ -1,4 +1,4 @@
-defmodule Murmuring.Audit.AuditLog do
+defmodule Cairn.Audit.AuditLog do
   @moduledoc "Schema for audit log entries."
 
   use Ecto.Schema

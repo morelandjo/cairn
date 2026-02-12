@@ -5,7 +5,7 @@
 
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-import { pushTokensApi } from "@murmuring/proto";
+import { pushTokensApi } from "@cairn/proto";
 import { client } from "../api/client";
 
 // Configure how notifications appear when app is in foreground

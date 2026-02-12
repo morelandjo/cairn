@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.PrivateChannelTest do
-  use MurmuringWeb.ChannelCase, async: true
+defmodule CairnWeb.PrivateChannelTest do
+  use CairnWeb.ChannelCase, async: true
 
-  alias Murmuring.{Accounts, Auth, Chat, Servers}
+  alias Cairn.{Accounts, Auth, Chat, Servers}
 
   @valid_password "secure_password_123"
 
@@ -30,7 +30,7 @@ defmodule MurmuringWeb.PrivateChannelTest do
       })
 
     {:ok, access_token, _claims} = Auth.Token.generate_access_token(user.id)
-    {:ok, socket} = connect(MurmuringWeb.UserSocket, %{"token" => access_token})
+    {:ok, socket} = connect(CairnWeb.UserSocket, %{"token" => access_token})
 
     {user, socket}
   end

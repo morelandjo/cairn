@@ -19,16 +19,16 @@ RUN npm prune --production
 FROM node:24-alpine AS runtime
 
 RUN apk add --no-cache curl \
-  && addgroup -S murmuring \
-  && adduser -S murmuring -G murmuring
+  && addgroup -S cairn \
+  && adduser -S cairn -G cairn
 
 WORKDIR /app
 
-COPY --from=builder --chown=murmuring:murmuring /app/node_modules ./node_modules
-COPY --from=builder --chown=murmuring:murmuring /app/dist ./dist
-COPY --from=builder --chown=murmuring:murmuring /app/package.json ./
+COPY --from=builder --chown=cairn:cairn /app/node_modules ./node_modules
+COPY --from=builder --chown=cairn:cairn /app/dist ./dist
+COPY --from=builder --chown=cairn:cairn /app/package.json ./
 
-USER murmuring
+USER cairn
 
 ENV NODE_ENV=production
 ENV PORT=4001

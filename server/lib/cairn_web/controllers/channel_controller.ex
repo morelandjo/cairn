@@ -1,7 +1,7 @@
-defmodule MurmuringWeb.ChannelController do
-  use MurmuringWeb, :controller
+defmodule CairnWeb.ChannelController do
+  use CairnWeb, :controller
 
-  alias Murmuring.Chat
+  alias Cairn.Chat
 
   def index(conn, _params) do
     channels = Chat.list_channels()
@@ -37,7 +37,7 @@ defmodule MurmuringWeb.ChannelController do
   defp has_channel_create_permission?(nil, _user_id), do: true
 
   defp has_channel_create_permission?(server_id, user_id) do
-    Murmuring.Servers.Permissions.has_permission?(server_id, user_id, "manage_channels")
+    Cairn.Servers.Permissions.has_permission?(server_id, user_id, "manage_channels")
   end
 
   def show(conn, %{"id" => id}) do
@@ -130,7 +130,7 @@ defmodule MurmuringWeb.ChannelController do
 
   defp has_manage_channels_permission?(channel, user_id) do
     if channel.server_id do
-      Murmuring.Servers.Permissions.has_channel_permission?(
+      Cairn.Servers.Permissions.has_channel_permission?(
         channel.server_id,
         user_id,
         channel.id,
@@ -232,7 +232,7 @@ defmodule MurmuringWeb.ChannelController do
 
   defp has_manage_messages_permission?(channel, user_id) do
     if channel.server_id do
-      Murmuring.Servers.Permissions.has_channel_permission?(
+      Cairn.Servers.Permissions.has_channel_permission?(
         channel.server_id,
         user_id,
         channel.id,

@@ -1,11 +1,11 @@
 /**
- * MLS API — delegates to @murmuring/proto.
+ * MLS API — delegates to @cairn/proto.
  */
 
-import { mlsApi } from "@murmuring/proto";
+import { mlsApi } from "@cairn/proto";
 import { client } from "./client.ts";
 
-export type { MlsProtocolMessage } from "@murmuring/proto/api";
+export type { MlsProtocolMessage } from "@cairn/proto/api";
 
 // KeyPackage endpoints
 

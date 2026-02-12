@@ -1,13 +1,13 @@
-defmodule Murmuring.Federation do
+defmodule Cairn.Federation do
   @moduledoc """
   Context for managing federation: federated nodes and activities.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Federation.FederatedNode
-  alias Murmuring.Federation.FederatedUser
-  alias Murmuring.Federation.FederationActivity
+  alias Cairn.Repo
+  alias Cairn.Federation.FederatedNode
+  alias Cairn.Federation.FederatedUser
+  alias Cairn.Federation.FederationActivity
 
   # ── Federated Nodes ──
 

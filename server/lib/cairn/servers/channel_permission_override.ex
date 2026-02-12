@@ -1,4 +1,4 @@
-defmodule Murmuring.Servers.ChannelPermissionOverride do
+defmodule Cairn.Servers.ChannelPermissionOverride do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,9 +8,9 @@ defmodule Murmuring.Servers.ChannelPermissionOverride do
   schema "channel_permission_overrides" do
     field :permissions, :map, default: %{}
 
-    belongs_to :channel, Murmuring.Chat.Channel
-    belongs_to :role, Murmuring.Accounts.Role
-    belongs_to :user, Murmuring.Accounts.User
+    belongs_to :channel, Cairn.Chat.Channel
+    belongs_to :role, Cairn.Accounts.Role
+    belongs_to :user, Cairn.Accounts.User
 
     timestamps()
   end
@@ -44,7 +44,7 @@ defmodule Murmuring.Servers.ChannelPermissionOverride do
         changeset
 
       perms when is_map(perms) ->
-        permission_keys = Murmuring.Servers.Permissions.permission_keys()
+        permission_keys = Cairn.Servers.Permissions.permission_keys()
         invalid = Enum.reject(perms, fn {k, v} -> k in permission_keys and v in @valid_values end)
 
         if invalid == [] do

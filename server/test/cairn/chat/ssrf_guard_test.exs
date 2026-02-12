@@ -1,7 +1,7 @@
-defmodule Murmuring.Chat.SsrfGuardTest do
+defmodule Cairn.Chat.SsrfGuardTest do
   use ExUnit.Case, async: true
 
-  alias Murmuring.Chat.SsrfGuard
+  alias Cairn.Chat.SsrfGuard
 
   describe "safe_url?" do
     test "blocks private IPs" do

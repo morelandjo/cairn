@@ -1,4 +1,4 @@
-defmodule Murmuring.PromEx do
+defmodule Cairn.PromEx do
   @moduledoc """
   PromEx configuration for Prometheus metrics.
 
@@ -6,17 +6,17 @@ defmodule Murmuring.PromEx do
   Includes Phoenix, Ecto, BEAM, and Oban plugins.
   """
 
-  use PromEx, otp_app: :murmuring
+  use PromEx, otp_app: :cairn
 
   @impl true
   def plugins do
     [
       PromEx.Plugins.Application,
       PromEx.Plugins.Beam,
-      {PromEx.Plugins.Phoenix, router: MurmuringWeb.Router, endpoint: MurmuringWeb.Endpoint},
-      {PromEx.Plugins.Ecto, repos: [Murmuring.Repo]},
+      {PromEx.Plugins.Phoenix, router: CairnWeb.Router, endpoint: CairnWeb.Endpoint},
+      {PromEx.Plugins.Ecto, repos: [Cairn.Repo]},
       {PromEx.Plugins.Oban, oban_supervisors: [Oban]},
-      Murmuring.PromEx.MurmuringPlugin
+      Cairn.PromEx.CairnPlugin
     ]
   end
 

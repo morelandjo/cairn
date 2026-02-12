@@ -1,4 +1,4 @@
-defmodule Murmuring.Types.UUIDv7 do
+defmodule Cairn.Types.UUIDv7 do
   @moduledoc """
   An Ecto type for UUIDv7 identifiers.
 

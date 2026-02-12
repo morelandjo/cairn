@@ -1,7 +1,7 @@
-defmodule Murmuring.Federation.NodeIdentityTest do
+defmodule Cairn.Federation.NodeIdentityTest do
   use ExUnit.Case, async: false
 
-  alias Murmuring.Federation.NodeIdentity
+  alias Cairn.Federation.NodeIdentity
 
   setup do
     # Stop any existing NodeIdentity from other tests
@@ -11,7 +11,7 @@ defmodule Murmuring.Federation.NodeIdentityTest do
     end
 
     # Use a unique subdirectory under the project's tmp for isolation
-    base = Path.join(System.tmp_dir!(), "murmuring_node_identity_test")
+    base = Path.join(System.tmp_dir!(), "cairn_node_identity_test")
     File.mkdir_p!(base)
     tmp_dir = Path.join(base, "#{:erlang.unique_integer([:positive, :monotonic])}")
     File.mkdir_p!(tmp_dir)

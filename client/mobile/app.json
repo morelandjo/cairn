@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "Murmuring",
-    "slug": "murmuring",
+    "name": "Cairn",
+    "slug": "cairn",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "scheme": "murmuring",
+    "scheme": "cairn",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -15,10 +15,10 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "dev.murmuring.app",
+      "bundleIdentifier": "dev.cairn.app",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "Murmuring needs microphone access for voice channels",
-        "NSFaceIDUsageDescription": "Use Face ID to unlock Murmuring",
+        "NSMicrophoneUsageDescription": "Cairn needs microphone access for voice channels",
+        "NSFaceIDUsageDescription": "Use Face ID to unlock Cairn",
         "UIBackgroundModes": ["audio", "voip", "remote-notification"]
       }
     },
@@ -27,7 +27,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1a1a2e"
       },
-      "package": "dev.murmuring.app",
+      "package": "dev.cairn.app",
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.USE_BIOMETRIC",

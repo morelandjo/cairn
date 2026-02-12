@@ -1,12 +1,12 @@
-defmodule Murmuring.Notifications do
+defmodule Cairn.Notifications do
   @moduledoc """
   The Notifications context — per-channel/server notification preferences.
   """
 
   import Ecto.Query
-  alias Murmuring.Repo
-  alias Murmuring.Notifications.Preference
-  alias Murmuring.Notifications.PushToken
+  alias Cairn.Repo
+  alias Cairn.Notifications.Preference
+  alias Cairn.Notifications.PushToken
 
   def get_preference(user_id, server_id \\ nil, channel_id \\ nil) do
     from(p in Preference,
@@ -103,7 +103,7 @@ defmodule Murmuring.Notifications do
 
     query =
       from pt in PushToken,
-        join: m in Murmuring.Chat.ChannelMember,
+        join: m in Cairn.Chat.ChannelMember,
         on: m.user_id == pt.user_id,
         where: m.channel_id == ^channel_id
 

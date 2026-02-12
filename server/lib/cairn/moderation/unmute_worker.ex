@@ -1,7 +1,7 @@
-defmodule Murmuring.Moderation.UnmuteWorker do
+defmodule Cairn.Moderation.UnmuteWorker do
   use Oban.Worker, queue: :moderation, max_attempts: 3
 
-  alias Murmuring.Moderation
+  alias Cairn.Moderation
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"mute_id" => mute_id}}) do

@@ -1,4 +1,4 @@
-defmodule Murmuring.Chat.DmRequest do
+defmodule Cairn.Chat.DmRequest do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,8 +10,8 @@ defmodule Murmuring.Chat.DmRequest do
     field :recipient_instance, :string
     field :status, :string, default: "pending"
 
-    belongs_to :channel, Murmuring.Chat.Channel
-    belongs_to :sender, Murmuring.Accounts.User, foreign_key: :sender_id
+    belongs_to :channel, Cairn.Chat.Channel
+    belongs_to :sender, Cairn.Accounts.User, foreign_key: :sender_id
 
     timestamps()
   end
@@ -21,7 +21,7 @@ defmodule Murmuring.Chat.DmRequest do
     |> cast(attrs, [:channel_id, :sender_id, :recipient_did, :recipient_instance, :status])
     |> validate_required([:channel_id, :sender_id, :recipient_did, :recipient_instance, :status])
     |> validate_inclusion(:status, ~w(pending accepted rejected blocked))
-    |> validate_format(:recipient_did, ~r/^did:murmuring:/)
+    |> validate_format(:recipient_did, ~r/^did:cairn:/)
     |> unique_constraint([:sender_id, :recipient_did])
     |> foreign_key_constraint(:channel_id)
     |> foreign_key_constraint(:sender_id)

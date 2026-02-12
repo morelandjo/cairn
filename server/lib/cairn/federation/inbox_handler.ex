@@ -1,4 +1,4 @@
-defmodule Murmuring.Federation.InboxHandler do
+defmodule Cairn.Federation.InboxHandler do
   @moduledoc """
   Dispatches incoming ActivityPub activities by type.
   Resolves remote authors via DID verification and creates local messages
@@ -6,7 +6,7 @@ defmodule Murmuring.Federation.InboxHandler do
   """
 
   require Logger
-  alias Murmuring.{Chat, Federation}
+  alias Cairn.{Chat, Federation}
 
   @doc """
   Process an incoming activity from a federated node.
@@ -94,7 +94,7 @@ defmodule Murmuring.Federation.InboxHandler do
         case Chat.edit_message(message, %{content: object["content"]}) do
           {:ok, updated} ->
             Phoenix.PubSub.broadcast(
-              Murmuring.PubSub,
+              Cairn.PubSub,
               "federated:channel:#{message.channel_id}",
               {:federated_msg, %{
                 type: "edit_msg",
@@ -130,7 +130,7 @@ defmodule Murmuring.Federation.InboxHandler do
             case Chat.delete_message(message) do
               {:ok, _} ->
                 Phoenix.PubSub.broadcast(
-                  Murmuring.PubSub,
+                  Cairn.PubSub,
                   "federated:channel:#{message.channel_id}",
                   {:federated_msg, %{
                     type: "delete_msg",
@@ -159,25 +159,25 @@ defmodule Murmuring.Federation.InboxHandler do
     object = activity["object"]
 
     case object do
-      %{"type" => "murmuring:DmHint"} ->
-        recipient_did = object["murmuring:recipientDid"]
-        sender_did = object["murmuring:senderDid"]
-        channel_id = object["murmuring:channelId"]
-        sender_username = object["murmuring:senderUsername"]
-        sender_display_name = object["murmuring:senderDisplayName"]
+      %{"type" => "cairn:DmHint"} ->
+        recipient_did = object["cairn:recipientDid"]
+        sender_did = object["cairn:senderDid"]
+        channel_id = object["cairn:channelId"]
+        sender_username = object["cairn:senderUsername"]
+        sender_display_name = object["cairn:senderDisplayName"]
 
         if is_nil(recipient_did) or is_nil(sender_did) or is_nil(channel_id) do
           {:error, :invalid_dm_hint}
         else
           # Look up local user by DID
-          case Murmuring.Accounts.get_user_by_did(recipient_did) do
+          case Cairn.Accounts.get_user_by_did(recipient_did) do
             nil ->
               {:error, :recipient_not_found}
 
             user ->
               # Broadcast DM request notification to recipient's user channel
               Phoenix.PubSub.broadcast(
-                Murmuring.PubSub,
+                Cairn.PubSub,
                 "user:#{user.id}",
                 {:dm_request, %{
                   sender_did: sender_did,
@@ -201,12 +201,12 @@ defmodule Murmuring.Federation.InboxHandler do
   # ── Author resolution ──
 
   defp resolve_author(actor_uri, object, node) do
-    did = object["murmuring:did"]
-    home_instance = object["murmuring:homeInstance"] || node.domain
+    did = object["cairn:did"]
+    home_instance = object["cairn:homeInstance"] || node.domain
 
     cond do
       # If DID is provided, use it to find/create the federated user
-      did && String.starts_with?(did, "did:murmuring:") ->
+      did && String.starts_with?(did, "did:cairn:") ->
         resolve_by_did(did, actor_uri, home_instance, object)
 
       # Fall back to actor_uri lookup
@@ -225,7 +225,7 @@ defmodule Murmuring.Federation.InboxHandler do
     attrs = %{
       did: did,
       username: username,
-      display_name: object["murmuring:displayName"],
+      display_name: object["cairn:displayName"],
       home_instance: home_instance,
       public_key: "pending-verification",
       actor_uri: actor_uri,
@@ -241,7 +241,7 @@ defmodule Murmuring.Federation.InboxHandler do
         username = extract_username_from_uri(actor_uri) || "unknown"
 
         Federation.get_or_create_federated_user(%{
-          did: "did:murmuring:unknown-#{:crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)}",
+          did: "did:cairn:unknown-#{:crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)}",
           username: username,
           home_instance: home_instance,
           public_key: "pending-verification",
@@ -265,9 +265,9 @@ defmodule Murmuring.Federation.InboxHandler do
   defp extract_channel_id(object) do
     # Extract channel ID from the object's context or target
     # Expected format: https://domain/channels/<channel_id>/messages/<msg_id>
-    # or the channel ID directly in murmuring:channelId
+    # or the channel ID directly in cairn:channelId
     cond do
-      channel_id = object["murmuring:channelId"] ->
+      channel_id = object["cairn:channelId"] ->
         {:ok, channel_id}
 
       id = object["id"] ->
@@ -306,7 +306,7 @@ defmodule Murmuring.Federation.InboxHandler do
 
   defp broadcast_federated_message(channel_id, message, federated_user) do
     Phoenix.PubSub.broadcast(
-      Murmuring.PubSub,
+      Cairn.PubSub,
       "federated:channel:#{channel_id}",
       {:federated_msg, %{
         id: message.id,

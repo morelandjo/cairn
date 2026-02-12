@@ -1,11 +1,11 @@
 /**
- * Server Discovery — delegates to @murmuring/proto.
+ * Server Discovery — delegates to @cairn/proto.
  */
 
-import { discoveryApi } from "@murmuring/proto";
+import { discoveryApi } from "@cairn/proto";
 import { client } from "./client.ts";
 
-export type { DirectoryEntry } from "@murmuring/proto/api";
+export type { DirectoryEntry } from "@cairn/proto/api";
 
 export function listDirectory(opts?: {
   limit?: number;

@@ -57,7 +57,7 @@ export default function InvitePage() {
     return (
       <div className="auth-page">
         <div className="auth-card">
-          <h1>Murmuring</h1>
+          <h1>Cairn</h1>
           <h2>You've been invited!</h2>
           {invite && (
             <p style={{ textAlign: "center", color: "#b5bac1", marginBottom: 16 }}>
@@ -77,7 +77,7 @@ export default function InvitePage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Murmuring</h1>
+        <h1>Cairn</h1>
         {error ? (
           <>
             <h2>Invite Error</h2>

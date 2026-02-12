@@ -1,12 +1,12 @@
-defmodule Murmuring.Federation.FederationRateLimiterTest do
+defmodule Cairn.Federation.FederationRateLimiterTest do
   use ExUnit.Case, async: false
 
-  alias Murmuring.Federation.FederationRateLimiter
+  alias Cairn.Federation.FederationRateLimiter
 
   setup do
     # Clean up Redis key before each test
     domain = "ratelimit-test-#{:erlang.unique_integer([:positive])}.example.com"
-    Redix.command(:murmuring_redis, ["DEL", "federation:rate:#{domain}"])
+    Redix.command(:cairn_redis, ["DEL", "federation:rate:#{domain}"])
     %{domain: domain}
   end
 
