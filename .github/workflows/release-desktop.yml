@@ -74,7 +74,7 @@ jobs:
           projectPath: client/desktop
           tagName: ${{ github.ref_name }}
           releaseName: "Cairn ${{ github.ref_name }}"
-          releaseBody: "See the [changelog](https://github.com/cairn/cairn/blob/main/CHANGELOG.md) for details."
+          releaseBody: "See the [changelog](https://github.com/morelandjo/cairn/blob/main/CHANGELOG.md) for details."
           releaseDraft: true
           prerelease: false
           args: --target ${{ matrix.target }} --bundles ${{ matrix.bundle }}

@@ -1,6 +1,6 @@
 services:
   server:
-    image: ${CAIRN_IMAGE:-cairn/server:latest}
+    image: ${CAIRN_IMAGE:-ghcr.io/morelandjo/cairn-server:latest}
     build:
       context: ../server
       dockerfile: Dockerfile
@@ -46,7 +46,7 @@ services:
           cpus: "1.0"
 
   sfu:
-    image: ${SFU_IMAGE:-cairn/sfu:latest}
+    image: ${SFU_IMAGE:-ghcr.io/morelandjo/cairn-sfu:latest}
     build:
       context: ../sfu
       dockerfile: Dockerfile

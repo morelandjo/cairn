@@ -16,8 +16,8 @@ set -euo pipefail
 
 VERSION="0.1.0"
 DEPLOY_DIR="/opt/cairn"
-COMPOSE_URL="https://raw.githubusercontent.com/cairn/cairn/main/deploy/docker-compose.prod.yml"
-ENV_TEMPLATE_URL="https://raw.githubusercontent.com/cairn/cairn/main/deploy/.env.example"
+COMPOSE_URL="https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/docker-compose.prod.yml"
+ENV_TEMPLATE_URL="https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/.env.example"
 
 # Colors
 RED='\033[0;31m'
@@ -382,7 +382,7 @@ install_cairn_ctl() {
   if [ -f /usr/local/bin/cairn-ctl ]; then
     return
   fi
-  local ctl_url="https://raw.githubusercontent.com/cairn/cairn/main/deploy/cairn-ctl"
+  local ctl_url="https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/cairn-ctl"
   log "Installing cairn-ctl..."
   curl -sSL "$ctl_url" -o /usr/local/bin/cairn-ctl
   chmod +x /usr/local/bin/cairn-ctl
