@@ -56,7 +56,7 @@ export default function InviteScreen() {
           <>
             <Text style={styles.title}>You've been invited!</Text>
             <Text style={styles.info}>
-              {(invite as Record<string, unknown>)?.server_name as string ?? "Server"}
+              {invite?.channel_name ?? "Server"}
             </Text>
           </>
         )}

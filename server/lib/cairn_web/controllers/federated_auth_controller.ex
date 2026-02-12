@@ -16,15 +16,8 @@ defmodule CairnWeb.FederatedAuthController do
       |> put_status(:bad_request)
       |> json(%{error: "User must have a DID to use federated auth"})
     else
-      case FederatedAuth.issue_token(user, target_instance) do
-        {:ok, token} ->
-          json(conn, %{token: token})
-
-        {:error, reason} ->
-          conn
-          |> put_status(:unprocessable_entity)
-          |> json(%{error: "Failed to issue token: #{inspect(reason)}"})
-      end
+      {:ok, token} = FederatedAuth.issue_token(user, target_instance)
+      json(conn, %{token: token})
     end
   end
 
@@ -70,7 +63,7 @@ defmodule CairnWeb.FederatedAuthController do
     federated_user = conn.assigns.federated_user
 
     if Servers.is_federated_member?(server_id, federated_user.id) do
-      channels = Cairn.Chat.list_channels(server_id)
+      channels = Cairn.Chat.list_server_channels(server_id)
 
       json(conn, %{
         channels:

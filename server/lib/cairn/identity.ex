@@ -154,7 +154,7 @@ defmodule Cairn.Identity do
   """
   def verify_operation_chain([]), do: {:error, :empty_chain}
 
-  def verify_operation_chain([genesis | rest] = ops) do
+  def verify_operation_chain([genesis | _rest] = ops) do
     with :ok <- verify_genesis(genesis),
          :ok <- verify_did_derivation(genesis),
          :ok <- verify_chain_links(ops),

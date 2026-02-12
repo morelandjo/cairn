@@ -5,9 +5,7 @@ defmodule Cairn.Export.DataExportWorker do
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"user_id" => user_id}}) do
-    case Export.generate_export(user_id) do
-      {:ok, _result} -> :ok
-      {:error, reason} -> {:error, reason}
-    end
+    {:ok, _result} = Export.generate_export(user_id)
+    :ok
   end
 end

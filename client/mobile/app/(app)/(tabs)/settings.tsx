@@ -36,7 +36,7 @@ export default function SettingsScreen() {
           <View style={styles.row}>
             <Text style={styles.label}>Display Name</Text>
             <Text style={styles.value}>
-              {(user as Record<string, unknown>)?.display_name as string ?? user?.username}
+              {user?.display_name ?? user?.username}
             </Text>
           </View>
         </View>

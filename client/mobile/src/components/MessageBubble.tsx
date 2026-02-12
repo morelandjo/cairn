@@ -29,7 +29,7 @@ export function MessageBubble({ message }: Props) {
             {message.reply_to.author_username}
           </Text>
           <Text style={styles.replyContent} numberOfLines={1}>
-            {message.reply_to.content}
+            {message.reply_to.content_snippet}
           </Text>
         </View>
       )}

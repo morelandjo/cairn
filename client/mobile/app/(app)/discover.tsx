@@ -52,7 +52,7 @@ export default function DiscoverScreen() {
           renderItem={({ item }) => (
             <View style={styles.entry}>
               <View style={styles.entryInfo}>
-                <Text style={styles.entryName}>{item.name}</Text>
+                <Text style={styles.entryName}>{item.server_name}</Text>
                 <Text style={styles.entryDesc} numberOfLines={2}>
                   {item.description ?? ""}
                 </Text>

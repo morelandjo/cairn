@@ -39,12 +39,7 @@ defmodule CairnWeb.ExportController do
   def portability(conn, _params) do
     user_id = conn.assigns.current_user.id
 
-    case Export.export_portability_data(user_id) do
-      {:ok, data} ->
-        json(conn, %{export: data})
-
-      {:error, _} ->
-        conn |> put_status(:internal_server_error) |> json(%{error: "export failed"})
-    end
+    {:ok, data} = Export.export_portability_data(user_id)
+    json(conn, %{export: data})
   end
 end

@@ -7,8 +7,8 @@ defmodule Cairn.Voice.Federation do
   is verified via federation credentials.
   """
 
-  alias Cairn.Federation
-  alias Cairn.Voice
+  alias Cairn.Federation.HttpSignatures
+  alias Cairn.Federation.NodeIdentity
 
   @doc """
   Relay a voice join request to the hosting node for a federated channel.
@@ -19,13 +19,21 @@ defmodule Cairn.Voice.Federation do
 
     if federation_config[:enabled] do
       url = "https://#{remote_domain}/api/v1/federation/voice/join"
+      body = Jason.encode!(%{channel_id: channel_id, user_id: user_id})
+      sign_fn = &NodeIdentity.sign/1
 
-      case Req.post(url,
-             json: %{channel_id: channel_id, user_id: user_id},
-             headers: Federation.HttpSignature.sign_headers("POST", url)
-           ) do
-        {:ok, %{status: 200, body: body}} -> {:ok, body}
-        {:ok, %{status: status, body: body}} -> {:error, {status, body}}
+      headers =
+        HttpSignatures.sign_request(
+          "POST",
+          url,
+          %{"content-type" => "application/json"},
+          body,
+          sign_fn
+        )
+
+      case Req.post(url, body: body, headers: headers) do
+        {:ok, %{status: 200, body: resp}} -> {:ok, resp}
+        {:ok, %{status: status, body: resp}} -> {:error, {status, resp}}
         {:error, reason} -> {:error, reason}
       end
     else
@@ -41,13 +49,21 @@ defmodule Cairn.Voice.Federation do
 
     if federation_config[:enabled] do
       url = "https://#{remote_domain}/api/v1/federation/voice/signal"
+      body = Jason.encode!(%{channel_id: channel_id, event: event, payload: payload})
+      sign_fn = &NodeIdentity.sign/1
 
-      case Req.post(url,
-             json: %{channel_id: channel_id, event: event, payload: payload},
-             headers: Federation.HttpSignature.sign_headers("POST", url)
-           ) do
-        {:ok, %{status: 200, body: body}} -> {:ok, body}
-        {:ok, %{status: status, body: body}} -> {:error, {status, body}}
+      headers =
+        HttpSignatures.sign_request(
+          "POST",
+          url,
+          %{"content-type" => "application/json"},
+          body,
+          sign_fn
+        )
+
+      case Req.post(url, body: body, headers: headers) do
+        {:ok, %{status: 200, body: resp}} -> {:ok, resp}
+        {:ok, %{status: status, body: resp}} -> {:error, {status, resp}}
         {:error, reason} -> {:error, reason}
       end
     else

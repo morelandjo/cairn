@@ -57,10 +57,10 @@ export default function SearchScreen() {
           renderItem={({ item }) => (
             <View style={styles.resultItem}>
               <Text style={styles.resultAuthor}>
-                {(item as Record<string, unknown>).author_username as string ?? "Unknown"}
+                {item.author_username ?? "Unknown"}
               </Text>
               <Text style={styles.resultContent} numberOfLines={3}>
-                {(item as Record<string, unknown>).content as string ?? ""}
+                {item.content ?? ""}
               </Text>
             </View>
           )}

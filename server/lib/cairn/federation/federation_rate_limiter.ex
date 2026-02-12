@@ -5,7 +5,6 @@ defmodule Cairn.Federation.FederationRateLimiter do
   Uses Redis for distributed state.
   """
 
-  @default_limit 100
   @default_burst 200
   @window_seconds 60
 

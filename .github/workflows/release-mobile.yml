@@ -11,6 +11,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Both platforms require developer account credentials configured in EAS — see docs/plans/future-work.md #15
+    if: false # Disabled until EAS credentials are configured
     strategy:
       fail-fast: false
       matrix:

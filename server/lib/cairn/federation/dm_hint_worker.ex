@@ -10,7 +10,6 @@ defmodule Cairn.Federation.DmHintWorker do
     max_attempts: 10
 
   require Logger
-  alias Cairn.Federation
   alias Cairn.Federation.NodeIdentity
   alias Cairn.Federation.HttpSignatures
 
