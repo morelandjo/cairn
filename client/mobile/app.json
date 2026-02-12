@@ -12,14 +12,20 @@
       "resizeMode": "contain",
       "backgroundColor": "#1a1a2e"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "dev.cairn.app",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Cairn needs microphone access for voice channels",
         "NSFaceIDUsageDescription": "Use Face ID to unlock Cairn",
-        "UIBackgroundModes": ["audio", "voip", "remote-notification"]
+        "UIBackgroundModes": [
+          "audio",
+          "voip",
+          "remote-notification"
+        ]
       }
     },
     "android": {
@@ -43,6 +49,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "9091a438-f872-4ed0-ba68-9e4b796c3839"
+      }
+    },
+    "owner": "cairn"
   }
 }
