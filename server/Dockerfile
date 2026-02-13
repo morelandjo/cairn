@@ -26,8 +26,8 @@ RUN mix compile
 # Build release
 RUN mix release
 
-# Stage 2: Runtime
-FROM alpine:3.21 AS runtime
+# Stage 2: Runtime (must match builder's Alpine for OpenSSL compatibility)
+FROM alpine:3.22 AS runtime
 
 RUN apk add --no-cache \
   libstdc++ \
