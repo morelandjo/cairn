@@ -5,10 +5,11 @@
 # Self-Hosting
 
 - [Quick Start](self-hosting/quickstart.md)
-- [Configuration](self-hosting/configuration.md)
-- [Reverse Proxy](self-hosting/reverse-proxy.md)
-- [Administration](self-hosting/administration.md)
-- [Federation](self-hosting/federation.md)
+- [Advanced](self-hosting/advanced.md)
+  - [Configuration](self-hosting/configuration.md)
+  - [Reverse Proxy](self-hosting/reverse-proxy.md)
+  - [Administration](self-hosting/administration.md)
+  - [Federation](self-hosting/federation.md)
 
 # Clients
 

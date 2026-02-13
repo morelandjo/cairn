@@ -13,6 +13,7 @@ set -euo pipefail
 #   5. Walks through interactive configuration
 #   6. Deploys all services via Docker Compose
 #   7. Runs database migrations and verifies health
+#   8. Sets up reverse proxy with TLS (Caddy or nginx)
 
 CAIRN_VERSION="0.1.0"
 DEPLOY_DIR="/opt/cairn"
@@ -335,6 +336,26 @@ run_wizard() {
     fi
   fi
 
+  # Reverse proxy
+  REVERSE_PROXY="none"
+  # Only offer proxy setup if domain is not an IP address
+  if [[ "$CAIRN_DOMAIN" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    warn "Domain is an IP address — skipping reverse proxy (Let's Encrypt requires a domain)."
+  else
+    echo ""
+    echo -e "${BLUE}?${NC} Set up a reverse proxy with automatic HTTPS?"
+    echo "  1) Caddy (recommended — automatic TLS, zero config)"
+    echo "  2) Nginx + Let's Encrypt"
+    echo "  3) None (I'll configure my own)"
+    read -rp "  Choice [1]: " proxy_choice < /dev/tty
+    case "${proxy_choice:-1}" in
+      1) REVERSE_PROXY="caddy" ;;
+      2) REVERSE_PROXY="nginx" ;;
+      3) REVERSE_PROXY="none" ;;
+      *) REVERSE_PROXY="caddy" ;;
+    esac
+  fi
+
   # Storage
   echo ""
   read -rp "$(echo -e "${BLUE}?${NC} Use S3 for file storage? (y/N): ")" s3_choice < /dev/tty
@@ -386,6 +407,100 @@ install_cairn_ctl() {
   log "Installing cairn-ctl..."
   curl -sSL "$ctl_url" -o /usr/local/bin/cairn-ctl
   chmod +x /usr/local/bin/cairn-ctl
+}
+
+# ── Reverse Proxy ──
+
+setup_caddy() {
+  local domain="$1"
+  local port="$2"
+
+  log "Installing Caddy..."
+  if [ "$PKG_MANAGER" = "apt" ]; then
+    apt-get install -y -qq debian-keyring debian-archive-keyring apt-transport-https >/dev/null 2>&1 || true
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg 2>/dev/null
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' > /etc/apt/sources.list.d/caddy-stable.list
+    apt-get update -qq
+    apt-get install -y -qq caddy >/dev/null
+  else
+    dnf install -y -q 'dnf-command(copr)' >/dev/null 2>&1 || true
+    dnf copr enable -y @caddy/caddy >/dev/null 2>&1
+    dnf install -y -q caddy >/dev/null
+  fi
+
+  log "Writing Caddyfile..."
+  cat > /etc/caddy/Caddyfile <<EOF
+${domain} {
+    reverse_proxy localhost:${port}
+}
+EOF
+
+  systemctl enable --now caddy
+  systemctl reload caddy 2>/dev/null || true
+  log "Caddy configured — TLS certificates will be obtained automatically"
+}
+
+setup_nginx() {
+  local domain="$1"
+  local port="$2"
+
+  log "Installing nginx and Certbot..."
+  if [ "$PKG_MANAGER" = "apt" ]; then
+    apt-get install -y -qq nginx certbot python3-certbot-nginx >/dev/null
+  else
+    dnf install -y -q nginx certbot python3-certbot-nginx >/dev/null
+  fi
+
+  log "Writing nginx config..."
+  local config_path
+  if [ "$PKG_MANAGER" = "apt" ]; then
+    config_path="/etc/nginx/sites-available/cairn"
+  else
+    config_path="/etc/nginx/conf.d/cairn.conf"
+  fi
+
+  cat > "$config_path" <<'NGINX'
+server {
+    listen 80;
+    server_name DOMAIN_PLACEHOLDER;
+
+    location / {
+        proxy_pass http://127.0.0.1:PORT_PLACEHOLDER;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket support
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # Long-lived WebSocket connections
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+    }
+}
+NGINX
+
+  # Replace placeholders (avoids issues with nginx $ variables in heredoc)
+  sed -i "s/DOMAIN_PLACEHOLDER/${domain}/g" "$config_path"
+  sed -i "s/PORT_PLACEHOLDER/${port}/g" "$config_path"
+
+  # Debian/Ubuntu: symlink to sites-enabled, remove default
+  if [ "$PKG_MANAGER" = "apt" ]; then
+    ln -sf /etc/nginx/sites-available/cairn /etc/nginx/sites-enabled/cairn
+    rm -f /etc/nginx/sites-enabled/default
+  fi
+
+  nginx -t
+  systemctl enable --now nginx
+  systemctl reload nginx
+
+  log "Obtaining TLS certificate..."
+  certbot --nginx -d "$domain" --non-interactive --agree-tos --register-unsafely-without-email
+
+  log "nginx configured with TLS — certificate will auto-renew"
 }
 
 # ── Main ──
@@ -481,25 +596,35 @@ main() {
   if curl -sf "http://localhost:${port}/health" &>/dev/null; then
     local domain
     domain=$(grep -oP 'CAIRN_DOMAIN=\K.*' "$DEPLOY_DIR/.env" 2>/dev/null || echo "localhost")
-    local force_ssl
-    force_ssl=$(grep -oP 'FORCE_SSL=\K.*' "$DEPLOY_DIR/.env" 2>/dev/null || echo "true")
+    local reverse_proxy
+    reverse_proxy="${REVERSE_PROXY:-none}"
+
+    # Set up reverse proxy (if selected during wizard)
+    if [ "$reverse_proxy" = "caddy" ]; then
+      setup_caddy "$domain" "$port"
+    elif [ "$reverse_proxy" = "nginx" ]; then
+      setup_nginx "$domain" "$port"
+    fi
 
     echo ""
     log "Cairn is running!"
     echo ""
-    echo -e "  ${GREEN}URL:${NC}     http://${domain}:${port}"
+    if [ "$reverse_proxy" = "caddy" ] || [ "$reverse_proxy" = "nginx" ]; then
+      echo -e "  ${GREEN}URL:${NC}     https://${domain}"
+    else
+      echo -e "  ${GREEN}URL:${NC}     http://${domain}:${port}"
+    fi
     echo -e "  ${GREEN}Config:${NC}  $DEPLOY_DIR/.env"
     echo -e "  ${GREEN}Logs:${NC}    cd $DEPLOY_DIR && docker compose logs -f"
     echo -e "  ${GREEN}Manage:${NC}  cairn-ctl status"
     echo ""
     echo -e "  ${YELLOW}Next steps:${NC}"
-    if [[ "$force_ssl" == "true" ]]; then
-      echo "  1. Set up a reverse proxy (nginx/Caddy) with TLS for ${domain}"
+    if [ "$reverse_proxy" = "none" ]; then
+      echo "  1. Set up a reverse proxy with TLS — see https://github.com/morelandjo/cairn/blob/main/docs/src/self-hosting/reverse-proxy.md"
+      echo "  2. Create an admin account: cairn-ctl user create <username> <password>"
     else
-      echo -e "  1. ${YELLOW}Warning: SSL is disabled. Only use this on trusted networks.${NC}"
+      echo "  1. Create an admin account: cairn-ctl user create <username> <password>"
     fi
-    echo "  2. Create an admin account"
-    echo "  3. Configure federation (if enabled)"
     echo ""
   else
     error "Health check failed. Check logs: cd $DEPLOY_DIR && docker compose logs"
