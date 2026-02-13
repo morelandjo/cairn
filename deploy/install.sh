@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Cairn Install Script
-# Usage: curl -sSL https://get.cairn.chat/install | bash
+# Usage: curl -sSL https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/install.sh | bash
 # Or: ./install.sh [--config /path/to/config.yml] [--env /path/to/.env] [--json]
 #
 # This script provisions a bare Linux server and deploys Cairn end-to-end:

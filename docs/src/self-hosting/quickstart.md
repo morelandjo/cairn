@@ -15,7 +15,7 @@ Get a Cairn instance running in under 10 minutes.
 SSH into your server and run:
 
 ```sh
-curl -sSL https://get.cairn.chat/install | sudo bash
+curl -sSL https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/install.sh | sudo bash
 ```
 
 The installer will:
@@ -44,13 +44,13 @@ The installer will:
 You can skip the wizard by providing a pre-filled `.env` file:
 
 ```sh
-curl -sSL https://get.cairn.chat/install | sudo bash -s -- --env /path/to/.env
+curl -sSL https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/install.sh | sudo bash -s -- --env /path/to/.env
 ```
 
 Or supply a custom Docker Compose file:
 
 ```sh
-curl -sSL https://get.cairn.chat/install | sudo bash -s -- --config /path/to/docker-compose.yml
+curl -sSL https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/install.sh | sudo bash -s -- --config /path/to/docker-compose.yml
 ```
 
 ## Verify
