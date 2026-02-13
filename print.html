@@ -1,0 +1,790 @@
+<!DOCTYPE HTML>
+<html lang="en" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Cairn Documentation</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="Self-hosting and client guides for Cairn">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="favicon-8114d1fc.png">
+        <link rel="stylesheet" href="css/variables-8adf115d.css">
+        <link rel="stylesheet" href="css/general-2459343d.css">
+        <link rel="stylesheet" href="css/chrome-ae938929.css">
+        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "navy";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex-a6cdf25a.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc-58fd86ec.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Cairn Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/morelandjo/cairn" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="cairn"><a class="header" href="#cairn">Cairn</a></h1>
+<p>Cairn is a privacy-first federated communication platform. Think Discord, but federated, end-to-end encrypted, and designed so the server operator never has access to your messages.</p>
+<h2 id="getting-started"><a class="header" href="#getting-started">Getting started</a></h2>
+<p><strong>Running your own instance?</strong> Start with the <a href="#quick-start">Quick Start</a> guide — you can have a server running in under 10 minutes.</p>
+<p><strong>Joining an existing instance?</strong> Open the instance URL in your browser, or install the <a href="#desktop-app">desktop</a> or <a href="#mobile-app">mobile</a> app and enter the server URL.</p>
+<h2 id="guides"><a class="header" href="#guides">Guides</a></h2>
+<h3 id="self-hosting"><a class="header" href="#self-hosting">Self-Hosting</a></h3>
+<ul>
+<li><a href="#quick-start">Quick Start</a> — install and run Cairn on a Linux server (includes TLS setup)</li>
+<li><a href="#advanced-installation">Advanced Installation</a> — configuration, custom proxy setups, administration, and federation</li>
+</ul>
+<h3 id="clients"><a class="header" href="#clients">Clients</a></h3>
+<ul>
+<li><a href="#web-client">Web</a> — served automatically by your instance</li>
+<li><a href="#desktop-app">Desktop</a> — native app for macOS, Linux, and Windows</li>
+<li><a href="#mobile-app">Mobile</a> — iOS and Android app</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="quick-start"><a class="header" href="#quick-start">Quick Start</a></h1>
+<p>Get a Cairn instance running in under 10 minutes.</p>
+<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
+<ul>
+<li>A Linux server (Debian, Ubuntu, or Fedora — and derivatives like Mint, Pop!_OS)</li>
+<li>Root/sudo access</li>
+<li>1 GB+ RAM (512 MB minimum; 2 GB swap is added automatically on small servers)</li>
+<li>2 GB+ free disk space</li>
+<li>A domain name pointed at your server (recommended)</li>
+</ul>
+<h2 id="install"><a class="header" href="#install">Install</a></h2>
+<p>SSH into your server and run:</p>
+<pre><code class="language-sh">curl -sSL https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/install.sh | sudo bash
+</code></pre>
+<p>The installer will:</p>
+<ol>
+<li>Install Docker and Docker Compose (if not already present)</li>
+<li>Create a <code>cairn</code> system user</li>
+<li>Configure UFW firewall and fail2ban</li>
+<li>Set up swap on low-memory servers</li>
+<li>Walk you through an interactive configuration wizard</li>
+<li>Pull Docker images and start all services</li>
+<li>Run database migrations and verify health</li>
+<li>Set up a reverse proxy with TLS (Caddy or nginx)</li>
+</ol>
+<h3 id="what-the-wizard-asks"><a class="header" href="#what-the-wizard-asks">What the wizard asks</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Prompt</th><th>Description</th><th>Default</th></tr>
+</thead>
+<tbody>
+<tr><td>Domain name</td><td>Your server’s domain or IP address</td><td><em>(required)</em></td></tr>
+<tr><td>HTTP port</td><td>Port the server listens on</td><td><code>4000</code></td></tr>
+<tr><td>Auto-generate secrets?</td><td>Generate all cryptographic secrets automatically</td><td>Yes</td></tr>
+<tr><td>Enable federation?</td><td>Allow communication with other Cairn instances</td><td>No</td></tr>
+<tr><td>Enable SSL enforcement?</td><td>Redirect HTTP to HTTPS (required if federation is enabled)</td><td>Yes</td></tr>
+<tr><td>Reverse proxy</td><td>Caddy (recommended), Nginx + Let’s Encrypt, or None</td><td>Caddy</td></tr>
+<tr><td>Use S3 for file storage?</td><td>Store uploads in S3 instead of local disk</td><td>No</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="non-interactive-install"><a class="header" href="#non-interactive-install">Non-interactive install</a></h3>
+<p>You can skip the wizard by providing a pre-filled <code>.env</code> file:</p>
+<pre><code class="language-sh">curl -sSL https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/install.sh | sudo bash -s -- --env /path/to/.env
+</code></pre>
+<p>Or supply a custom Docker Compose file:</p>
+<pre><code class="language-sh">curl -sSL https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/install.sh | sudo bash -s -- --config /path/to/docker-compose.yml
+</code></pre>
+<h2 id="verify"><a class="header" href="#verify">Verify</a></h2>
+<p>Check that everything is running:</p>
+<pre><code class="language-sh">cairn-ctl status
+</code></pre>
+<p>You should see all services (server, sfu, postgres, redis, meilisearch, coturn) listed as running, with health reported as <strong>OK</strong>.</p>
+<h2 id="create-your-first-user"><a class="header" href="#create-your-first-user">Create your first user</a></h2>
+<pre><code class="language-sh">cairn-ctl user create &lt;username&gt; &lt;password&gt;
+</code></pre>
+<h2 id="next-steps"><a class="header" href="#next-steps">Next steps</a></h2>
+<ol>
+<li><strong>Create your first server</strong> — log in and click “Create Server” to set up a community</li>
+<li><strong>Connect a client</strong> — open <code>https://your-domain.com</code> in a browser, or install the <a href="#desktop-app">desktop</a> or <a href="#mobile-app">mobile</a> app</li>
+<li><strong>Explore advanced options</strong> — see <a href="#configuration">Configuration</a>, <a href="#administration">Administration</a>, or <a href="#federation">Federation</a></li>
+</ol>
+<h2 id="file-locations"><a class="header" href="#file-locations">File locations</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Path</th><th>Contents</th></tr>
+</thead>
+<tbody>
+<tr><td><code>/opt/cairn/.env</code></td><td>Configuration (secrets, domain, feature flags)</td></tr>
+<tr><td><code>/opt/cairn/docker-compose.yml</code></td><td>Docker Compose service definitions</td></tr>
+<tr><td><code>/opt/cairn/backups/</code></td><td>Backup archives</td></tr>
+<tr><td><code>/opt/cairn/keys/</code></td><td>Federation signing keys</td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="advanced-installation"><a class="header" href="#advanced-installation">Advanced Installation</a></h1>
+<p>These guides cover manual configuration, custom proxy setups, administration, and federation. If you used the <a href="#quick-start">install script</a>, most of this was handled automatically.</p>
+<ul>
+<li><a href="#configuration">Configuration</a> — environment variables, storage backends, SSL</li>
+<li><a href="#reverse-proxy">Reverse Proxy</a> — Caddy and nginx configs with TLS (for manual setup)</li>
+<li><a href="#administration">Administration</a> — cairn-ctl commands, backups, upgrades, Ansible</li>
+<li><a href="#federation">Federation</a> — connect your instance to others</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="configuration"><a class="header" href="#configuration">Configuration</a></h1>
+<p>All configuration is stored in <code>/opt/cairn/.env</code>. Changes take effect after restarting services:</p>
+<pre><code class="language-sh">cairn-ctl restart
+</code></pre>
+<p>You can also view or set individual values with:</p>
+<pre><code class="language-sh">cairn-ctl config                    # show all
+cairn-ctl config CAIRN_DOMAIN       # show one
+cairn-ctl config CAIRN_DOMAIN x.com # set one
+</code></pre>
+<h2 id="environment-variables"><a class="header" href="#environment-variables">Environment variables</a></h2>
+<h3 id="required"><a class="header" href="#required">Required</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Variable</th><th>Description</th><th>How to generate</th></tr>
+</thead>
+<tbody>
+<tr><td><code>CAIRN_DOMAIN</code></td><td>Domain name or IP for this instance</td><td>—</td></tr>
+<tr><td><code>SECRET_KEY_BASE</code></td><td>Phoenix cookie signing key (48+ bytes, base64)</td><td><code>openssl rand -base64 48</code></td></tr>
+<tr><td><code>JWT_SECRET</code></td><td>JWT signing key (48+ bytes, base64)</td><td><code>openssl rand -base64 48</code></td></tr>
+<tr><td><code>POSTGRES_PASSWORD</code></td><td>PostgreSQL password</td><td><code>openssl rand -base64 32</code></td></tr>
+<tr><td><code>MEILI_MASTER_KEY</code></td><td>Meilisearch admin key</td><td><code>openssl rand -base64 32</code></td></tr>
+<tr><td><code>SFU_AUTH_SECRET</code></td><td>Shared secret between server and SFU</td><td><code>openssl rand -base64 32</code></td></tr>
+<tr><td><code>ALTCHA_HMAC_KEY</code></td><td>HMAC key for proof-of-work challenges</td><td><code>openssl rand -base64 32</code></td></tr>
+<tr><td><code>TURN_SECRET</code></td><td>TURN server shared secret</td><td><code>openssl rand -base64 32</code></td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="optional"><a class="header" href="#optional">Optional</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Variable</th><th>Description</th><th>Default</th></tr>
+</thead>
+<tbody>
+<tr><td><code>SERVER_PORT</code></td><td>Host port mapped to the server container</td><td><code>4000</code></td></tr>
+<tr><td><code>FORCE_SSL</code></td><td>Enforce HTTPS redirects. Cannot be <code>false</code> when federation is enabled.</td><td><code>true</code></td></tr>
+<tr><td><code>FEDERATION_ENABLED</code></td><td>Enable federation with other Cairn instances</td><td><code>false</code></td></tr>
+<tr><td><code>TURN_URLS</code></td><td>Comma-separated TURN server URLs</td><td><code>turn:&lt;CAIRN_DOMAIN&gt;:3478</code></td></tr>
+<tr><td><code>STORAGE_BACKEND</code></td><td>File storage backend: <code>local</code> or <code>s3</code></td><td><code>local</code></td></tr>
+<tr><td><code>CAIRN_IMAGE</code></td><td>Custom server Docker image</td><td><code>ghcr.io/morelandjo/cairn-server:latest</code></td></tr>
+<tr><td><code>SFU_IMAGE</code></td><td>Custom SFU Docker image</td><td><code>ghcr.io/morelandjo/cairn-sfu:latest</code></td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="s3-storage"><a class="header" href="#s3-storage">S3 storage</a></h3>
+<p>Set <code>STORAGE_BACKEND=s3</code> and configure these additional variables:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Variable</th><th>Description</th><th>Default</th></tr>
+</thead>
+<tbody>
+<tr><td><code>S3_BUCKET</code></td><td>S3 bucket name</td><td><code>cairn-uploads</code></td></tr>
+<tr><td><code>S3_ENDPOINT</code></td><td>S3 endpoint URL (use for MinIO, Backblaze B2, etc.)</td><td><code>https://s3.amazonaws.com</code></td></tr>
+<tr><td><code>AWS_REGION</code></td><td>AWS region</td><td><code>us-east-1</code></td></tr>
+<tr><td><code>AWS_ACCESS_KEY_ID</code></td><td>AWS access key</td><td>—</td></tr>
+<tr><td><code>AWS_SECRET_ACCESS_KEY</code></td><td>AWS secret key</td><td>—</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="ssl--tls"><a class="header" href="#ssl--tls">SSL / TLS</a></h3>
+<p>Cairn does not terminate TLS itself — use a reverse proxy (see <a href="#reverse-proxy">Reverse Proxy</a>). The <code>FORCE_SSL</code> flag controls whether the server issues HTTP-to-HTTPS redirects and sets HSTS headers.</p>
+<p>Setting <code>FORCE_SSL=false</code> disables these redirects, which is useful when running behind a VPN, Tailscale, or Cloudflare Tunnel where TLS is handled externally. Federation requires SSL and will override this setting to <code>true</code>.</p>
+<h3 id="sfu"><a class="header" href="#sfu">SFU</a></h3>
+<p>The SFU (Selective Forwarding Unit) handles voice and video media. It runs with <code>network_mode: host</code> to support WebRTC’s UDP requirements.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Variable</th><th>Description</th><th>Default</th></tr>
+</thead>
+<tbody>
+<tr><td><code>SFU_AUTH_SECRET</code></td><td>Shared auth secret (must match the server’s value)</td><td>—</td></tr>
+<tr><td><code>ANNOUNCED_IP</code></td><td>Public IP/domain the SFU advertises to clients</td><td><code>CAIRN_DOMAIN</code></td></tr>
+<tr><td><code>RTC_MIN_PORT</code></td><td>Start of UDP port range for media</td><td><code>40000</code></td></tr>
+<tr><td><code>RTC_MAX_PORT</code></td><td>End of UDP port range for media</td><td><code>40100</code></td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="resource-limits"><a class="header" href="#resource-limits">Resource limits</a></h3>
+<p>The production Docker Compose file sets default memory limits:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Service</th><th>Memory</th><th>CPU</th></tr>
+</thead>
+<tbody>
+<tr><td>server</td><td>512 MB</td><td>1.0</td></tr>
+<tr><td>sfu</td><td>256 MB</td><td>1.0</td></tr>
+<tr><td>postgres</td><td>256 MB</td><td>—</td></tr>
+<tr><td>redis</td><td>128 MB</td><td>—</td></tr>
+<tr><td>meilisearch</td><td>256 MB</td><td>—</td></tr>
+</tbody>
+</table>
+</div>
+<p>To adjust these, edit the <code>deploy</code> section in your <code>docker-compose.yml</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="reverse-proxy"><a class="header" href="#reverse-proxy">Reverse Proxy</a></h1>
+<p>Cairn listens on HTTP (default port 4000). You need a reverse proxy to terminate TLS and expose the instance on ports 80/443.</p>
+<h2 id="caddy-recommended"><a class="header" href="#caddy-recommended">Caddy (recommended)</a></h2>
+<p>Caddy automatically obtains and renews Let’s Encrypt certificates.</p>
+<p>Create <code>/etc/caddy/Caddyfile</code>:</p>
+<pre><code class="language-caddyfile">cairn.example.com {
+    reverse_proxy localhost:4000
+}
+</code></pre>
+<p>Reload Caddy:</p>
+<pre><code class="language-sh">sudo systemctl reload caddy
+</code></pre>
+<p>That’s it — Caddy handles TLS certificates, HTTP/2, and WebSocket upgrades automatically.</p>
+<h2 id="nginx--lets-encrypt"><a class="header" href="#nginx--lets-encrypt">nginx + Let’s Encrypt</a></h2>
+<p>Install nginx and Certbot:</p>
+<pre><code class="language-sh"># Debian/Ubuntu
+sudo apt install nginx certbot python3-certbot-nginx
+
+# Fedora
+sudo dnf install nginx certbot python3-certbot-nginx
+</code></pre>
+<p>Create <code>/etc/nginx/sites-available/cairn</code>:</p>
+<pre><code class="language-nginx">server {
+    listen 80;
+    server_name cairn.example.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:4000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket support (required for real-time features)
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # Increase timeouts for long-lived WebSocket connections
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+    }
+}
+</code></pre>
+<p>Enable the site and obtain a certificate:</p>
+<pre><code class="language-sh">sudo ln -s /etc/nginx/sites-available/cairn /etc/nginx/sites-enabled/
+sudo nginx -t &amp;&amp; sudo systemctl reload nginx
+sudo certbot --nginx -d cairn.example.com
+</code></pre>
+<p>Certbot will modify the config to add TLS and set up auto-renewal.</p>
+<h2 id="websocket-paths"><a class="header" href="#websocket-paths">WebSocket paths</a></h2>
+<p>Cairn uses WebSocket connections at <code>/socket/websocket</code> for real-time messaging. Your reverse proxy must support WebSocket upgrades. Both the Caddy and nginx configurations above handle this correctly.</p>
+<h2 id="voice-and-video-ports"><a class="header" href="#voice-and-video-ports">Voice and video ports</a></h2>
+<p>The SFU and TURN server use <code>network_mode: host</code>, so they bind directly to the host’s network interfaces — no proxy configuration is needed for them. Make sure these ports are open in your firewall:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Port</th><th>Protocol</th><th>Service</th></tr>
+</thead>
+<tbody>
+<tr><td>3478</td><td>TCP + UDP</td><td>TURN signaling</td></tr>
+<tr><td>40000–40100</td><td>UDP</td><td>SFU media (WebRTC)</td></tr>
+<tr><td>49152–49200</td><td>UDP</td><td>TURN relay</td></tr>
+</tbody>
+</table>
+</div>
+<p>The install script configures UFW rules for these automatically. If you manage your firewall manually, ensure these ports are open.</p>
+<h2 id="cloudflare"><a class="header" href="#cloudflare">Cloudflare</a></h2>
+<p>If you use Cloudflare as a proxy, note that Cloudflare does not proxy arbitrary UDP traffic on free plans. Voice/video will connect directly to your server IP via TURN, bypassing Cloudflare. HTTP and WebSocket traffic will work through Cloudflare normally.</p>
+<p>Set Cloudflare SSL mode to <strong>Full (strict)</strong> if your origin has a valid certificate.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="administration"><a class="header" href="#administration">Administration</a></h1>
+<h2 id="cairn-ctl"><a class="header" href="#cairn-ctl">cairn-ctl</a></h2>
+<p><code>cairn-ctl</code> is the operator CLI installed at <code>/usr/local/bin/cairn-ctl</code>. It wraps Docker Compose commands and provides shortcuts for common tasks.</p>
+<p>All commands operate on the deploy directory at <code>/opt/cairn</code> (override with the <code>CAIRN_DIR</code> environment variable).</p>
+<h3 id="command-reference"><a class="header" href="#command-reference">Command reference</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Command</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>cairn-ctl status</code></td><td>Show service status, health check result, and deploy directory</td></tr>
+<tr><td><code>cairn-ctl start</code></td><td>Start all services</td></tr>
+<tr><td><code>cairn-ctl stop</code></td><td>Stop all services</td></tr>
+<tr><td><code>cairn-ctl restart</code></td><td>Restart all services</td></tr>
+<tr><td><code>cairn-ctl logs [service]</code></td><td>Follow logs for all services, or a specific one (e.g., <code>server</code>, <code>sfu</code>, <code>postgres</code>)</td></tr>
+<tr><td><code>cairn-ctl upgrade</code></td><td>Pull latest images, create a backup, restart with rolling updates, run migrations</td></tr>
+<tr><td><code>cairn-ctl rollback</code></td><td>Restore the database from the most recent backup (prompts for confirmation)</td></tr>
+<tr><td><code>cairn-ctl backup</code></td><td>Create a backup of the database, uploads, and federation keys</td></tr>
+<tr><td><code>cairn-ctl restore &lt;path&gt;</code></td><td>Restore from a specific backup directory (prompts for confirmation)</td></tr>
+<tr><td><code>cairn-ctl config</code></td><td>Show all configuration values</td></tr>
+<tr><td><code>cairn-ctl config &lt;key&gt;</code></td><td>Show a single configuration value</td></tr>
+<tr><td><code>cairn-ctl config &lt;key&gt; &lt;value&gt;</code></td><td>Set a configuration value (restart required to take effect)</td></tr>
+<tr><td><code>cairn-ctl user create &lt;username&gt; &lt;password&gt;</code></td><td>Create a user account</td></tr>
+<tr><td><code>cairn-ctl federation list</code></td><td>List known federation nodes and their status</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="backups"><a class="header" href="#backups">Backups</a></h2>
+<h3 id="what-gets-backed-up"><a class="header" href="#what-gets-backed-up">What gets backed up</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Component</th><th>Contents</th></tr>
+</thead>
+<tbody>
+<tr><td>Database</td><td>Full PostgreSQL dump (<code>pg_dump -Fc</code>)</td></tr>
+<tr><td>Uploads</td><td>User-uploaded files from <code>/app/priv/uploads</code></td></tr>
+<tr><td>Keys</td><td>Federation signing keys from <code>/app/priv/keys</code></td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="manual-backup"><a class="header" href="#manual-backup">Manual backup</a></h3>
+<pre><code class="language-sh">cairn-ctl backup
+</code></pre>
+<p>Backups are saved to <code>/opt/cairn/backups/cairn-backup-YYYYMMDD-HHMMSS/</code>.</p>
+<h3 id="restore"><a class="header" href="#restore">Restore</a></h3>
+<pre><code class="language-sh">cairn-ctl restore /opt/cairn/backups/cairn-backup-20250115-143022
+cairn-ctl restart
+</code></pre>
+<p>The restore command replaces the current database. A restart is needed afterward.</p>
+<h3 id="automated-backups-with-cron"><a class="header" href="#automated-backups-with-cron">Automated backups with cron</a></h3>
+<pre><code class="language-sh"># Daily backup at 3 AM, keep 30 days
+echo "0 3 * * * root cairn-ctl backup" | sudo tee /etc/cron.d/cairn-backup
+
+# Prune backups older than 30 days
+echo "30 3 * * * root find /opt/cairn/backups -maxdepth 1 -mtime +30 -exec rm -rf {} +" | sudo tee -a /etc/cron.d/cairn-backup
+</code></pre>
+<h2 id="upgrading"><a class="header" href="#upgrading">Upgrading</a></h2>
+<h3 id="using-cairn-ctl"><a class="header" href="#using-cairn-ctl">Using cairn-ctl</a></h3>
+<pre><code class="language-sh">cairn-ctl upgrade
+</code></pre>
+<p>This performs a full upgrade cycle:</p>
+<ol>
+<li>Creates a pre-upgrade backup</li>
+<li>Pulls latest Docker images</li>
+<li>Restarts the server (rolling — no full downtime)</li>
+<li>Waits for health check</li>
+<li>Runs database migrations</li>
+<li>Restarts the SFU</li>
+</ol>
+<h3 id="manual-upgrade"><a class="header" href="#manual-upgrade">Manual upgrade</a></h3>
+<pre><code class="language-sh">cd /opt/cairn
+docker compose pull
+docker compose up -d --no-deps server
+# Wait for health
+docker compose exec -T server bin/cairn eval "Cairn.Release.migrate()"
+docker compose up -d --no-deps sfu
+</code></pre>
+<h3 id="pinning-a-version"><a class="header" href="#pinning-a-version">Pinning a version</a></h3>
+<p>By default, services pull <code>latest</code>. To pin to a specific release:</p>
+<pre><code class="language-sh">cairn-ctl config CAIRN_IMAGE ghcr.io/morelandjo/cairn-server:v0.1.0
+cairn-ctl config SFU_IMAGE ghcr.io/morelandjo/cairn-sfu:v0.1.0
+cairn-ctl restart
+</code></pre>
+<h2 id="ansible-playbooks"><a class="header" href="#ansible-playbooks">Ansible playbooks</a></h2>
+<p>For managing multiple servers or automating deployments, Ansible playbooks are provided in <code>deploy/ansible/</code>.</p>
+<h3 id="setup"><a class="header" href="#setup">Setup</a></h3>
+<p>Create an inventory file from the example:</p>
+<pre><code class="language-sh">cp deploy/ansible/inventory.example.ini deploy/ansible/inventory.ini
+</code></pre>
+<p>Edit <code>inventory.ini</code> with your server’s IP and domain:</p>
+<pre><code class="language-ini">[cairn]
+cairn-server ansible_host=203.0.113.10 ansible_user=root
+
+[cairn:vars]
+cairn_domain=cairn.example.com
+deploy_dir=/opt/cairn
+</code></pre>
+<h3 id="available-playbooks"><a class="header" href="#available-playbooks">Available playbooks</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Playbook</th><th>Description</th><th>Usage</th></tr>
+</thead>
+<tbody>
+<tr><td><code>setup.yml</code></td><td>Provision a fresh server (Docker, firewall, swap, cairn user)</td><td><code>ansible-playbook -i inventory.ini setup.yml</code></td></tr>
+<tr><td><code>deploy.yml</code></td><td>Deploy Cairn (copy compose/env, pull images, start, migrate)</td><td><code>ansible-playbook -i inventory.ini deploy.yml</code></td></tr>
+<tr><td><code>backup.yml</code></td><td>Create a backup (database, uploads, keys) with 30-day retention</td><td><code>ansible-playbook -i inventory.ini backup.yml</code></td></tr>
+<tr><td><code>update.yml</code></td><td>Update Cairn (backup, pull images, rolling restart, migrate)</td><td><code>ansible-playbook -i inventory.ini update.yml</code></td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="typical-workflow"><a class="header" href="#typical-workflow">Typical workflow</a></h3>
+<pre><code class="language-sh"># First time: provision the server, then deploy
+ansible-playbook -i inventory.ini setup.yml
+ansible-playbook -i inventory.ini deploy.yml
+
+# Later: update to latest version
+ansible-playbook -i inventory.ini update.yml
+</code></pre>
+<h2 id="monitoring"><a class="header" href="#monitoring">Monitoring</a></h2>
+<p>Cairn exposes Prometheus metrics via PromEx. To enable monitoring, connect a Prometheus instance to scrape the server’s metrics endpoint and import the provided Grafana dashboards.</p>
+<h2 id="logs"><a class="header" href="#logs">Logs</a></h2>
+<p>View logs for all services:</p>
+<pre><code class="language-sh">cairn-ctl logs
+</code></pre>
+<p>View logs for a specific service:</p>
+<pre><code class="language-sh">cairn-ctl logs server
+cairn-ctl logs sfu
+cairn-ctl logs postgres
+</code></pre>
+<p>Every HTTP request includes a correlation ID in the <code>x-request-id</code> header and in log metadata, which can be used to trace requests across services.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="federation"><a class="header" href="#federation">Federation</a></h1>
+<p>Federation allows users on different Cairn instances to communicate with each other — join servers, send messages, and participate in voice channels across instances.</p>
+<h2 id="what-federation-enables"><a class="header" href="#what-federation-enables">What federation enables</a></h2>
+<ul>
+<li>Users can join servers hosted on other Cairn instances</li>
+<li>Messages are delivered between instances in real time</li>
+<li>Voice calls work across instances via relay</li>
+<li>Each user has a portable cryptographic identity (<code>did:cairn</code>) that works everywhere</li>
+</ul>
+<h2 id="what-federation-does-not-do"><a class="header" href="#what-federation-does-not-do">What federation does not do</a></h2>
+<ul>
+<li><strong>DMs are never federated.</strong> Direct messages stay on your home instance and are never sent to remote servers.</li>
+<li><strong>Metadata is stripped.</strong> When forwarding messages to other instances, unnecessary metadata is removed to protect user privacy.</li>
+</ul>
+<h2 id="enable-federation"><a class="header" href="#enable-federation">Enable federation</a></h2>
+<p>Set two environment variables in your <code>.env</code>:</p>
+<pre><code class="language-sh">cairn-ctl config FEDERATION_ENABLED true
+cairn-ctl config CAIRN_DOMAIN cairn.example.com
+cairn-ctl restart
+</code></pre>
+<p>Or edit <code>/opt/cairn/.env</code> directly:</p>
+<pre><code class="language-env">FEDERATION_ENABLED=true
+CAIRN_DOMAIN=cairn.example.com
+</code></pre>
+<h3 id="requirements"><a class="header" href="#requirements">Requirements</a></h3>
+<ul>
+<li><strong>SSL is mandatory.</strong> Federation forces <code>FORCE_SSL=true</code> — you cannot disable SSL while federation is enabled.</li>
+<li><strong>A publicly reachable domain.</strong> Other instances need to reach your server over HTTPS.</li>
+<li><strong>A reverse proxy with TLS</strong> — see <a href="#reverse-proxy">Reverse Proxy</a>.</li>
+</ul>
+<h2 id="how-it-works"><a class="header" href="#how-it-works">How it works</a></h2>
+<h3 id="discovery"><a class="header" href="#discovery">Discovery</a></h3>
+<p>Each federated instance publishes a well-known endpoint at:</p>
+<pre><code>https://cairn.example.com/.well-known/cairn
+</code></pre>
+<p>This returns the instance’s public Ed25519 signing key, which other instances use to verify message authenticity.</p>
+<h3 id="authentication"><a class="header" href="#authentication">Authentication</a></h3>
+<p>Federation uses HTTP Signatures (RFC 9421) to authenticate requests between instances. Each instance has an Ed25519 key pair stored in <code>/opt/cairn/keys/</code>. The key is generated automatically on first startup when federation is enabled.</p>
+<h3 id="identity"><a class="header" href="#identity">Identity</a></h3>
+<p>Users are identified across instances by their DID (Decentralized Identifier):</p>
+<pre><code>did:cairn:&lt;base58-encoded-hash&gt;
+</code></pre>
+<p>A DID is stable and never changes, even if a user rotates their signing keys. Users carry their identity with them when joining servers on other instances.</p>
+<h2 id="key-rotation"><a class="header" href="#key-rotation">Key rotation</a></h2>
+<p>Rotate your instance’s federation signing key:</p>
+<pre><code class="language-sh"># Via the admin API
+curl -X POST https://cairn.example.com/api/v1/admin/federation/rotate-key \
+  -H "Authorization: Bearer &lt;admin-token&gt;"
+</code></pre>
+<p>Key rotation is transparent to other instances — the new key is published at the well-known endpoint and other instances will pick it up automatically.</p>
+<h2 id="managing-federation"><a class="header" href="#managing-federation">Managing federation</a></h2>
+<p>List known federation nodes:</p>
+<pre><code class="language-sh">cairn-ctl federation list
+</code></pre>
+<p>This shows all remote instances your server has communicated with and their current status.</p>
+<h2 id="rate-limiting"><a class="header" href="#rate-limiting">Rate limiting</a></h2>
+<p>Inbound federation requests are rate-limited to prevent abuse. The server applies per-instance limits on incoming ActivityPub deliveries.</p>
+<h2 id="disabling-federation"><a class="header" href="#disabling-federation">Disabling federation</a></h2>
+<pre><code class="language-sh">cairn-ctl config FEDERATION_ENABLED false
+cairn-ctl restart
+</code></pre>
+<p>Existing federated data (remote users, memberships) will remain in the database but no new federation activity will occur.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="web-client"><a class="header" href="#web-client">Web Client</a></h1>
+<p>The web client is served directly by the Cairn server as a single-page application — there is no separate setup required.</p>
+<h2 id="access"><a class="header" href="#access">Access</a></h2>
+<p>Open your Cairn instance in a browser:</p>
+<pre><code>https://your-domain.com
+</code></pre>
+<p>The server injects your instance’s configuration (domain, feature flags) into the page at load time, so everything works out of the box.</p>
+<h2 id="supported-browsers"><a class="header" href="#supported-browsers">Supported browsers</a></h2>
+<p>Any modern browser with WebSocket and WebCrypto support:</p>
+<ul>
+<li>Chrome / Edge 90+</li>
+<li>Firefox 90+</li>
+<li>Safari 15+</li>
+</ul>
+<h2 id="features"><a class="header" href="#features">Features</a></h2>
+<p>The web client supports all Cairn features:</p>
+<ul>
+<li>Text messaging with threads, reactions, and pins</li>
+<li>Voice and video calls with end-to-end encryption (via Insertable Streams)</li>
+<li>Screen sharing and simulcast video</li>
+<li>MLS group encryption for private channels</li>
+<li>File uploads and link previews</li>
+<li>Full-text search</li>
+<li>Server discovery and federation</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="desktop-app"><a class="header" href="#desktop-app">Desktop App</a></h1>
+<p>The Cairn desktop app is built with Tauri and wraps the web client with native OS integrations.</p>
+<h2 id="download"><a class="header" href="#download">Download</a></h2>
+<p>Download the latest release for your platform from <a href="https://github.com/morelandjo/cairn/releases">GitHub Releases</a>:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Platform</th><th>Format</th></tr>
+</thead>
+<tbody>
+<tr><td>macOS (Apple Silicon)</td><td><code>.app.tar.gz</code> (aarch64)</td></tr>
+<tr><td>macOS (Intel)</td><td><code>.app.tar.gz</code> (x86_64)</td></tr>
+<tr><td>Linux</td><td><code>.AppImage</code>, <code>.deb</code></td></tr>
+<tr><td>Windows</td><td><code>.msi</code></td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="first-launch"><a class="header" href="#first-launch">First launch</a></h2>
+<ol>
+<li>Open the app</li>
+<li>Enter your Cairn server URL (e.g., <code>https://cairn.example.com</code>)</li>
+<li>Log in or create an account</li>
+</ol>
+<p>The server URL is saved — you won’t need to enter it again.</p>
+<h2 id="features-1"><a class="header" href="#features-1">Features</a></h2>
+<p>Everything in the <a href="#web-client">web client</a>, plus:</p>
+<ul>
+<li><strong>System tray</strong> — minimize to tray, badge for unread notifications</li>
+<li><strong>Native notifications</strong> — OS-level push notifications</li>
+<li><strong>Secure key storage</strong> — encryption keys are stored in the OS keychain (macOS Keychain, Windows Credential Manager, Linux Secret Service) instead of browser localStorage</li>
+<li><strong>Keyboard shortcuts</strong> — global shortcuts for mute/deafen</li>
+<li><strong>Deep linking</strong> — <code>cairn://</code> links open directly in the app (e.g., server invites)</li>
+<li><strong>Auto-update</strong> — the app checks for updates and prompts you to install them</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mobile-app"><a class="header" href="#mobile-app">Mobile App</a></h1>
+<p>The Cairn mobile app is built with Expo and React Native.</p>
+<h2 id="install-1"><a class="header" href="#install-1">Install</a></h2>
+<p>Download from your app store, or sideload the APK/IPA from <a href="https://github.com/morelandjo/cairn/releases">GitHub Releases</a>.</p>
+<h2 id="first-launch-1"><a class="header" href="#first-launch-1">First launch</a></h2>
+<ol>
+<li>Open the app</li>
+<li>Enter your Cairn server URL (e.g., <code>https://cairn.example.com</code>)</li>
+<li>Log in or create an account</li>
+</ol>
+<h2 id="features-2"><a class="header" href="#features-2">Features</a></h2>
+<ul>
+<li>Text messaging with threads, reactions, and pins</li>
+<li>Voice calls via WebRTC</li>
+<li>File uploads and link previews</li>
+<li>Server discovery and federation</li>
+<li>Push notifications (privacy-first — no message content or sender info in the push payload)</li>
+<li>Biometric authentication (Face ID, Touch ID, fingerprint)</li>
+<li>Offline mode with SQLite message cache and outbound queue</li>
+</ul>
+<h2 id="push-notifications"><a class="header" href="#push-notifications">Push notifications</a></h2>
+<p>Push notifications are delivered through the Expo Push API. For privacy, the notification payload contains only a signal that new activity is available — message content and sender information are never included. The app fetches the actual message data when you open the notification.</p>
+<p>Manage your push notification preferences in <strong>Settings &gt; Notifications</strong>.</p>
+<h2 id="known-limitations"><a class="header" href="#known-limitations">Known limitations</a></h2>
+<ul>
+<li><strong>No MLS end-to-end encryption.</strong> The MLS protocol relies on WebAssembly, which is not available in the React Native runtime. Private (E2EE) channels show a placeholder on mobile. Standard channels work normally.</li>
+<li><strong>No voice end-to-end encryption.</strong> Voice encryption uses the Insertable Streams API, which is not available in React Native’s WebRTC implementation. Voice calls work but are encrypted only at the transport level (DTLS-SRTP), not end-to-end.</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr-ef4e11c1.min.js"></script>
+        <script src="mark-09e88c2c.min.js"></script>
+        <script src="searcher-c2a407aa.js"></script>
+
+        <script src="clipboard-1626706a.min.js"></script>
+        <script src="highlight-abc7f01d.js"></script>
+        <script src="book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>
