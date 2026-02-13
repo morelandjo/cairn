@@ -102,10 +102,73 @@ step_validate() {
 }
 
 # ============================================================
-# Step 2: Run tests
+# Step 2: Bump version
+# ============================================================
+step_bump_version() {
+  if [[ -z "$VERSION" ]]; then
+    return
+  fi
+
+  info "Step 2: Bumping version to $VERSION"
+
+  # Write canonical VERSION file
+  echo "$VERSION" > "$ROOT/VERSION"
+  ok "VERSION file"
+
+  # package.json files (proto, sfu, mobile)
+  for pkg in proto/package.json sfu/package.json client/mobile/package.json; do
+    sed -i.bak -E "s/\"version\": \"[^\"]+\"/\"version\": \"$VERSION\"/" "$ROOT/$pkg"
+    rm -f "$ROOT/$pkg.bak"
+    ok "$pkg"
+  done
+
+  # mobile app.json
+  sed -i.bak -E "s/\"version\": \"[^\"]+\"/\"version\": \"$VERSION\"/" "$ROOT/client/mobile/app.json"
+  rm -f "$ROOT/client/mobile/app.json.bak"
+  ok "client/mobile/app.json"
+
+  # desktop Cargo.toml (only the package version line)
+  sed -i.bak -E "s/^version = \"[^\"]+\"/version = \"$VERSION\"/" "$ROOT/client/desktop/Cargo.toml"
+  rm -f "$ROOT/client/desktop/Cargo.toml.bak"
+  ok "client/desktop/Cargo.toml"
+
+  # desktop tauri.conf.json
+  sed -i.bak -E "s/\"version\": \"[^\"]+\"/\"version\": \"$VERSION\"/" "$ROOT/client/desktop/tauri.conf.json"
+  rm -f "$ROOT/client/desktop/tauri.conf.json.bak"
+  ok "client/desktop/tauri.conf.json"
+
+  # install script
+  sed -i.bak -E "s/^CAIRN_VERSION=\"[^\"]+\"/CAIRN_VERSION=\"$VERSION\"/" "$ROOT/deploy/install.sh"
+  rm -f "$ROOT/deploy/install.sh.bak"
+  ok "deploy/install.sh"
+
+  # server/mix.exs reads VERSION file directly — no sed needed
+
+  # Commit the version bump (skip in dry-run)
+  if [[ "$DRY_RUN" == false ]]; then
+    git -C "$ROOT" add \
+      VERSION \
+      proto/package.json \
+      sfu/package.json \
+      client/mobile/package.json \
+      client/mobile/app.json \
+      client/desktop/Cargo.toml \
+      client/desktop/tauri.conf.json \
+      deploy/install.sh
+    git -C "$ROOT" commit -m "Bump version to $VERSION"
+    ok "version bump committed"
+  else
+    warn "dry-run: skipping version bump commit"
+  fi
+
+  echo ""
+}
+
+# ============================================================
+# Step 3: Run tests
 # ============================================================
 step_test() {
-  info "Step 2: Running tests"
+  info "Step 3: Running tests"
 
   # Server
   info "  Server: format + compile + test"
@@ -144,11 +207,11 @@ step_test() {
 }
 
 # ============================================================
-# Step 3: Build Docker images
+# Step 4: Build Docker images
 # ============================================================
 step_docker() {
   local ver="${VERSION:-dev}"
-  info "Step 3: Building Docker images (tag: $ver)"
+  info "Step 4: Building Docker images (tag: $ver)"
 
   docker build \
     -t "ghcr.io/morelandjo/cairn-server:${ver}" \
@@ -178,10 +241,10 @@ step_docker() {
 }
 
 # ============================================================
-# Step 4: Build desktop app
+# Step 5: Build desktop app
 # ============================================================
 step_desktop() {
-  info "Step 4: Building desktop app"
+  info "Step 5: Building desktop app"
 
   # Proto + web must be built first (done in step_test, but ensure freshness)
   if [[ ! -d "$ROOT/client/web/dist" ]]; then
@@ -220,30 +283,30 @@ step_desktop() {
 }
 
 # ============================================================
-# Step 5: Build docs
+# Step 6: Build docs
 # ============================================================
 step_docs() {
   if ! command -v mdbook >/dev/null; then
-    warn "Step 5: Skipping docs (mdbook not installed)"
+    warn "Step 6: Skipping docs (mdbook not installed)"
     echo ""
     return
   fi
 
-  info "Step 5: Building docs"
+  info "Step 6: Building docs"
   mdbook build "$ROOT/docs"
   ok "docs built at docs/book/"
   echo ""
 }
 
 # ============================================================
-# Step 6: Git tag + push
+# Step 7: Git tag + push
 # ============================================================
 step_git() {
   if [[ "$DRY_RUN" == true ]]; then
     return
   fi
 
-  info "Step 6: Git tag + push"
+  info "Step 7: Git tag + push"
 
   # Check for uncommitted changes
   if ! git -C "$ROOT" diff --quiet HEAD; then
@@ -285,14 +348,14 @@ step_git() {
 }
 
 # ============================================================
-# Step 7: Create GitHub release
+# Step 8: Create GitHub release
 # ============================================================
 step_release() {
   if [[ "$DRY_RUN" == true ]]; then
     return
   fi
 
-  info "Step 7: Creating GitHub release"
+  info "Step 8: Creating GitHub release"
 
   if ! confirm "Create release $TAG on public repo?"; then
     warn "skipped release creation"
@@ -334,7 +397,7 @@ step_release() {
 }
 
 # ============================================================
-# Step 8: Deploy docs
+# Step 9: Deploy docs
 # ============================================================
 step_deploy_docs() {
   if [[ "$DRY_RUN" == true ]]; then
@@ -342,12 +405,12 @@ step_deploy_docs() {
   fi
 
   if [[ ! -d "$ROOT/docs/book" ]]; then
-    warn "Step 8: Skipping docs deploy (docs/book not found)"
+    warn "Step 9: Skipping docs deploy (docs/book not found)"
     echo ""
     return
   fi
 
-  info "Step 8: Deploying docs to gh-pages"
+  info "Step 9: Deploying docs to gh-pages"
 
   if ! confirm "Push docs to gh-pages on public repo?"; then
     warn "skipped docs deploy"
@@ -403,6 +466,7 @@ main() {
   echo ""
 
   step_validate
+  step_bump_version
   step_test
   step_docker
   step_desktop

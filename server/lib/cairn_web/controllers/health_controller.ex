@@ -12,7 +12,7 @@ defmodule CairnWeb.HealthController do
     |> put_status(status_code)
     |> json(%{
       status: if(all_healthy, do: "healthy", else: "degraded"),
-      version: "0.1.0",
+      version: Application.spec(:cairn, :vsn) |> to_string(),
       postgres: Atom.to_string(postgres_status),
       redis: Atom.to_string(redis_status),
       force_ssl: Application.get_env(:cairn, :force_ssl, true)

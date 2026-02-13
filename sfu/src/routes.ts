@@ -1,6 +1,10 @@
+import { createRequire } from "module";
 import type { FastifyInstance } from "fastify";
 import type { RoomManager } from "./rooms.js";
 import type { WorkerPool } from "./workers.js";
+
+const require = createRequire(import.meta.url);
+const { version } = require("../package.json") as { version: string };
 
 export function registerRoutes(
   app: FastifyInstance,
@@ -12,7 +16,7 @@ export function registerRoutes(
     const stats = roomManager.stats;
     return {
       status: "healthy",
-      version: "0.1.0",
+      version,
       workers: workerPool.count,
       rooms: stats.rooms,
       peers: stats.peers,
