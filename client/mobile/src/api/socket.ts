@@ -9,7 +9,7 @@ import { getWsUrl } from "../lib/config";
 
 type PresenceState = Record<
   string,
-  { metas: Array<{ online_at?: string; phx_ref?: string }> }
+  { metas: { online_at?: string; phx_ref?: string }[] }
 >;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

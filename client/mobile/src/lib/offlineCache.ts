@@ -93,12 +93,12 @@ export async function queueOutboundMessage(
 }
 
 /** Get all queued outbound messages. */
-export async function getOutboundQueue(): Promise<Array<{
+export async function getOutboundQueue(): Promise<{
   id: number;
   channel_id: string;
   content: string;
   reply_to_id: string | null;
-}>> {
+}[]> {
   const database = await getDb();
   const rows = await database.getAllAsync(
     `SELECT * FROM outbound_queue ORDER BY id ASC`,

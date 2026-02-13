@@ -76,7 +76,7 @@ defmodule Cairn.VoiceTest do
 
   describe "list_voice_states/1" do
     test "lists all voice participants", %{channel: channel, server: server} do
-      users =
+      _users =
         for i <- 1..3 do
           {:ok, {u, _}} =
             Accounts.register_user(%{

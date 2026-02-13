@@ -2,8 +2,6 @@ declare module "mediasoup-client" {
   import type {
     RtpCapabilities,
     Transport,
-    Producer,
-    Consumer,
   } from "mediasoup-client/lib/types";
 
   export class Device {

@@ -36,7 +36,7 @@ defmodule CairnWeb.UserChannelTest do
 
   describe "notifications" do
     test "receives dm_request push", %{socket: socket, user: user} do
-      {:ok, _reply, socket} =
+      {:ok, _reply, _socket} =
         subscribe_and_join(socket, CairnWeb.UserChannel, "user:#{user.id}")
 
       # Simulate a PubSub broadcast (as InboxHandler would do)
@@ -58,7 +58,7 @@ defmodule CairnWeb.UserChannelTest do
     end
 
     test "receives dm_request_response push", %{socket: socket, user: user} do
-      {:ok, _reply, socket} =
+      {:ok, _reply, _socket} =
         subscribe_and_join(socket, CairnWeb.UserChannel, "user:#{user.id}")
 
       Phoenix.PubSub.broadcast(

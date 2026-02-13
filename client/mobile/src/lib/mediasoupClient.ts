@@ -3,6 +3,7 @@
  * Uses react-native-webrtc handler for WebRTC primitives.
  */
 
+// eslint-disable-next-line import/no-unresolved
 import { Device } from "mediasoup-client";
 import type {
   Transport,
@@ -12,6 +13,7 @@ import type {
 } from "mediasoup-client/lib/types";
 
 // React Native handler for mediasoup
+// eslint-disable-next-line import/no-unresolved
 import { ReactNativeUnifiedPlan } from "mediasoup-client/lib/handlers/ReactNativeUnifiedPlan";
 
 export class MediasoupManager {

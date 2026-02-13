@@ -14,7 +14,7 @@ import {
   FlatList,
   Alert,
 } from "react-native";
-import { setServerUrl, getServerUrl } from "../lib/config";
+import { setServerUrl } from "../lib/config";
 
 interface ServerConnectProps {
   onConnect: () => void;

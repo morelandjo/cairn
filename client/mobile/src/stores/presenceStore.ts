@@ -6,7 +6,7 @@ import { create } from "zustand";
 
 type PresenceState = Record<
   string,
-  { metas: Array<{ online_at?: string; phx_ref?: string }> }
+  { metas: { online_at?: string; phx_ref?: string }[] }
 >;
 
 interface PresenceStoreState {

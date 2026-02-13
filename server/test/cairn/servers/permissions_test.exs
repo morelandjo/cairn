@@ -4,7 +4,7 @@ defmodule Cairn.Servers.PermissionsTest do
   alias Cairn.{Accounts, Servers}
   alias Cairn.Servers.Permissions
 
-  defp create_user(attrs \\ %{}) do
+  defp create_user(attrs) do
     username = Map.get(attrs, :username, "user_#{System.unique_integer([:positive])}")
 
     {:ok, {user, _codes}} =

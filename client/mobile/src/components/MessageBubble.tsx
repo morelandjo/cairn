@@ -9,7 +9,6 @@ interface Props {
 }
 
 export function MessageBubble({ message }: Props) {
-  const setReplyingTo = useChannelStore((s) => s.setReplyingTo);
   const [showReactions, setShowReactions] = useState(false);
 
   const timestamp = new Date(message.inserted_at).toLocaleTimeString([], {

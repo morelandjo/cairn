@@ -22,6 +22,11 @@ end
 
 config :cairn, CairnWeb.Endpoint, http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
+# Redis URL (defaults to localhost:6380 for local dev; CI and prod override via env)
+if redis_url = System.get_env("REDIS_URL") do
+  config :cairn, :redis_url, redis_url
+end
+
 # JWT secret (required in prod, optional in dev/test)
 if jwt_secret = System.get_env("JWT_SECRET") do
   config :cairn, :jwt_secret, jwt_secret
