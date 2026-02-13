@@ -288,17 +288,15 @@ defmodule Cairn.Identity do
 
   defp verify_chain_links([_genesis]), do: :ok
 
-  defp verify_chain_links([prev | [next | _] = rest]) do
+  defp verify_chain_links([prev, next | rest]) do
     expected_hash = hash_operation(prev)
 
     if next.prev_hash == expected_hash and next.payload["prev"] == expected_hash do
-      verify_chain_links(rest)
+      verify_chain_links([next | rest])
     else
       {:error, {:chain_break, next.seq}}
     end
   end
-
-  defp verify_chain_links([]), do: :ok
 
   defp verify_signatures(ops) do
     verify_signatures_with_state(ops, nil)
