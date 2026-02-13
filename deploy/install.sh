@@ -14,7 +14,7 @@ set -euo pipefail
 #   6. Deploys all services via Docker Compose
 #   7. Runs database migrations and verifies health
 
-VERSION="0.1.0"
+CAIRN_VERSION="0.1.0"
 DEPLOY_DIR="/opt/cairn"
 COMPOSE_URL="https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/docker-compose.prod.yml"
 ENV_TEMPLATE_URL="https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/.env.example"
@@ -70,10 +70,10 @@ prompt() {
   local prompt_text="$2"
   local default="$3"
   if [ -n "$default" ]; then
-    read -rp "$(echo -e "${BLUE}?${NC} ${prompt_text} [${default}]: ")" value
+    read -rp "$(echo -e "${BLUE}?${NC} ${prompt_text} [${default}]: ")" value < /dev/tty
     eval "$var_name=\"${value:-$default}\""
   else
-    read -rp "$(echo -e "${BLUE}?${NC} ${prompt_text}: ")" value
+    read -rp "$(echo -e "${BLUE}?${NC} ${prompt_text}: ")" value < /dev/tty
     eval "$var_name=\"$value\""
   fi
 }
@@ -278,7 +278,7 @@ run_wizard() {
   echo ""
   echo -e "${GREEN}╔══════════════════════════════════════╗${NC}"
   echo -e "${GREEN}║     Cairn Installation Wizard    ║${NC}"
-  echo -e "${GREEN}║          v${VERSION}                      ║${NC}"
+  echo -e "${GREEN}║          v${CAIRN_VERSION}                      ║${NC}"
   echo -e "${GREEN}╚══════════════════════════════════════╝${NC}"
   echo ""
 
@@ -287,7 +287,7 @@ run_wizard() {
 
   # Secrets
   echo ""
-  read -rp "$(echo -e "${BLUE}?${NC} Auto-generate cryptographic secrets? (Y/n): ")" secrets_choice
+  read -rp "$(echo -e "${BLUE}?${NC} Auto-generate cryptographic secrets? (Y/n): ")" secrets_choice < /dev/tty
   if [[ "$secrets_choice" =~ ^[Nn] ]]; then
     log "Enter your own secrets. Values must be non-empty."
     prompt SECRET_KEY_BASE "SECRET_KEY_BASE (base64, 48+ bytes recommended)" ""
@@ -316,7 +316,7 @@ run_wizard() {
 
   # Federation
   echo ""
-  read -rp "$(echo -e "${BLUE}?${NC} Enable federation? (y/N): ")" fed_choice
+  read -rp "$(echo -e "${BLUE}?${NC} Enable federation? (y/N): ")" fed_choice < /dev/tty
   FEDERATION_ENABLED="false"
   if [[ "$fed_choice" =~ ^[Yy] ]]; then
     FEDERATION_ENABLED="true"
@@ -328,7 +328,7 @@ run_wizard() {
     log "SSL enforcement: enabled (required for federation)"
   else
     echo ""
-    read -rp "$(echo -e "${BLUE}?${NC} Enable SSL enforcement? Recommended unless using a VPN/tunnel (Y/n): ")" ssl_choice
+    read -rp "$(echo -e "${BLUE}?${NC} Enable SSL enforcement? Recommended unless using a VPN/tunnel (Y/n): ")" ssl_choice < /dev/tty
     if [[ "$ssl_choice" =~ ^[Nn] ]]; then
       FORCE_SSL="false"
       warn "SSL disabled. Only use this on trusted private networks."
@@ -337,7 +337,7 @@ run_wizard() {
 
   # Storage
   echo ""
-  read -rp "$(echo -e "${BLUE}?${NC} Use S3 for file storage? (y/N): ")" s3_choice
+  read -rp "$(echo -e "${BLUE}?${NC} Use S3 for file storage? (y/N): ")" s3_choice < /dev/tty
   STORAGE_BACKEND="local"
   S3_BUCKET=""
   S3_ENDPOINT=""
@@ -395,7 +395,7 @@ main() {
   detect_distro
 
   echo ""
-  echo -e "${GREEN}Cairn Installer v${VERSION}${NC}"
+  echo -e "${GREEN}Cairn Installer v${CAIRN_VERSION}${NC}"
   echo ""
 
   # Phase 1: System provisioning
