@@ -448,7 +448,7 @@ defmodule Cairn.Chat do
 
     from(m in Message,
       where: m.reply_to_id == ^message_id,
-      order_by: [asc: m.id],
+      order_by: [asc: m.inserted_at, asc: m.id],
       limit: ^limit,
       left_join: u in assoc(m, :author),
       left_join: fu in assoc(m, :federated_author),
