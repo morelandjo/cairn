@@ -8,8 +8,8 @@ Download the latest release for your platform from [GitHub Releases](https://git
 
 | Platform | Format |
 |----------|--------|
-| macOS (Apple Silicon) | `.dmg` (aarch64) |
-| macOS (Intel) | `.dmg` (x86_64) |
+| macOS (Apple Silicon) | `.app.tar.gz` (aarch64) |
+| macOS (Intel) | `.app.tar.gz` (x86_64) |
 | Linux | `.AppImage`, `.deb` |
 | Windows | `.msi` |
 

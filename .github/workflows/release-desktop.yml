@@ -18,10 +18,10 @@ jobs:
         include:
           - platform: macos-latest
             target: aarch64-apple-darwin
-            bundle: dmg
+            bundle: app
           - platform: macos-latest
             target: x86_64-apple-darwin
-            bundle: dmg
+            bundle: app
           - platform: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             bundle: appimage,deb
