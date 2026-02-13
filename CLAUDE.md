@@ -1,5 +1,9 @@
 # Cairn — Project Instructions
 
+## Commit Rules
+
+- **Never** include `Co-Authored-By` lines in commit messages. No AI attribution in commits.
+
 ## Repository Layout
 
 - `server/` — Phoenix/Elixir backend
