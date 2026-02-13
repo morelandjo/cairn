@@ -13,7 +13,7 @@ Cairn is a privacy-first federated communication platform. Think Discord, but fe
 ### Self-Hosting
 
 - [Quick Start](self-hosting/quickstart.md) — install and run Cairn on a Linux server (includes TLS setup)
-- [Advanced](self-hosting/advanced.md) — configuration, custom proxy setups, administration, and federation
+- [Advanced Installation](self-hosting/advanced.md) — configuration, custom proxy setups, administration, and federation
 
 ### Clients
 

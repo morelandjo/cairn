@@ -1,4 +1,4 @@
-# Advanced
+# Advanced Installation
 
 These guides cover manual configuration, custom proxy setups, administration, and federation. If you used the [install script](quickstart.md), most of this was handled automatically.
 
