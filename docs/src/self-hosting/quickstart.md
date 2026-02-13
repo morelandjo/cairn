@@ -41,20 +41,6 @@ The installer will:
 | Reverse proxy | Caddy (recommended), Nginx + Let's Encrypt, or None | Caddy |
 | Use S3 for file storage? | Store uploads in S3 instead of local disk | No |
 
-### Non-interactive install
-
-You can skip the wizard by providing a pre-filled `.env` file:
-
-```sh
-curl -sSL https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/install.sh | sudo bash -s -- --env /path/to/.env
-```
-
-Or supply a custom Docker Compose file:
-
-```sh
-curl -sSL https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/install.sh | sudo bash -s -- --config /path/to/docker-compose.yml
-```
-
 ## Verify
 
 Check that everything is running:

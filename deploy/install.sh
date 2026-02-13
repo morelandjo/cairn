@@ -15,7 +15,7 @@ set -euo pipefail
 #   7. Runs database migrations and verifies health
 #   8. Sets up reverse proxy with TLS (Caddy or nginx)
 
-CAIRN_VERSION="0.1.0"
+CAIRN_VERSION="0.1.2"
 DEPLOY_DIR="/opt/cairn"
 COMPOSE_URL="https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/docker-compose.prod.yml"
 ENV_TEMPLATE_URL="https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/.env.example"
