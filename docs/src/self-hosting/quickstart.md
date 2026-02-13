@@ -27,6 +27,7 @@ The installer will:
 5. Walk you through an interactive configuration wizard
 6. Pull Docker images and start all services
 7. Run database migrations and verify health
+8. Set up a reverse proxy with TLS (Caddy or nginx)
 
 ### What the wizard asks
 
@@ -37,6 +38,7 @@ The installer will:
 | Auto-generate secrets? | Generate all cryptographic secrets automatically | Yes |
 | Enable federation? | Allow communication with other Cairn instances | No |
 | Enable SSL enforcement? | Redirect HTTP to HTTPS (required if federation is enabled) | Yes |
+| Reverse proxy | Caddy (recommended), Nginx + Let's Encrypt, or None | Caddy |
 | Use S3 for file storage? | Store uploads in S3 instead of local disk | No |
 
 ### Non-interactive install
@@ -71,10 +73,9 @@ cairn-ctl user create <username> <password>
 
 ## Next steps
 
-1. **Set up a reverse proxy** with TLS — see [Reverse Proxy](reverse-proxy.md)
-2. **Review configuration options** — see [Configuration](configuration.md)
-3. **Enable federation** (optional) — see [Federation](federation.md)
-4. **Connect a client** — open `https://your-domain.com` in a browser, or install the [desktop](../clients/desktop.md) or [mobile](../clients/mobile.md) app
+1. **Create your first server** — log in and click "Create Server" to set up a community
+2. **Connect a client** — open `https://your-domain.com` in a browser, or install the [desktop](../clients/desktop.md) or [mobile](../clients/mobile.md) app
+3. **Explore advanced options** — see [Configuration](configuration.md), [Administration](administration.md), or [Federation](federation.md)
 
 ## File locations
 

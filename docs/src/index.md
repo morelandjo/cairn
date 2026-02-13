@@ -12,11 +12,8 @@ Cairn is a privacy-first federated communication platform. Think Discord, but fe
 
 ### Self-Hosting
 
-- [Quick Start](self-hosting/quickstart.md) — install and run Cairn on a Linux server
-- [Configuration](self-hosting/configuration.md) — environment variables, storage backends, SSL
-- [Reverse Proxy](self-hosting/reverse-proxy.md) — Caddy and nginx configs with TLS
-- [Administration](self-hosting/administration.md) — cairn-ctl commands, backups, upgrades, Ansible
-- [Federation](self-hosting/federation.md) — connect your instance to others
+- [Quick Start](self-hosting/quickstart.md) — install and run Cairn on a Linux server (includes TLS setup)
+- [Advanced](self-hosting/advanced.md) — configuration, custom proxy setups, administration, and federation
 
 ### Clients
 
