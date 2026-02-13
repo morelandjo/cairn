@@ -10,6 +10,7 @@ concurrency:
 
 jobs:
   docker:
+    if: false
     runs-on: ubuntu-latest
     permissions:
       contents: read

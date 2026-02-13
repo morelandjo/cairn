@@ -10,6 +10,7 @@ concurrency:
 
 jobs:
   build:
+    if: false
     permissions:
       contents: write
     strategy:
@@ -84,6 +85,7 @@ jobs:
           args: --target ${{ matrix.target }} --bundles ${{ matrix.bundle }}
 
   rename-assets:
+    if: false
     needs: build
     runs-on: ubuntu-latest
     permissions:

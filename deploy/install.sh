@@ -448,11 +448,26 @@ main() {
   cd "$DEPLOY_DIR"
   sudo -u cairn docker compose pull
 
-  log "Starting services..."
+  # Phase 7: Start database services and run migrations BEFORE the server
+  log "Starting database services..."
+  sudo -u cairn docker compose up -d postgres redis meilisearch
+
+  log "Waiting for database to be ready..."
+  for _ in $(seq 1 30); do
+    if sudo -u cairn docker compose exec -T postgres pg_isready -U cairn &>/dev/null; then
+      break
+    fi
+    sleep 2
+  done
+
+  log "Running database migrations..."
+  sudo -u cairn docker compose run --rm -T server bin/cairn eval "Cairn.Release.migrate()"
+
+  # Phase 8: Start all services
+  log "Starting all services..."
   sudo -u cairn docker compose up -d
 
-  # Phase 7: Wait for health
-  log "Waiting for services to be healthy..."
+  log "Waiting for server to be healthy..."
   local port
   port=$(grep -oP 'SERVER_PORT=\K\d+' "$DEPLOY_DIR/.env" 2>/dev/null || echo "4000")
   for _ in $(seq 1 30); do
@@ -461,10 +476,6 @@ main() {
     fi
     sleep 2
   done
-
-  # Phase 8: Migrations
-  log "Running database migrations..."
-  sudo -u cairn docker compose exec -T server bin/cairn eval "Cairn.Release.migrate()" 2>/dev/null || true
 
   # Final health check
   if curl -sf "http://localhost:${port}/health" &>/dev/null; then
