@@ -49,6 +49,8 @@ jobs:
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
+          build-args: |
+            APP_VERSION=${{ steps.version.outputs.version }}
           # arm64 disabled: mediasoup C++ worker takes hours under QEMU emulation
           platforms: linux/amd64
           push: true

@@ -214,6 +214,7 @@ step_docker() {
   info "Step 4: Building Docker images (tag: $ver)"
 
   docker build \
+    --build-arg "APP_VERSION=${ver}" \
     -t "ghcr.io/morelandjo/cairn-server:${ver}" \
     -t "ghcr.io/morelandjo/cairn-server:latest" \
     "$ROOT/server/"
