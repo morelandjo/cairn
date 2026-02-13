@@ -1,0 +1,15 @@
+[book]
+title = "Cairn Documentation"
+description = "Self-hosting and client guides for Cairn"
+authors = ["Cairn Contributors"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/morelandjo/cairn"
+edit-url-template = "https://github.com/morelandjo/cairn/edit/main/docs/{path}"
