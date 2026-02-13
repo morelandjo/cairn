@@ -10,6 +10,10 @@ ENV MIX_ENV=prod
 # Install hex + rebar
 RUN mix local.hex --force && mix local.rebar --force
 
+# Version (injected from git tag or VERSION file)
+ARG APP_VERSION=dev
+RUN echo "$APP_VERSION" > ../VERSION
+
 # Copy dependency files first for caching
 COPY mix.exs mix.lock ./
 RUN mix deps.get --only $MIX_ENV
