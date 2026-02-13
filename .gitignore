@@ -40,6 +40,9 @@ Thumbs.db
 priv/keys/
 *.pem
 
+# Test-generated exports
+server/priv/exports/
+
 # Docker volumes
 deploy/pgdata/
 deploy/redisdata/
