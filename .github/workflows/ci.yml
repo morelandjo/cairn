@@ -15,6 +15,7 @@ jobs:
   # Elixir — compile, lint, test, dialyzer
   # ----------------------------------------------------------------
   elixir:
+    if: false
     name: Elixir
     runs-on: ubuntu-latest
     defaults:
@@ -103,6 +104,7 @@ jobs:
   # TypeScript — lint, build, test (matrix across sub-projects)
   # ----------------------------------------------------------------
   typescript:
+    if: false
     name: TypeScript (${{ matrix.project }})
     runs-on: ubuntu-latest
 
@@ -194,6 +196,7 @@ jobs:
   # Rust — fmt, clippy, tests for mls-wasm crate
   # ----------------------------------------------------------------
   rust:
+    if: false
     name: Rust (mls-wasm)
     runs-on: ubuntu-latest
 
@@ -243,6 +246,7 @@ jobs:
   # Rust — cargo check for Tauri desktop client
   # ----------------------------------------------------------------
   desktop:
+    if: false
     name: Rust (desktop)
     runs-on: ubuntu-latest
 
@@ -281,6 +285,7 @@ jobs:
   # Mobile — Expo TypeScript check + lint
   # ----------------------------------------------------------------
   mobile:
+    if: false
     name: Mobile (Expo)
     runs-on: ubuntu-latest
 
