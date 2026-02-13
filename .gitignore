@@ -57,6 +57,7 @@ coverage/
 
 # Internal docs and plan files
 docs/internal/
+docs/book/
 extracted-plan.txt
 federated-platform-plan.docx
 .claude/
