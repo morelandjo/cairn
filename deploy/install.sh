@@ -15,7 +15,7 @@ set -euo pipefail
 #   7. Runs database migrations and verifies health
 #   8. Sets up reverse proxy with TLS (Caddy or nginx)
 
-CAIRN_VERSION="0.1.2"
+CAIRN_VERSION="0.1.4"
 DEPLOY_DIR="/opt/cairn"
 COMPOSE_URL="https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/docker-compose.prod.yml"
 ENV_TEMPLATE_URL="https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/.env.example"
@@ -80,7 +80,7 @@ prompt() {
 }
 
 generate_secret() {
-  openssl rand -base64 48 | tr -d '\n'
+  openssl rand -hex 32
 }
 
 # ── System Provisioning ──
@@ -574,6 +574,24 @@ main() {
     fi
     sleep 2
   done
+
+  # Verify postgres password matches (catches stale volumes from failed installs)
+  local pg_password
+  pg_password=$(grep -oP 'POSTGRES_PASSWORD=\K.*' "$DEPLOY_DIR/.env" 2>/dev/null || true)
+  if [ -n "$pg_password" ]; then
+    if ! sudo -u cairn docker compose exec -T -e PGPASSWORD="$pg_password" postgres \
+        psql -U cairn -d cairn -c "SELECT 1" &>/dev/null; then
+      warn "Postgres password mismatch — resetting database volume..."
+      sudo -u cairn docker compose down -v postgres
+      sudo -u cairn docker compose up -d postgres
+      for _ in $(seq 1 15); do
+        if sudo -u cairn docker compose exec -T postgres pg_isready -U cairn &>/dev/null; then
+          break
+        fi
+        sleep 2
+      done
+    fi
+  fi
 
   log "Running database migrations..."
   sudo -u cairn docker compose run --rm -T server bin/cairn eval "Cairn.Release.migrate()"
