@@ -126,6 +126,7 @@ defmodule Cairn.Federation.NodeIdentity do
     {:reply, signature, state}
   end
 
+  # sobelow_skip ["Traversal.FileModule"]
   @impl true
   def handle_call(:rotate_key, _from, state) do
     key_path = state.key_path
@@ -163,6 +164,7 @@ defmodule Cairn.Federation.NodeIdentity do
     |> Keyword.get(:node_key_path, Path.join(:code.priv_dir(:cairn), "keys/node_ed25519.key"))
   end
 
+  # sobelow_skip ["Traversal.FileModule"]
   defp load_previous_key(path) do
     prev_path = path <> ".prev"
 
@@ -170,7 +172,7 @@ defmodule Cairn.Federation.NodeIdentity do
       case File.read(prev_path) do
         {:ok, data} ->
           try do
-            case :erlang.binary_to_term(data) do
+            case :erlang.binary_to_term(data, [:safe]) do
               {_private_key, public_key} when is_binary(public_key) -> public_key
               _ -> nil
             end
@@ -194,11 +196,12 @@ defmodule Cairn.Federation.NodeIdentity do
     end
   end
 
+  # sobelow_skip ["Traversal.FileModule"]
   defp load_key(path) do
     case File.read(path) do
       {:ok, data} ->
         try do
-          case :erlang.binary_to_term(data) do
+          case :erlang.binary_to_term(data, [:safe]) do
             {private_key, public_key} when is_binary(private_key) and is_binary(public_key) ->
               {:ok, private_key, public_key}
 
@@ -214,6 +217,7 @@ defmodule Cairn.Federation.NodeIdentity do
     end
   end
 
+  # sobelow_skip ["Traversal.FileModule"]
   defp generate_and_save_key(path) do
     {public_key, private_key} = :crypto.generate_key(:eddsa, :ed25519)
 

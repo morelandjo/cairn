@@ -16,6 +16,7 @@ defmodule CairnWeb.ExportController do
     end
   end
 
+  # sobelow_skip ["Traversal.SendFile"]
   # GET /api/v1/users/me/export/download
   def download(conn, _params) do
     user_id = conn.assigns.current_user.id

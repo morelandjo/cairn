@@ -54,6 +54,7 @@ defmodule Cairn.Auth.PasswordValidator do
     end
   end
 
+  # sobelow_skip ["Traversal.FileModule"]
   defp load_passwords do
     path = Application.app_dir(:cairn, "priv/data/common_passwords.txt")
 

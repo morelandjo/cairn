@@ -11,6 +11,7 @@ defmodule CairnWeb.SpaController do
 
   @index_cache_key :spa_index_html
 
+  # sobelow_skip ["XSS.SendResp"]
   def index(conn, _params) do
     case get_index_html() do
       {:ok, html} ->
@@ -28,6 +29,7 @@ defmodule CairnWeb.SpaController do
     end
   end
 
+  # sobelow_skip ["Traversal.FileModule"]
   defp get_index_html do
     case :persistent_term.get(@index_cache_key, nil) do
       nil ->

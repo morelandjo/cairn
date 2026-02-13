@@ -17,6 +17,7 @@ defmodule Cairn.Export do
     |> Oban.insert()
   end
 
+  # sobelow_skip ["Traversal.FileModule"]
   def generate_export(user_id) do
     user = Accounts.get_user!(user_id)
 

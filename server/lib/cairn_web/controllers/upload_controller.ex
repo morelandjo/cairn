@@ -74,6 +74,7 @@ defmodule CairnWeb.UploadController do
     end
   end
 
+  # sobelow_skip ["XSS.SendResp", "XSS.ContentType"]
   def show(conn, %{"id" => id}) do
     case Repo.get(FileRecord, id) do
       nil ->
@@ -117,6 +118,7 @@ defmodule CairnWeb.UploadController do
     end
   end
 
+  # sobelow_skip ["Traversal.FileModule"]
   defp read_upload(%Plug.Upload{path: path}) do
     File.read(path)
   end

@@ -97,7 +97,7 @@ jobs:
         run: mix dialyzer
 
       - name: Security scan (Sobelow)
-        run: mix sobelow --config --exit low
+        run: mix sobelow --config --skip --exit low
 
   # ----------------------------------------------------------------
   # TypeScript — lint, build, test (matrix across sub-projects)

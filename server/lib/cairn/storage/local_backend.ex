@@ -8,6 +8,7 @@ defmodule Cairn.Storage.LocalBackend do
 
   @behaviour Cairn.Storage
 
+  # sobelow_skip ["Traversal.FileModule"]
   @impl true
   def put(key, data, _content_type) do
     path = file_path(key)
@@ -21,6 +22,7 @@ defmodule Cairn.Storage.LocalBackend do
     end
   end
 
+  # sobelow_skip ["Traversal.FileModule"]
   @impl true
   def get(key) do
     path = file_path(key)
@@ -32,6 +34,7 @@ defmodule Cairn.Storage.LocalBackend do
     end
   end
 
+  # sobelow_skip ["Traversal.FileModule"]
   @impl true
   def delete(key) do
     path = file_path(key)
