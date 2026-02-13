@@ -1,0 +1,1 @@
+[exit: :low, format: "txt", ignore_files: [], ignore: ["Config.HTTPS", "Misc.BinToTerm"], out: nil, private: true, router: nil, skip: false, threshold: :low, verbose: false, version: false]

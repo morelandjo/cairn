@@ -1,0 +1,73 @@
+---
+# Cairn Deploy Playbook
+# Usage: ansible-playbook -i inventory.ini deploy.yml
+
+- name: Deploy Cairn
+  hosts: cairn
+  become: true
+  become_user: cairn
+
+  vars:
+    deploy_dir: /opt/cairn
+    compose_file: docker-compose.prod.yml
+
+  tasks:
+    - name: Copy docker-compose file
+      copy:
+        src: ../docker-compose.prod.yml
+        dest: "{{ deploy_dir }}/docker-compose.yml"
+        owner: cairn
+        group: cairn
+        mode: "0640"
+
+    - name: Copy .env file (if not exists)
+      copy:
+        src: ../.env
+        dest: "{{ deploy_dir }}/.env"
+        owner: cairn
+        group: cairn
+        mode: "0600"
+        force: false
+
+    - name: Pull latest images
+      command: docker compose pull
+      args:
+        chdir: "{{ deploy_dir }}"
+
+    - name: Start services
+      command: docker compose up -d
+      args:
+        chdir: "{{ deploy_dir }}"
+
+    - name: Wait for PostgreSQL to be healthy
+      command: docker compose exec -T postgres pg_isready -U cairn
+      args:
+        chdir: "{{ deploy_dir }}"
+      register: pg_ready
+      retries: 30
+      delay: 2
+      until: pg_ready.rc == 0
+
+    - name: Run database migrations
+      command: docker compose exec -T server bin/cairn eval "Cairn.Release.migrate()"
+      args:
+        chdir: "{{ deploy_dir }}"
+
+    - name: Verify health endpoint
+      uri:
+        url: "http://localhost:4000/health"
+        return_content: true
+      register: health
+      retries: 10
+      delay: 3
+      until: health.status == 200
+
+    - name: Show service status
+      command: docker compose ps
+      args:
+        chdir: "{{ deploy_dir }}"
+      register: status
+
+    - name: Print status
+      debug:
+        var: status.stdout_lines

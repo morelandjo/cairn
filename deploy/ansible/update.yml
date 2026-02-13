@@ -1,0 +1,53 @@
+---
+# Cairn Update Playbook
+# Usage: ansible-playbook -i inventory.ini update.yml
+
+- name: Update Cairn
+  hosts: cairn
+  become: true
+  become_user: cairn
+
+  vars:
+    deploy_dir: /opt/cairn
+
+  tasks:
+    - name: Create pre-update backup
+      include_tasks: backup.yml
+
+    - name: Pull latest images
+      command: docker compose pull
+      args:
+        chdir: "{{ deploy_dir }}"
+
+    - name: Rolling restart — server
+      command: docker compose up -d --no-deps server
+      args:
+        chdir: "{{ deploy_dir }}"
+
+    - name: Wait for server health
+      uri:
+        url: "http://localhost:4000/health"
+      register: health
+      retries: 15
+      delay: 3
+      until: health.status == 200
+
+    - name: Run database migrations
+      command: docker compose exec -T server bin/cairn eval "Cairn.Release.migrate()"
+      args:
+        chdir: "{{ deploy_dir }}"
+
+    - name: Rolling restart — SFU
+      command: docker compose up -d --no-deps sfu
+      args:
+        chdir: "{{ deploy_dir }}"
+
+    - name: Verify all services
+      command: docker compose ps
+      args:
+        chdir: "{{ deploy_dir }}"
+      register: status
+
+    - name: Print status
+      debug:
+        var: status.stdout_lines

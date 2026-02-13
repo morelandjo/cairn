@@ -1,0 +1,62 @@
+# Elixir / Phoenix
+_build/
+deps/
+*.beam
+*.ez
+.elixir_ls/
+.fetch
+erl_crash.dump
+*.ez
+server-*.tar
+/tmp/
+
+# Node.js
+node_modules/
+dist/
+.cache/
+*.tsbuildinfo
+
+# Rust (Phase 2+)
+target/
+Cargo.lock
+
+# Environment / Secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Private keys and certificates
+priv/keys/
+*.pem
+
+# Docker volumes
+deploy/pgdata/
+deploy/redisdata/
+deploy/meilidata/
+
+# Dialyzer PLT files (rebuilt in CI)
+server/priv/plts/*.plt
+server/priv/plts/*.plt.hash
+
+# Test / Coverage
+cover/
+htmlcov/
+.nyc_output/
+coverage/
+
+# Internal docs and plan files
+docs/
+extracted-plan.txt
+federated-platform-plan.docx
+.claude/
