@@ -84,6 +84,8 @@ defmodule Cairn.Chat.ThreadingTest do
           reply_to_id: parent.id
         })
 
+      Process.sleep(10)
+
       {:ok, r2} =
         Chat.create_message(%{
           content: "Second",
