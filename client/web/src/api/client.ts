@@ -22,6 +22,11 @@ export function configureClient(opts: {
   });
 }
 
+/** Set the base URL for all API requests (used by desktop to point at a remote server). */
+export function setBaseUrl(baseUrl: string) {
+  client.configure({ baseUrl });
+}
+
 export function apiFetch<T>(
   path: string,
   options: RequestInit = {},

@@ -8,6 +8,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { useAuthStore } from "./stores/authStore.ts";
+import { useServerUrlStore } from "./stores/serverUrlStore.ts";
 import LoginPage from "./pages/LoginPage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import ChannelView from "./pages/ChannelView.tsx";
@@ -16,6 +17,7 @@ import SecuritySettings from "./pages/SecuritySettings.tsx";
 import ServerSettings from "./pages/ServerSettings.tsx";
 import ServerDiscovery from "./pages/ServerDiscovery.tsx";
 import FederatedInvitePage from "./pages/FederatedInvitePage.tsx";
+import ServerConnect from "./pages/ServerConnect.tsx";
 import MainLayout from "./layouts/MainLayout.tsx";
 import { useChannelStore } from "./stores/channelStore.ts";
 import { useServerStore } from "./stores/serverStore.ts";
@@ -33,6 +35,28 @@ function RequireAuth({ children }: { children: ReactNode }) {
 
   if (!user && !accessToken) {
     return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+/** Gates routes on desktop until a server URL is configured. No-op in web mode. */
+function RequireServer({ children }: { children: ReactNode }) {
+  const serverUrl = useServerUrlStore((s) => s.serverUrl);
+  const isLoaded = useServerUrlStore((s) => s.isLoaded);
+  const loadServerUrl = useServerUrlStore((s) => s.loadServerUrl);
+  const setServerUrl = useServerUrlStore((s) => s.setServerUrl);
+
+  useEffect(() => {
+    loadServerUrl();
+  }, [loadServerUrl]);
+
+  if (!isLoaded) {
+    return <div className="loading-screen">Loading...</div>;
+  }
+
+  if (serverUrl === null) {
+    return <ServerConnect onConnect={(url) => setServerUrl(url)} />;
   }
 
   return <>{children}</>;
@@ -184,7 +208,9 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppRoutes />
+      <RequireServer>
+        <AppRoutes />
+      </RequireServer>
     </BrowserRouter>
   );
 }

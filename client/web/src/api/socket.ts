@@ -39,6 +39,13 @@ interface SocketCallbacks {
   onDmRequestResponse?: (data: unknown) => void;
 }
 
+let socketBaseUrl = "";
+
+/** Set base URL for WebSocket connections (used by desktop to point at a remote server). */
+export function setSocketBaseUrl(baseUrl: string) {
+  socketBaseUrl = baseUrl;
+}
+
 let callbacks: SocketCallbacks | null = null;
 
 export function setSocketCallbacks(cb: SocketCallbacks) {
@@ -49,7 +56,8 @@ export function connectSocket(token: string) {
   if (socket) {
     socket.disconnect();
   }
-  socket = new Socket("/socket", {
+  const endpoint = socketBaseUrl ? `${socketBaseUrl}/socket` : "/socket";
+  socket = new Socket(endpoint, {
     params: { token },
   });
   socket.connect();
