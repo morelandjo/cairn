@@ -1,0 +1,55 @@
+name: Release Mobile
+
+on:
+  push:
+    tags: ["v*"]
+
+concurrency:
+  group: release-mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Both platforms require developer account credentials configured in EAS — see docs/plans/future-work.md #15
+    if: false # Disabled until EAS credentials are configured
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ios, android]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-bindgen-cli
+        run: command -v wasm-bindgen || cargo install wasm-bindgen-cli
+
+      - name: Build proto
+        run: |
+          cd proto
+          npm ci
+          npm run build
+
+      - name: Install mobile dependencies
+        run: |
+          cd client/mobile
+          npm ci
+
+      - name: Set up EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Build with EAS
+        run: |
+          cd client/mobile
+          eas build --platform ${{ matrix.platform }} --profile production --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

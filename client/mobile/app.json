@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "Cairn",
+    "slug": "cairn",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "scheme": "cairn",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a1a2e"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.cairn.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": true,
+        "NSMicrophoneUsageDescription": "Cairn needs microphone access for voice channels",
+        "NSFaceIDUsageDescription": "Use Face ID to unlock Cairn",
+        "UIBackgroundModes": [
+          "audio",
+          "voip",
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a1a2e"
+      },
+      "package": "dev.cairn.app",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-local-authentication",
+      "expo-notifications",
+      "expo-sqlite"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "9091a438-f872-4ed0-ba68-9e4b796c3839"
+      }
+    },
+    "owner": "cairn"
+  }
+}

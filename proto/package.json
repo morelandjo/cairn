@@ -1,0 +1,42 @@
+{
+  "name": "@cairn/proto",
+  "version": "0.1.0",
+  "description": "Cairn protocol types, constants, and shared definitions",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/esm/index.d.ts"
+    },
+    "./api": {
+      "import": "./dist/esm/api/index.js",
+      "require": "./dist/cjs/api/index.js",
+      "types": "./dist/esm/api/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run build:wasm && npm run build:esm && npm run build:cjs && npm run postbuild",
+    "postbuild": "node -e \"const fs=require('fs'),p=require('path');fs.mkdirSync(p.join('dist','mls-wasm','pkg'),{recursive:true});for(const f of['mls_wasm.js','mls_wasm.d.ts','mls_wasm_bg.wasm'])fs.copyFileSync(p.join('mls-wasm','pkg',f),p.join('dist','mls-wasm','pkg',f))\"",
+    "build:wasm": "cargo build --manifest-path mls-wasm/Cargo.toml --target wasm32-unknown-unknown --release && wasm-bindgen mls-wasm/target/wasm32-unknown-unknown/release/mls_wasm.wasm --out-dir mls-wasm/pkg --target web --typescript",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "libsodium-wrappers-sumo": "^0.7.15"
+  }
+}

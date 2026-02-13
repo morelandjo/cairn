@@ -1,0 +1,333 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ----------------------------------------------------------------
+  # Elixir — compile, lint, test, dialyzer
+  # ----------------------------------------------------------------
+  elixir:
+    name: Elixir
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: cairn
+          POSTGRES_PASSWORD: cairn_dev
+          POSTGRES_DB: cairn_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cairn"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:8
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      MIX_ENV: test
+      PGPORT: "5432"
+      REDIS_URL: redis://localhost:6379/0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Erlang & Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "28"
+          elixir-version: "1.19"
+
+      - name: Cache deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            server/deps
+            server/_build
+          key: elixir-${{ runner.os }}-${{ hashFiles('server/mix.lock') }}
+          restore-keys: |
+            elixir-${{ runner.os }}-
+
+      - name: Cache Dialyzer PLTs
+        uses: actions/cache@v4
+        with:
+          path: server/priv/plts
+          key: plts-${{ runner.os }}-${{ hashFiles('server/mix.lock') }}
+          restore-keys: |
+            plts-${{ runner.os }}-
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Check formatting
+        run: mix format --check-formatted
+
+      - name: Compile (warnings as errors)
+        run: mix compile --warnings-as-errors
+
+      - name: Run tests
+        run: mix test
+
+      - name: Run Dialyzer
+        run: mix dialyzer
+
+      - name: Security scan (Sobelow)
+        run: mix sobelow --config --skip --exit low
+
+  # ----------------------------------------------------------------
+  # TypeScript — lint, build, test (matrix across sub-projects)
+  # ----------------------------------------------------------------
+  typescript:
+    name: TypeScript (${{ matrix.project }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [proto, sfu, client/web]
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.project }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      # mediasoup needs Python 3 + pip for native build (SFU only)
+      - name: Install mediasoup build dependencies
+        if: matrix.project == 'sfu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+
+      # Rust toolchain needed for proto (WASM build) and client/web (proto dependency)
+      - name: Set up Rust toolchain
+        if: matrix.project == 'proto' || matrix.project == 'client/web'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Cargo artifacts
+        if: matrix.project == 'proto' || matrix.project == 'client/web'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            proto/mls-wasm/target/
+          key: cargo-wasm-${{ runner.os }}-${{ hashFiles('proto/mls-wasm/Cargo.toml') }}
+          restore-keys: |
+            cargo-wasm-${{ runner.os }}-
+
+      - name: Install wasm-bindgen-cli
+        if: matrix.project == 'proto' || matrix.project == 'client/web'
+        run: command -v wasm-bindgen || cargo install wasm-bindgen-cli
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: ${{ matrix.project }}/node_modules
+          key: node-${{ runner.os }}-${{ matrix.project }}-${{ hashFiles(format('{0}/package-lock.json', matrix.project)) }}
+          restore-keys: |
+            node-${{ runner.os }}-${{ matrix.project }}-
+
+      - name: Build proto dependency (for client/web)
+        if: matrix.project == 'client/web'
+        working-directory: proto
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (if script exists)
+        run: |
+          if npm run --silent lint --if-present 2>/dev/null; then
+            echo "Lint passed"
+          fi
+        continue-on-error: false
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: Security audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+  # ----------------------------------------------------------------
+  # Rust — fmt, clippy, tests for mls-wasm crate
+  # ----------------------------------------------------------------
+  rust:
+    name: Rust (mls-wasm)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: proto/mls-wasm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Cargo artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            proto/mls-wasm/target/
+          key: cargo-rust-${{ runner.os }}-${{ hashFiles('proto/mls-wasm/Cargo.toml') }}
+          restore-keys: |
+            cargo-rust-${{ runner.os }}-
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Clippy (native)
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Clippy (WASM target)
+        run: cargo clippy --target wasm32-unknown-unknown --all-features -- -D warnings
+
+      - name: Run tests
+        run: cargo test --all
+
+      - name: Security audit
+        run: cargo install cargo-audit --quiet && cargo audit
+        continue-on-error: true
+
+  # ----------------------------------------------------------------
+  # Rust — cargo check for Tauri desktop client
+  # ----------------------------------------------------------------
+  desktop:
+    name: Rust (desktop)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: client/desktop
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Cache Cargo artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            client/desktop/target/
+          key: cargo-desktop-${{ runner.os }}-${{ hashFiles('client/desktop/Cargo.toml') }}
+          restore-keys: |
+            cargo-desktop-${{ runner.os }}-
+
+      - name: Cargo check
+        run: cargo check
+
+  # ----------------------------------------------------------------
+  # Mobile — Expo TypeScript check + lint
+  # ----------------------------------------------------------------
+  mobile:
+    name: Mobile (Expo)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: client/mobile
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Cargo artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            proto/mls-wasm/target/
+          key: cargo-wasm-${{ runner.os }}-${{ hashFiles('proto/mls-wasm/Cargo.toml') }}
+          restore-keys: |
+            cargo-wasm-${{ runner.os }}-
+
+      - name: Install wasm-bindgen-cli
+        run: command -v wasm-bindgen || cargo install wasm-bindgen-cli
+
+      - name: Build proto dependency
+        working-directory: proto
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx expo lint
