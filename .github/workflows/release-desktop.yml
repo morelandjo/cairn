@@ -82,3 +82,46 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: --target ${{ matrix.target }} --bundles ${{ matrix.bundle }}
+
+  rename-assets:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Rename release assets with OS labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          repo="${GITHUB_REPOSITORY}"
+
+          # Get release ID (may be draft)
+          release_id=$(gh api "repos/${repo}/releases" --jq ".[] | select(.tag_name==\"${tag}\") | .id")
+          if [ -z "$release_id" ]; then
+            echo "Release not found for tag ${tag}"
+            exit 1
+          fi
+
+          # Fetch all assets
+          assets=$(gh api "repos/${repo}/releases/${release_id}/assets" --jq '.[] | "\(.id) \(.name)"')
+
+          echo "$assets" | while read -r asset_id name; do
+            new_name="$name"
+            case "$name" in
+              *aarch64.app.tar.gz*)   new_name="Cairn-macOS-Apple-Silicon.app.tar.gz" ;;
+              *x64.app.tar.gz*)       new_name="Cairn-macOS-Intel.app.tar.gz" ;;
+              *.AppImage)             new_name="Cairn-Linux-x86_64.AppImage" ;;
+              *amd64.deb)             new_name="Cairn-Linux-x86_64.deb" ;;
+              *x64*.msi)              new_name="Cairn-Windows-x64.msi" ;;
+              *aarch64.app.tar.gz.sig*) new_name="Cairn-macOS-Apple-Silicon.app.tar.gz.sig" ;;
+              *x64.app.tar.gz.sig*)   new_name="Cairn-macOS-Intel.app.tar.gz.sig" ;;
+              *.AppImage.sig)         new_name="Cairn-Linux-x86_64.AppImage.sig" ;;
+              *.msi.sig)              new_name="Cairn-Windows-x64.msi.sig" ;;
+            esac
+
+            if [ "$new_name" != "$name" ]; then
+              echo "Renaming: $name -> $new_name"
+              gh api "repos/${repo}/releases/assets/${asset_id}" -X PATCH -f name="$new_name"
+            fi
+          done
