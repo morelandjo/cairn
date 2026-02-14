@@ -9,6 +9,25 @@ defmodule Cairn.Federation do
   alias Cairn.Federation.FederatedUser
   alias Cairn.Federation.FederationActivity
 
+  # ── URL Helpers ──
+
+  @doc "Build a URL for the local node using the correct scheme."
+  def local_url(path \\ "") do
+    scheme = if Application.get_env(:cairn, :force_ssl, true), do: "https", else: "http"
+    "#{scheme}://#{config_domain()}#{path}"
+  end
+
+  @doc "Build a URL for a remote federated node using its known transport security."
+  def node_url(%FederatedNode{} = node, path \\ "") do
+    scheme = if node.secure, do: "https", else: "http"
+    "#{scheme}://#{node.domain}#{path}"
+  end
+
+  defp config_domain do
+    config = Application.get_env(:cairn, :federation, [])
+    Keyword.get(config, :domain, "localhost")
+  end
+
   # ── Federated Nodes ──
 
   def list_nodes do

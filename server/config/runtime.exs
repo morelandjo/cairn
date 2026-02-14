@@ -69,18 +69,18 @@ end
 federation_enabled = System.get_env("FEDERATION_ENABLED") in ~w(true 1)
 
 if federation_enabled do
-  # Federation requires SSL — override if operator tried to disable it
   if force_ssl_env == "false" do
-    IO.puts(:stderr, """
-    [warning] FORCE_SSL=false is incompatible with federation. \
-    SSL enforcement has been re-enabled. To disable SSL, also disable federation.\
-    """)
+    IO.puts(:stderr,
+      "[warning] Federation without SSL — transport is unencrypted. " <>
+      "Federation metadata and public channel content can be intercepted in transit."
+    )
   end
 
-  config :cairn, :force_ssl, true
+  allow_insecure = System.get_env("FEDERATION_ALLOW_INSECURE") in ~w(true 1)
 
   config :cairn, :federation,
     enabled: true,
+    allow_insecure: allow_insecure,
     domain: System.get_env("CAIRN_DOMAIN") || "localhost",
     node_key_path: System.get_env("NODE_KEY_PATH")
 end

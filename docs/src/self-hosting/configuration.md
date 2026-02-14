@@ -34,8 +34,9 @@ cairn-ctl config CAIRN_DOMAIN x.com # set one
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `SERVER_PORT` | Host port mapped to the server container | `4000` |
-| `FORCE_SSL` | Enforce HTTPS redirects. Cannot be `false` when federation is enabled. | `true` |
+| `FORCE_SSL` | Enforce HTTPS redirects | `true` |
 | `FEDERATION_ENABLED` | Enable federation with other Cairn instances | `false` |
+| `FEDERATION_ALLOW_INSECURE` | Allow federating with HTTP-only (insecure) nodes. See [Federation](federation.md#insecure-federation). | `false` |
 | `TURN_URLS` | Comma-separated TURN server URLs | `turn:<CAIRN_DOMAIN>:3478` |
 | `STORAGE_BACKEND` | File storage backend: `local` or `s3` | `local` |
 | `CAIRN_IMAGE` | Custom server Docker image | `ghcr.io/morelandjo/cairn-server:latest` |
@@ -57,7 +58,7 @@ Set `STORAGE_BACKEND=s3` and configure these additional variables:
 
 Cairn does not terminate TLS itself — use a reverse proxy (see [Reverse Proxy](reverse-proxy.md)). The `FORCE_SSL` flag controls whether the server issues HTTP-to-HTTPS redirects and sets HSTS headers.
 
-Setting `FORCE_SSL=false` disables these redirects, which is useful when running behind a VPN, Tailscale, or Cloudflare Tunnel where TLS is handled externally. Federation requires SSL and will override this setting to `true`.
+Setting `FORCE_SSL=false` disables these redirects, which is useful when running behind a VPN, Tailscale, or Cloudflare Tunnel where TLS is handled externally. When federation is enabled without SSL, a warning is logged but the server will start — see [Insecure Federation](federation.md#insecure-federation) for details.
 
 ### SFU
 

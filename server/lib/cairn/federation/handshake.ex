@@ -20,10 +20,11 @@ defmodule Cairn.Federation.Handshake do
   def initiate(remote_domain) do
     config = Application.get_env(:cairn, :federation, [])
     local_domain = Keyword.get(config, :domain, "localhost")
+    allow_insecure = Keyword.get(config, :allow_insecure, false)
 
-    with {:ok, well_known} <- fetch_well_known(remote_domain),
+    with {:ok, well_known, secure} <- fetch_well_known(remote_domain, allow_insecure),
          :ok <- validate_protocol(well_known),
-         {:ok, node} <- register_or_update_node(well_known, remote_domain),
+         {:ok, node} <- register_or_update_node(well_known, remote_domain, secure),
          :ok <- send_follow(node, local_domain) do
       {:ok, node}
     end
@@ -41,7 +42,7 @@ defmodule Cairn.Federation.Handshake do
     accept =
       ActivityPub.wrap_activity(
         "Accept",
-        "https://#{local_domain}",
+        Federation.local_url(),
         activity,
         local_domain
       )
@@ -59,15 +60,30 @@ defmodule Cairn.Federation.Handshake do
 
   # ── Private ──
 
-  defp fetch_well_known(domain) do
-    url = "https://#{domain}/.well-known/cairn-federation"
+  defp fetch_well_known(domain, allow_insecure) do
+    https_url = "https://#{domain}/.well-known/cairn-federation"
 
-    case Req.get(url, receive_timeout: 10_000) do
+    case Req.get(https_url, receive_timeout: 10_000) do
       {:ok, %Req.Response{status: 200, body: body}} when is_map(body) ->
-        {:ok, body}
+        {:ok, body, true}
 
       {:ok, %Req.Response{status: status}} ->
         {:error, "Remote returned HTTP #{status}"}
+
+      {:error, _reason} when allow_insecure ->
+        Logger.warning("HTTPS failed for #{domain}, falling back to HTTP (allow_insecure=true)")
+        http_url = "http://#{domain}/.well-known/cairn-federation"
+
+        case Req.get(http_url, receive_timeout: 10_000) do
+          {:ok, %Req.Response{status: 200, body: body}} when is_map(body) ->
+            {:ok, body, false}
+
+          {:ok, %Req.Response{status: status}} ->
+            {:error, "Remote returned HTTP #{status}"}
+
+          {:error, reason} ->
+            {:error, "Failed to reach #{domain}: #{inspect(reason)}"}
+        end
 
       {:error, reason} ->
         {:error, "Failed to reach #{domain}: #{inspect(reason)}"}
@@ -84,7 +100,7 @@ defmodule Cairn.Federation.Handshake do
 
   defp validate_protocol(_), do: {:error, "Invalid well-known response"}
 
-  defp register_or_update_node(well_known, domain) do
+  defp register_or_update_node(well_known, domain, secure) do
     case Federation.get_node_by_domain(domain) do
       nil ->
         Federation.register_node(%{
@@ -94,7 +110,8 @@ defmodule Cairn.Federation.Handshake do
           inbox_url: well_known["inbox_url"],
           protocol_version: well_known["protocol_version"],
           privacy_manifest: well_known["privacy_manifest"] || %{},
-          status: "pending"
+          status: "pending",
+          secure: secure
         })
 
       existing ->
@@ -102,7 +119,8 @@ defmodule Cairn.Federation.Handshake do
           node_id: well_known["node_id"],
           public_key: well_known["public_key"],
           inbox_url: well_known["inbox_url"],
-          protocol_version: well_known["protocol_version"]
+          protocol_version: well_known["protocol_version"],
+          secure: secure
         })
     end
   end
@@ -111,8 +129,8 @@ defmodule Cairn.Federation.Handshake do
     follow =
       ActivityPub.wrap_activity(
         "Follow",
-        "https://#{local_domain}",
-        "https://#{node.domain}",
+        Federation.local_url(),
+        Federation.node_url(node),
         local_domain
       )
 

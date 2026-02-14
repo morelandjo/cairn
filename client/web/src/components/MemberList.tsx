@@ -10,6 +10,7 @@ export default function MemberList() {
     did: string;
     instance: string;
     name: string;
+    insecure?: boolean;
   } | null>(null);
 
   const online = members.filter((m) => onlineUsers.has(m.id));
@@ -20,6 +21,7 @@ export default function MemberList() {
     const isFederated = "home_instance" in m && !!extra.home_instance;
     const homeInstance = isFederated ? extra.home_instance as string : null;
     const memberDid = extra.did as string | undefined;
+    const isInsecure = isFederated && extra.secure === false;
 
     return (
       <div key={m.id} className={`member-item ${onlineUsers.has(m.id) ? "online" : "offline"}`}>
@@ -39,6 +41,13 @@ export default function MemberList() {
             </svg>
           </span>
         )}
+        {isInsecure && (
+          <span className="member-insecure-badge" title="Insecure instance (no HTTPS)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z" />
+            </svg>
+          </span>
+        )}
         {isFederated && homeInstance && memberDid && (
           <button
             className="btn-dm-federated"
@@ -48,6 +57,7 @@ export default function MemberList() {
                 did: memberDid,
                 instance: homeInstance,
                 name: m.display_name || m.username,
+                insecure: isInsecure,
               })
             }
           >
@@ -75,6 +85,7 @@ export default function MemberList() {
           recipientDid={dmTarget.did}
           recipientInstance={dmTarget.instance}
           recipientName={dmTarget.name}
+          recipientInsecure={dmTarget.insecure}
           onClose={() => setDmTarget(null)}
         />
       )}

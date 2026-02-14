@@ -70,6 +70,7 @@ defmodule CairnWeb.SpaController do
       max_upload_size: Application.get_env(:cairn, :max_upload_size, 10_485_760),
       voice_enabled: Application.get_env(:cairn, :voice_enabled, true),
       force_ssl: Application.get_env(:cairn, :force_ssl, true),
+      federation_allow_insecure: Keyword.get(federation_config, :allow_insecure, false),
       version: Application.spec(:cairn, :vsn) |> to_string()
     }
   end

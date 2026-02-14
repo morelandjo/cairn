@@ -19,6 +19,7 @@ import ServerDiscovery from "./pages/ServerDiscovery.tsx";
 import FederatedInvitePage from "./pages/FederatedInvitePage.tsx";
 import ServerConnect from "./pages/ServerConnect.tsx";
 import MainLayout from "./layouts/MainLayout.tsx";
+import InsecureBanner from "./components/InsecureBanner.tsx";
 import { useChannelStore } from "./stores/channelStore.ts";
 import { useServerStore } from "./stores/serverStore.ts";
 import "./App.css";
@@ -208,6 +209,7 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <InsecureBanner />
       <RequireServer>
         <AppRoutes />
       </RequireServer>

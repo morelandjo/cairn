@@ -3,18 +3,22 @@ defmodule Cairn.Federation.ActivityPub do
   ActivityPub serializers for converting internal entities to AP JSON-LD format.
   """
 
-  def serialize_user(user, domain) do
+  alias Cairn.Federation
+
+  def serialize_user(user, _domain) do
+    user_url = Federation.local_url("/users/#{user.username}")
+
     actor = %{
       "@context" => "https://www.w3.org/ns/activitystreams",
       "type" => "Person",
-      "id" => "https://#{domain}/users/#{user.username}",
+      "id" => user_url,
       "preferredUsername" => user.username,
       "name" => user.display_name || user.username,
-      "inbox" => "https://#{domain}/users/#{user.username}/inbox",
-      "outbox" => "https://#{domain}/users/#{user.username}/outbox",
+      "inbox" => "#{user_url}/inbox",
+      "outbox" => "#{user_url}/outbox",
       "publicKey" => %{
-        "id" => "https://#{domain}/users/#{user.username}#main-key",
-        "owner" => "https://#{domain}/users/#{user.username}",
+        "id" => "#{user_url}#main-key",
+        "owner" => user_url,
         "publicKeyPem" => user.identity_public_key || ""
       }
     }
@@ -25,32 +29,35 @@ defmodule Cairn.Federation.ActivityPub do
     end
   end
 
-  def serialize_server(server, domain) do
+  def serialize_server(server, _domain) do
     %{
       "@context" => "https://www.w3.org/ns/activitystreams",
       "type" => "Group",
-      "id" => "https://#{domain}/servers/#{server.id}",
+      "id" => Federation.local_url("/servers/#{server.id}"),
       "name" => server.name,
       "summary" => server.description
     }
   end
 
-  def serialize_channel(channel, domain) do
+  def serialize_channel(channel, _domain) do
     %{
       "@context" => "https://www.w3.org/ns/activitystreams",
       "type" => "OrderedCollection",
-      "id" => "https://#{domain}/channels/#{channel.id}",
+      "id" => Federation.local_url("/channels/#{channel.id}"),
       "name" => channel.name,
       "summary" => channel.description
     }
   end
 
-  def serialize_message(message, channel_id, domain, author \\ nil) do
+  def serialize_message(message, channel_id, _domain, author \\ nil) do
+    config = Application.get_env(:cairn, :federation, [])
+    domain = Keyword.get(config, :domain, "localhost")
+
     note = %{
       "@context" => "https://www.w3.org/ns/activitystreams",
       "type" => "Note",
-      "id" => "https://#{domain}/channels/#{channel_id}/messages/#{message.id}",
-      "attributedTo" => "https://#{domain}/users/#{message.author_id}",
+      "id" => Federation.local_url("/channels/#{channel_id}/messages/#{message.id}"),
+      "attributedTo" => Federation.local_url("/users/#{message.author_id}"),
       "content" => message.content,
       "published" => DateTime.to_iso8601(message.inserted_at),
       "cairn:channelId" => channel_id
@@ -69,11 +76,11 @@ defmodule Cairn.Federation.ActivityPub do
     end
   end
 
-  def wrap_activity(type, actor_uri, object, domain) do
+  def wrap_activity(type, actor_uri, object, _domain) do
     %{
       "@context" => "https://www.w3.org/ns/activitystreams",
       "type" => type,
-      "id" => "https://#{domain}/activities/#{Ecto.UUID.generate()}",
+      "id" => Federation.local_url("/activities/#{Ecto.UUID.generate()}"),
       "actor" => actor_uri,
       "object" => object
     }

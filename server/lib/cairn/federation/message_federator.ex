@@ -19,7 +19,7 @@ defmodule Cairn.Federation.MessageFederator do
       activity =
         ActivityPub.wrap_activity(
           "Create",
-          "https://#{domain}/users/#{message.author_id}",
+          Federation.local_url("/users/#{message.author_id}"),
           object,
           domain
         )
@@ -37,7 +37,7 @@ defmodule Cairn.Federation.MessageFederator do
       activity =
         ActivityPub.wrap_activity(
           "Update",
-          "https://#{domain}/users/#{message.author_id}",
+          Federation.local_url("/users/#{message.author_id}"),
           object,
           domain
         )
@@ -52,8 +52,8 @@ defmodule Cairn.Federation.MessageFederator do
       activity =
         ActivityPub.wrap_activity(
           "Delete",
-          "https://#{domain}/users/#{message.author_id}",
-          "https://#{domain}/channels/#{channel_id}/messages/#{message.id}",
+          Federation.local_url("/users/#{message.author_id}"),
+          Federation.local_url("/channels/#{channel_id}/messages/#{message.id}"),
           domain
         )
 

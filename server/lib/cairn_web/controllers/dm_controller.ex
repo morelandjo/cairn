@@ -276,12 +276,10 @@ defmodule CairnWeb.DmController do
 
     # Only deliver hints when federation is enabled
     if Keyword.get(config, :enabled, false) do
-      domain = Keyword.get(config, :domain, "localhost")
-
       activity = %{
         "@context" => "https://www.w3.org/ns/activitystreams",
         "type" => "Invite",
-        "actor" => "https://#{domain}/users/#{sender.username}",
+        "actor" => Cairn.Federation.local_url("/users/#{sender.username}"),
         "object" => %{
           "type" => "cairn:DmHint",
           "cairn:channelId" => channel.id,

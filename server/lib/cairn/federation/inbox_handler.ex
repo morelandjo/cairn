@@ -65,6 +65,7 @@ defmodule Cairn.Federation.InboxHandler do
     with {:ok, _} <- validate_object(object),
          {:ok, channel_id} <- extract_channel_id(object),
          {:ok, channel} <- get_channel(channel_id),
+         :ok <- check_channel_security(channel, node),
          {:ok, federated_user} <- resolve_author(activity["actor"], object, node) do
       attrs = %{
         content: object["content"],
@@ -254,6 +255,16 @@ defmodule Cairn.Federation.InboxHandler do
 
       user ->
         {:ok, user}
+    end
+  end
+
+  # ── Channel security ──
+
+  defp check_channel_security(channel, node) do
+    if channel.type in ["private", "voice"] and not node.secure do
+      {:error, :insecure_node_blocked_from_secure_channel}
+    else
+      :ok
     end
   end
 

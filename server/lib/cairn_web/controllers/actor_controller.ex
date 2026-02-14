@@ -2,6 +2,7 @@ defmodule CairnWeb.ActorController do
   use CairnWeb, :controller
 
   alias Cairn.Accounts
+  alias Cairn.Federation
   alias Cairn.Federation.ActivityPub
 
   @doc "GET /users/:username — returns ActivityPub actor profile."
@@ -33,9 +34,6 @@ defmodule CairnWeb.ActorController do
 
   @doc "GET /users/:username/outbox — returns user's outbox."
   def outbox(conn, %{"username" => username}) do
-    config = Application.get_env(:cairn, :federation, [])
-    domain = Keyword.get(config, :domain, "localhost")
-
     case Accounts.get_user_by_username(username) do
       nil ->
         conn
@@ -48,7 +46,7 @@ defmodule CairnWeb.ActorController do
         |> json(%{
           "@context" => "https://www.w3.org/ns/activitystreams",
           "type" => "OrderedCollection",
-          "id" => "https://#{domain}/users/#{username}/outbox",
+          "id" => Federation.local_url("/users/#{username}/outbox"),
           "totalItems" => 0,
           "orderedItems" => []
         })

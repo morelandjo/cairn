@@ -33,9 +33,87 @@ CAIRN_DOMAIN=cairn.example.com
 
 ### Requirements
 
-- **SSL is mandatory.** Federation forces `FORCE_SSL=true` — you cannot disable SSL while federation is enabled.
-- **A publicly reachable domain.** Other instances need to reach your server over HTTPS.
-- **A reverse proxy with TLS** — see [Reverse Proxy](reverse-proxy.md).
+- **A reachable address.** Other instances need to reach your server — either a domain name or an IP address.
+- **HTTPS is strongly recommended.** Use a reverse proxy with TLS — see [Reverse Proxy](reverse-proxy.md). Federation works without HTTPS, but traffic will be unencrypted (see [Insecure Federation](#insecure-federation) below).
+
+## Transport security model
+
+Cairn distinguishes between two layers of encryption:
+
+- **Transport encryption (HTTPS):** Protects all data in transit between instances — federation metadata, public channel messages, authentication headers, and API calls. This is what `FORCE_SSL` controls.
+- **End-to-end encryption (E2EE):** Protects message content in private and voice channels using MLS/Double Ratchet. E2EE works regardless of transport — even over HTTP, message content in private channels is encrypted client-to-client.
+
+An instance is considered **secure** if it uses HTTPS, and **insecure** if it uses plain HTTP. The well-known federation endpoint advertises each instance's security status so other nodes can make informed policy decisions.
+
+## Insecure federation
+
+By default, Cairn only federates with HTTPS instances. To allow federation with HTTP-only nodes (for example, instances on private networks or IP addresses without TLS), enable `FEDERATION_ALLOW_INSECURE`:
+
+```sh
+cairn-ctl federation allow-insecure true
+cairn-ctl restart
+```
+
+Or set it in `.env`:
+
+```env
+FEDERATION_ALLOW_INSECURE=true
+```
+
+### What "insecure" means
+
+When federating with an HTTP-only instance, the following data is sent in plain text over the network and can be intercepted by anyone on the network path:
+
+- Federation metadata (node IDs, public keys, handshake messages)
+- Public channel messages and edits
+- ActivityPub activity payloads (author info, timestamps)
+- HTTP Signature headers (though signatures themselves prevent tampering)
+
+### What remains protected
+
+- **Private and voice channel content** — these channels use E2EE (MLS key agreement + AES-128-GCM), so message content is encrypted client-to-client regardless of transport.
+- **DMs** — never federated at all; they stay on the sender's home instance.
+- **User passwords** — only sent between the user's client and their own home instance, not between instances.
+
+### Restrictions on insecure nodes
+
+Even with `FEDERATION_ALLOW_INSECURE=true`, insecure nodes face restrictions:
+
+- **Blocked from E2EE channels.** Messages from insecure nodes are rejected for private and voice channels. This prevents metadata leakage (who is sending, when, to which channel) over unencrypted transport.
+- **Visible warnings.** Users on insecure instances and users interacting with insecure peers see clear warnings (see below).
+
+### HTTPS-first handshake
+
+When initiating federation with a new remote instance, Cairn always tries HTTPS first. HTTP is only attempted as a fallback if HTTPS fails and `FEDERATION_ALLOW_INSECURE` is enabled. If `FEDERATION_ALLOW_INSECURE` is `false` (the default), HTTP-only nodes are rejected.
+
+The transport security status of each node is recorded and used for all subsequent communication.
+
+### User-facing warnings
+
+Cairn shows clear warnings so users understand the security implications:
+
+**On insecure instances (HTTP):**
+A persistent red banner appears at the top of the app:
+
+> This server is not using HTTPS. Your connection is not encrypted. Passwords, messages, and files are sent in plain text.
+
+This banner is shown on all pages, including login and registration. Users can dismiss it, but it reappears on each page load.
+
+**When interacting with insecure federated users:**
+- Federated members from insecure instances show an unlocked-shield icon next to their federation badge in the member list.
+- When sending a DM request to a user on an insecure instance, a warning is shown:
+
+> This user's server does not use HTTPS. DM request metadata will be sent over an unencrypted connection.
+
+### When to use insecure federation
+
+Insecure federation is appropriate for:
+
+- **Private/home networks** — instances on a LAN or VPN where network traffic is already trusted
+- **Development and testing** — local instances without TLS certificates
+- **IP-only deployments** — servers without a domain name where Let's Encrypt isn't an option
+
+It is **not recommended** for public-facing instances accessible over the internet.
 
 ## How it works
 
@@ -44,10 +122,10 @@ CAIRN_DOMAIN=cairn.example.com
 Each federated instance publishes a well-known endpoint at:
 
 ```
-https://cairn.example.com/.well-known/cairn
+https://cairn.example.com/.well-known/cairn-federation
 ```
 
-This returns the instance's public Ed25519 signing key, which other instances use to verify message authenticity.
+This returns the instance's public Ed25519 signing key, protocol version, inbox URL, privacy manifest, and transport security status (`secure: true/false`).
 
 ### Authentication
 
@@ -83,7 +161,21 @@ List known federation nodes:
 cairn-ctl federation list
 ```
 
-This shows all remote instances your server has communicated with and their current status.
+This shows all remote instances your server has communicated with, their current status, and whether they use a secure (HTTPS) or insecure (HTTP) connection.
+
+Check or change the insecure federation policy:
+
+```sh
+cairn-ctl federation allow-insecure         # show current value
+cairn-ctl federation allow-insecure true    # allow HTTP peers
+cairn-ctl federation allow-insecure false   # require HTTPS peers
+```
+
+After changing the policy, restart services:
+
+```sh
+cairn-ctl restart
+```
 
 ## Rate limiting
 

@@ -38,7 +38,8 @@ The installer will:
 | HTTP port | Port the server listens on | `4000` |
 | Auto-generate secrets? | Generate all cryptographic secrets automatically | Yes |
 | Enable federation? | Allow communication with other Cairn instances | No |
-| Enable SSL enforcement? | Redirect HTTP to HTTPS (required if federation is enabled) | Yes |
+| Enable SSL enforcement? | Redirect HTTP to HTTPS | Yes |
+| Allow insecure federation? | Allow HTTP-only servers to federate (shown when federation is enabled) | No |
 | Reverse proxy | Caddy (recommended), Nginx + Let's Encrypt, or None | Caddy |
 | Use S3 for file storage? | Store uploads in S3 instead of local disk | No |
 | Admin username | Username for the first admin account | _(required)_ |
