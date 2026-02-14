@@ -62,9 +62,10 @@ The installer creates your admin account at the end. To create additional accoun
 cairn-ctl admin create <username> <password>
 ```
 
-1. **Create your first server** — log in and click "Create Server" to set up a community
-2. **Connect a client** — open `https://your-domain.com` in a browser, or install the [desktop](../clients/desktop.md) or [mobile](../clients/mobile.md) app
-3. **Explore advanced options** — see [Configuration](configuration.md), [Administration](administration.md), or [Federation](federation.md)
+1. **Open the web client** — navigate to your instance URL (shown at the end of the installer) in a browser and log in with the admin account you just created
+2. **Create your first server** — click "Create Server" to set up a community space with channels
+3. **Install apps** — optionally install the [desktop](../clients/desktop.md) or [mobile](../clients/mobile.md) app and connect to your instance
+4. **Explore advanced options** — see [Configuration](configuration.md), [Administration](administration.md), or [Federation](federation.md)
 
 ## File locations
 

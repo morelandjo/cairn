@@ -351,6 +351,7 @@ run_wizard() {
   # Only offer proxy setup if domain is not an IP address
   if [[ "$CAIRN_DOMAIN" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     warn "Domain is an IP address — skipping reverse proxy (Let's Encrypt requires a domain)."
+    FORCE_SSL="false"
   else
     echo ""
     echo -e "${BLUE}?${NC} Set up a reverse proxy with automatic HTTPS?"
@@ -364,6 +365,12 @@ run_wizard() {
       3) REVERSE_PROXY="none" ;;
       *) REVERSE_PROXY="caddy" ;;
     esac
+  fi
+
+  # SSL enforcement without a reverse proxy creates a broken redirect loop
+  if [[ "$REVERSE_PROXY" == "none" ]] && [[ "$FORCE_SSL" == "true" ]]; then
+    FORCE_SSL="false"
+    warn "SSL enforcement disabled (no reverse proxy to terminate TLS)."
   fi
 
   # Storage
@@ -523,6 +530,43 @@ main() {
   echo -e "${GREEN}Cairn Installer v${CAIRN_VERSION}${NC}"
   echo ""
 
+  # Check for existing installation
+  if [ -f "$DEPLOY_DIR/.env" ] || (command -v docker &>/dev/null && cd "$DEPLOY_DIR" 2>/dev/null && docker compose ps --quiet 2>/dev/null | grep -q .); then
+    echo ""
+    echo -e "${RED}╔══════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}║                    ⚠  EXISTING INSTALLATION DETECTED           ║${NC}"
+    echo -e "${RED}╠══════════════════════════════════════════════════════════════════╣${NC}"
+    echo -e "${RED}║  A Cairn installation already exists at ${DEPLOY_DIR}             ║${NC}"
+    echo -e "${RED}║                                                                ║${NC}"
+    echo -e "${RED}║  Continuing will:                                              ║${NC}"
+    echo -e "${RED}║    • Overwrite Docker Compose configuration                    ║${NC}"
+    echo -e "${RED}║    • Recreate the database (ALL DATA WILL BE LOST)             ║${NC}"
+    echo -e "${RED}║    • Replace TLS certificates and keys                         ║${NC}"
+    echo -e "${RED}║    • Stop and restart all services                             ║${NC}"
+    echo -e "${RED}║                                                                ║${NC}"
+    echo -e "${RED}║  To upgrade instead, run: cairn-ctl upgrade                    ║${NC}"
+    echo -e "${RED}╚══════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "${YELLOW}Type 'yes' to wipe and reinstall, or anything else to cancel:${NC}"
+    read -rp "> " confirm_reinstall < /dev/tty
+    if [ "$confirm_reinstall" != "yes" ]; then
+      echo "Installation cancelled."
+      exit 0
+    fi
+
+    # Stop existing services before proceeding
+    log "Stopping existing services..."
+    cd "$DEPLOY_DIR" 2>/dev/null && sudo -u cairn docker compose down 2>/dev/null || true
+
+    # Remove stale volumes so fresh install starts clean
+    local project
+    project=$(basename "$DEPLOY_DIR")
+    docker volume rm "${project}_pgdata" 2>/dev/null || true
+
+    # Remove old .env so the wizard runs fresh
+    rm -f "$DEPLOY_DIR/.env"
+  fi
+
   # Phase 1: System provisioning
   log "Preparing system..."
   install_base_packages
@@ -587,14 +631,18 @@ main() {
 
   # Verify postgres password matches (catches stale volumes from failed installs)
   local pg_password
-  pg_password=$(grep -oP 'POSTGRES_PASSWORD=\K.*' "$DEPLOY_DIR/.env" 2>/dev/null || true)
+  pg_password=$(grep 'POSTGRES_PASSWORD=' "$DEPLOY_DIR/.env" 2>/dev/null | cut -d= -f2- || true)
   if [ -n "$pg_password" ]; then
     if ! sudo -u cairn docker compose exec -T -e PGPASSWORD="$pg_password" postgres \
         psql -U cairn -d cairn -c "SELECT 1" &>/dev/null; then
-      warn "Postgres password mismatch — resetting database volume..."
-      sudo -u cairn docker compose down -v postgres
+      warn "Postgres password mismatch (stale volume) — recreating postgres data only..."
+      local project
+      project=$(basename "$DEPLOY_DIR")
+      sudo -u cairn docker compose stop postgres
+      sudo -u cairn docker compose rm -f postgres
+      docker volume rm "${project}_pgdata" 2>/dev/null || true
       sudo -u cairn docker compose up -d postgres
-      for _ in $(seq 1 15); do
+      for _ in $(seq 1 30); do
         if sudo -u cairn docker compose exec -T postgres pg_isready -U cairn &>/dev/null; then
           break
         fi

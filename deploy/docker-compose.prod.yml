@@ -25,6 +25,7 @@ services:
       SFU_AUTH_SECRET: "${SFU_AUTH_SECRET}"
       TURN_SECRET: "${TURN_SECRET}"
       TURN_URLS: "${TURN_URLS:-turn:${CAIRN_DOMAIN}:3478}"
+      FORCE_SSL: "${FORCE_SSL:-true}"
       FEDERATION_ENABLED: "${FEDERATION_ENABLED:-false}"
       CAIRN_DOMAIN: "${CAIRN_DOMAIN}"
       NODE_KEY_PATH: "/app/priv/keys/node_ed25519.key"
