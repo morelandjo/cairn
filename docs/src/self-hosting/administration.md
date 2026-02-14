@@ -22,7 +22,7 @@ All commands operate on the deploy directory at `/opt/cairn` (override with the 
 | `cairn-ctl config` | Show all configuration values |
 | `cairn-ctl config <key>` | Show a single configuration value |
 | `cairn-ctl config <key> <value>` | Set a configuration value (restart required to take effect) |
-| `cairn-ctl user create <username> <password>` | Create a user account |
+| `cairn-ctl admin create <username> <password>` | Create an admin account |
 | `cairn-ctl federation list` | List known federation nodes and their status |
 
 ## Backups
