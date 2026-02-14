@@ -28,6 +28,7 @@ The installer will:
 6. Pull Docker images and start all services
 7. Run database migrations and verify health
 8. Set up a reverse proxy with TLS (Caddy or nginx)
+9. Create an admin account
 
 ### What the wizard asks
 
@@ -40,6 +41,8 @@ The installer will:
 | Enable SSL enforcement? | Redirect HTTP to HTTPS (required if federation is enabled) | Yes |
 | Reverse proxy | Caddy (recommended), Nginx + Let's Encrypt, or None | Caddy |
 | Use S3 for file storage? | Store uploads in S3 instead of local disk | No |
+| Admin username | Username for the first admin account | _(required)_ |
+| Admin password | Password for the admin account | _(required)_ |
 
 ## Verify
 
@@ -51,13 +54,13 @@ cairn-ctl status
 
 You should see all services (server, sfu, postgres, redis, meilisearch, coturn) listed as running, with health reported as **OK**.
 
-## Create your first user
+## Next steps
+
+The installer creates your admin account at the end. To create additional accounts later:
 
 ```sh
-cairn-ctl user create <username> <password>
+cairn-ctl admin create <username> <password>
 ```
-
-## Next steps
 
 1. **Create your first server** — log in and click "Create Server" to set up a community
 2. **Connect a client** — open `https://your-domain.com` in a browser, or install the [desktop](../clients/desktop.md) or [mobile](../clients/mobile.md) app

@@ -210,24 +210,24 @@ cmd_config() {
   echo -e "${YELLOW}Restart services for changes to take effect: cairn-ctl restart${NC}"
 }
 
-cmd_user() {
+cmd_admin() {
   local subcmd="${1:-}"
   shift || true
 
   case "$subcmd" in
     create)
-      echo "Creating user via remote eval..."
       local username="${1:-}"
       local password="${2:-}"
       if [ -z "$username" ] || [ -z "$password" ]; then
-        echo "Usage: cairn-ctl user create <username> <password>"
+        echo "Usage: cairn-ctl admin create <username> <password>"
         exit 1
       fi
+      echo "Creating admin account..."
       $COMPOSE exec -T server bin/cairn eval \
-        "Cairn.Accounts.register_user(%{username: \"$username\", password: \"$password\"})"
+        "Cairn.Release.create_admin(\"$username\", \"$password\")"
       ;;
     *)
-      echo "Usage: cairn-ctl user <create>"
+      echo "Usage: cairn-ctl admin <create>"
       ;;
   esac
 }
@@ -265,7 +265,7 @@ usage() {
   echo "  backup              Create a backup"
   echo "  restore <path>      Restore from a backup"
   echo "  config [key] [val]  View or set configuration"
-  echo "  user create <u> <p> Create a user account"
+  echo "  admin create <u> <p> Create an admin account"
   echo "  federation list     List federation nodes"
   echo "  help                Show this help"
 }
@@ -286,7 +286,7 @@ case "$command" in
   backup)     cmd_backup ;;
   restore)    cmd_restore "$@" ;;
   config)     cmd_config "$@" ;;
-  user)       cmd_user "$@" ;;
+  admin)      cmd_admin "$@" ;;
   federation) cmd_federation "$@" ;;
   help|--help|-h) usage ;;
   *)

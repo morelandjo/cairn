@@ -284,6 +284,16 @@ run_wizard() {
   echo ""
 
   prompt CAIRN_DOMAIN "Domain name or IP address for this instance" ""
+
+  if [[ "$CAIRN_DOMAIN" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo ""
+    warn "Using an IP address disables automatic HTTPS."
+    warn "Without HTTPS, passwords and messages are sent in plain text over the network."
+    warn "This is only safe on trusted private networks (LAN, VPN, Tailscale)."
+    warn "To enable HTTPS, point a domain at this server and re-run the installer."
+    echo ""
+  fi
+
   prompt SERVER_PORT "HTTP port" "4000"
 
   # Secrets
@@ -626,6 +636,29 @@ main() {
 
     echo ""
     log "Cairn is running!"
+
+    # Create admin account
+    echo ""
+    echo -e "${BLUE}?${NC} Create an admin account"
+    prompt ADMIN_USERNAME "  Admin username" ""
+    while true; do
+      read -srp "$(echo -e "${BLUE}?${NC}   Admin password: ")" ADMIN_PASSWORD < /dev/tty
+      echo ""
+      read -srp "$(echo -e "${BLUE}?${NC}   Confirm password: ")" ADMIN_PASSWORD_CONFIRM < /dev/tty
+      echo ""
+      if [ "$ADMIN_PASSWORD" = "$ADMIN_PASSWORD_CONFIRM" ]; then
+        break
+      fi
+      warn "Passwords do not match. Try again."
+    done
+
+    if [ -n "$ADMIN_USERNAME" ] && [ -n "$ADMIN_PASSWORD" ]; then
+      sudo -u cairn docker compose exec -T server bin/cairn eval \
+        "Cairn.Release.create_admin(\"$ADMIN_USERNAME\", \"$ADMIN_PASSWORD\")" \
+        &>/dev/null && log "Admin account '${ADMIN_USERNAME}' created." \
+        || warn "Failed to create admin account. Create one manually: cairn-ctl admin create <username> <password>"
+    fi
+
     echo ""
     if [ "$reverse_proxy" = "caddy" ] || [ "$reverse_proxy" = "nginx" ]; then
       echo -e "  ${GREEN}URL:${NC}     https://${domain}"
@@ -635,13 +668,11 @@ main() {
     echo -e "  ${GREEN}Config:${NC}  $DEPLOY_DIR/.env"
     echo -e "  ${GREEN}Logs:${NC}    cd $DEPLOY_DIR && docker compose logs -f"
     echo -e "  ${GREEN}Manage:${NC}  cairn-ctl status"
-    echo ""
-    echo -e "  ${YELLOW}Next steps:${NC}"
+
     if [ "$reverse_proxy" = "none" ]; then
-      echo "  1. Set up a reverse proxy with TLS — see https://github.com/morelandjo/cairn/blob/main/docs/src/self-hosting/reverse-proxy.md"
-      echo "  2. Create an admin account: cairn-ctl user create <username> <password>"
-    else
-      echo "  1. Create an admin account: cairn-ctl user create <username> <password>"
+      echo ""
+      echo -e "  ${YELLOW}Note:${NC} No reverse proxy was configured. Traffic is unencrypted (HTTP)."
+      echo "  To add HTTPS later, see: https://cairn.dev/self-hosting/reverse-proxy.html"
     fi
     echo ""
   else
