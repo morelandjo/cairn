@@ -239,10 +239,23 @@ cmd_federation() {
   case "$subcmd" in
     list)
       $COMPOSE exec -T server bin/cairn eval \
-        "Cairn.Federation.list_nodes() |> Enum.each(fn n -> IO.puts(\"\#{n.domain} [\#{n.status}]\") end)"
+        "Cairn.Federation.list_nodes() |> Enum.each(fn n -> IO.puts(\"\#{n.domain} [\#{n.status}] \#{if n.secure, do: \"secure\", else: \"insecure\"}\") end)"
+      ;;
+    allow-insecure)
+      local value="${1:-}"
+      if [ -z "$value" ]; then
+        current=$(grep "^FEDERATION_ALLOW_INSECURE=" .env 2>/dev/null | cut -d= -f2)
+        echo "FEDERATION_ALLOW_INSECURE=${current:-false}"
+        return
+      fi
+      if [[ "$value" != "true" && "$value" != "false" ]]; then
+        echo -e "${RED}Value must be 'true' or 'false'${NC}"
+        exit 1
+      fi
+      cmd_config "FEDERATION_ALLOW_INSECURE" "$value"
       ;;
     *)
-      echo "Usage: cairn-ctl federation <list>"
+      echo "Usage: cairn-ctl federation <list|allow-insecure [true|false]>"
       ;;
   esac
 }
@@ -267,6 +280,8 @@ usage() {
   echo "  config [key] [val]  View or set configuration"
   echo "  admin create <u> <p> Create an admin account"
   echo "  federation list     List federation nodes"
+  echo "  federation allow-insecure [true|false]"
+  echo "                      Get or set insecure federation policy"
   echo "  help                Show this help"
 }
 

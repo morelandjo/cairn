@@ -15,7 +15,9 @@ defmodule CairnWeb.HealthController do
       version: Application.spec(:cairn, :vsn) |> to_string(),
       postgres: Atom.to_string(postgres_status),
       redis: Atom.to_string(redis_status),
-      force_ssl: Application.get_env(:cairn, :force_ssl, true)
+      force_ssl: Application.get_env(:cairn, :force_ssl, true),
+      federation_allow_insecure:
+        Application.get_env(:cairn, :federation, []) |> Keyword.get(:allow_insecure, false)
     })
   end
 

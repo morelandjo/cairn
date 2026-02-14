@@ -9,6 +9,7 @@ interface Props {
   recipientDid: string;
   recipientInstance: string;
   recipientName: string;
+  recipientInsecure?: boolean;
   onClose: () => void;
 }
 
@@ -16,6 +17,7 @@ export default function FederatedDmDialog({
   recipientDid,
   recipientInstance,
   recipientName,
+  recipientInsecure,
   onClose,
 }: Props) {
   const initiateDm = useDmStore((s) => s.initiateDm);
@@ -64,6 +66,15 @@ export default function FederatedDmDialog({
                 Send a DM request to <strong>{recipientName}</strong> on{" "}
                 <strong>{recipientInstance}</strong>?
               </p>
+              {recipientInsecure && (
+                <div className="insecure-dm-warning">
+                  <span className="insecure-dm-warning-icon">&#x26A0;</span>
+                  <span>
+                    This user's server does not use HTTPS. DM request metadata
+                    will be sent over an unencrypted connection.
+                  </span>
+                </div>
+              )}
               <p className="dm-request-hint">
                 This will create an encrypted DM channel on your instance.
                 The recipient must accept before messages can be exchanged.

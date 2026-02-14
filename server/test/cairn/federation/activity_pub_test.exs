@@ -1,7 +1,28 @@
 defmodule Cairn.Federation.ActivityPubTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias Cairn.Federation.ActivityPub
+
+  # In test config, force_ssl is false, so URLs use http://
+  # These tests configure the federation domain to "example.com"
+  setup do
+    original_federation = Application.get_env(:cairn, :federation)
+
+    Application.put_env(:cairn, :federation,
+      enabled: true,
+      domain: "example.com"
+    )
+
+    on_exit(fn ->
+      if original_federation do
+        Application.put_env(:cairn, :federation, original_federation)
+      else
+        Application.delete_env(:cairn, :federation)
+      end
+    end)
+
+    :ok
+  end
 
   describe "serialize_user/2" do
     test "serializes user as AP Person" do
@@ -14,11 +35,11 @@ defmodule Cairn.Federation.ActivityPubTest do
       result = ActivityPub.serialize_user(user, "example.com")
 
       assert result["type"] == "Person"
-      assert result["id"] == "https://example.com/users/alice"
+      assert result["id"] == "http://example.com/users/alice"
       assert result["preferredUsername"] == "alice"
       assert result["name"] == "Alice"
-      assert result["inbox"] == "https://example.com/users/alice/inbox"
-      assert result["outbox"] == "https://example.com/users/alice/outbox"
+      assert result["inbox"] == "http://example.com/users/alice/inbox"
+      assert result["outbox"] == "http://example.com/users/alice/outbox"
       assert result["publicKey"]["publicKeyPem"] == "base64key=="
     end
   end
@@ -29,7 +50,7 @@ defmodule Cairn.Federation.ActivityPubTest do
       result = ActivityPub.serialize_server(server, "example.com")
 
       assert result["type"] == "Group"
-      assert result["id"] == "https://example.com/servers/srv-123"
+      assert result["id"] == "http://example.com/servers/srv-123"
       assert result["name"] == "My Server"
     end
   end
@@ -46,9 +67,9 @@ defmodule Cairn.Federation.ActivityPubTest do
       result = ActivityPub.serialize_message(message, "ch-123", "example.com")
 
       assert result["type"] == "Note"
-      assert result["id"] == "https://example.com/channels/ch-123/messages/msg-456"
+      assert result["id"] == "http://example.com/channels/ch-123/messages/msg-456"
       assert result["content"] == "Hello world"
-      assert result["attributedTo"] == "https://example.com/users/user-789"
+      assert result["attributedTo"] == "http://example.com/users/user-789"
       assert result["cairn:channelId"] == "ch-123"
     end
 
@@ -91,15 +112,15 @@ defmodule Cairn.Federation.ActivityPubTest do
       result =
         ActivityPub.wrap_activity(
           "Create",
-          "https://example.com/users/alice",
+          "http://example.com/users/alice",
           object,
           "example.com"
         )
 
       assert result["type"] == "Create"
-      assert result["actor"] == "https://example.com/users/alice"
+      assert result["actor"] == "http://example.com/users/alice"
       assert result["object"] == object
-      assert result["id"] =~ "https://example.com/activities/"
+      assert result["id"] =~ "http://example.com/activities/"
     end
   end
 end

@@ -1,3 +1,67 @@
+/* ─── Insecure Banner ─── */
+
+.insecure-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #d83c3e;
+  color: #fff;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  z-index: 9999;
+}
+
+.insecure-banner-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.insecure-banner-text {
+  flex: 1;
+}
+
+.insecure-banner-dismiss {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.insecure-banner-dismiss:hover {
+  opacity: 1;
+}
+
+.insecure-dm-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 12px;
+  margin: 8px 0;
+  background-color: rgba(250, 168, 26, 0.15);
+  border: 1px solid rgba(250, 168, 26, 0.4);
+  border-radius: 4px;
+  color: #faa81a;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.insecure-dm-warning-icon {
+  flex-shrink: 0;
+  font-size: 0.95rem;
+}
+
+.member-insecure-badge {
+  color: #faa81a;
+  margin-left: 2px;
+  opacity: 0.7;
+  vertical-align: middle;
+}
+
 /* ─── Auth Pages ─── */
 
 .auth-page {

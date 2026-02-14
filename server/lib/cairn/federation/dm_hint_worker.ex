@@ -10,6 +10,7 @@ defmodule Cairn.Federation.DmHintWorker do
     max_attempts: 10
 
   require Logger
+  alias Cairn.Federation
   alias Cairn.Federation.NodeIdentity
   alias Cairn.Federation.HttpSignatures
 
@@ -20,7 +21,15 @@ defmodule Cairn.Federation.DmHintWorker do
       "activity" => activity
     } = args
 
-    inbox_url = "https://#{recipient_instance}/inbox"
+    inbox_url =
+      case Federation.get_node_by_domain(recipient_instance) do
+        %{secure: secure} ->
+          scheme = if secure, do: "https", else: "http"
+          "#{scheme}://#{recipient_instance}/inbox"
+
+        nil ->
+          "https://#{recipient_instance}/inbox"
+      end
     body = Jason.encode!(activity)
 
     sign_fn = fn message -> NodeIdentity.sign(message) end

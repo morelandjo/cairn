@@ -15,7 +15,7 @@ set -euo pipefail
 #   7. Runs database migrations and verifies health
 #   8. Sets up reverse proxy with TLS (Caddy or nginx)
 
-CAIRN_VERSION="0.1.4"
+CAIRN_VERSION="0.1.6"
 DEPLOY_DIR="/opt/cairn"
 COMPOSE_URL="https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/docker-compose.prod.yml"
 ENV_TEMPLATE_URL="https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/.env.example"
@@ -335,14 +335,24 @@ run_wizard() {
 
   # SSL enforcement
   FORCE_SSL="true"
+  FEDERATION_ALLOW_INSECURE="false"
+  echo ""
+  read -rp "$(echo -e "${BLUE}?${NC} Enable SSL enforcement? Recommended unless using a VPN/tunnel (Y/n): ")" ssl_choice < /dev/tty
+  if [[ "$ssl_choice" =~ ^[Nn] ]]; then
+    FORCE_SSL="false"
+    warn "SSL disabled. Only use this on trusted private networks."
+    if [[ "$FEDERATION_ENABLED" == "true" ]]; then
+      warn "Federation without SSL means traffic is unencrypted in transit."
+    fi
+  fi
+
+  # Allow insecure federation peers
   if [[ "$FEDERATION_ENABLED" == "true" ]]; then
-    log "SSL enforcement: enabled (required for federation)"
-  else
     echo ""
-    read -rp "$(echo -e "${BLUE}?${NC} Enable SSL enforcement? Recommended unless using a VPN/tunnel (Y/n): ")" ssl_choice < /dev/tty
-    if [[ "$ssl_choice" =~ ^[Nn] ]]; then
-      FORCE_SSL="false"
-      warn "SSL disabled. Only use this on trusted private networks."
+    read -rp "$(echo -e "${BLUE}?${NC} Allow insecure (HTTP) servers to federate? (y/N): ")" insecure_choice < /dev/tty
+    if [[ "$insecure_choice" =~ ^[Yy] ]]; then
+      FEDERATION_ALLOW_INSECURE="true"
+      warn "Insecure federation enabled. Traffic to HTTP-only peers is unencrypted."
     fi
   fi
 
@@ -405,6 +415,7 @@ SFU_AUTH_SECRET=${SFU_AUTH_SECRET}
 TURN_SECRET=${TURN_SECRET}
 TURN_URLS=turn:${CAIRN_DOMAIN}:3478
 FEDERATION_ENABLED=${FEDERATION_ENABLED}
+FEDERATION_ALLOW_INSECURE=${FEDERATION_ALLOW_INSECURE}
 FORCE_SSL=${FORCE_SSL}
 STORAGE_BACKEND=${STORAGE_BACKEND}
 S3_BUCKET=${S3_BUCKET}

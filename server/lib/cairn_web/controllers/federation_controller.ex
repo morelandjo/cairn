@@ -1,6 +1,7 @@
 defmodule CairnWeb.FederationController do
   use CairnWeb, :controller
 
+  alias Cairn.Federation
   alias Cairn.Federation.NodeIdentity
 
   @protocol_version "0.1.0"
@@ -23,8 +24,9 @@ defmodule CairnWeb.FederationController do
         public_key: NodeIdentity.public_key_base64(),
         protocol_version: @protocol_version,
         supported_versions: @supported_versions,
-        inbox_url: "https://#{domain}/inbox",
-        privacy_manifest: "https://#{domain}/.well-known/privacy-manifest"
+        inbox_url: Federation.local_url("/inbox"),
+        privacy_manifest: Federation.local_url("/.well-known/privacy-manifest"),
+        secure: Application.get_env(:cairn, :force_ssl, true)
       }
 
       response =
@@ -103,7 +105,7 @@ defmodule CairnWeb.FederationController do
                   %{
                     rel: "self",
                     type: "application/activity+json",
-                    href: "https://#{domain}/users/#{username}"
+                    href: Federation.local_url("/users/#{username}")
                   }
                 ]
               })
@@ -125,12 +127,12 @@ defmodule CairnWeb.FederationController do
                   %{
                     rel: "self",
                     type: "application/activity+json",
-                    href: "https://#{domain}/users/#{user.username}"
+                    href: Federation.local_url("/users/#{user.username}")
                   },
                   %{
                     rel: "https://cairn.chat/ns/did",
                     type: "application/json",
-                    href: "https://#{domain}/.well-known/did/#{did}"
+                    href: Federation.local_url("/.well-known/did/#{did}")
                   }
                 ]
               })

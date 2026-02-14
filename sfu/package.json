@@ -1,6 +1,6 @@
 {
   "name": "@cairn/sfu",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "Cairn SFU (Selective Forwarding Unit) for voice/video",
   "license": "AGPL-3.0",
   "type": "module",

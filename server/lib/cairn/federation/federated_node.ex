@@ -15,6 +15,7 @@ defmodule Cairn.Federation.FederatedNode do
     field :protocol_version, :string
     field :privacy_manifest, :map, default: %{}
     field :status, :string, default: "pending"
+    field :secure, :boolean, default: true
 
     has_many :activities, Cairn.Federation.FederationActivity
 
@@ -30,7 +31,8 @@ defmodule Cairn.Federation.FederatedNode do
       :inbox_url,
       :protocol_version,
       :privacy_manifest,
-      :status
+      :status,
+      :secure
     ])
     |> validate_required([:domain, :node_id, :public_key, :inbox_url, :protocol_version])
     |> validate_inclusion(:status, @valid_statuses)

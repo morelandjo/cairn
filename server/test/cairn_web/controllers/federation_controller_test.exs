@@ -55,8 +55,9 @@ defmodule CairnWeb.FederationControllerTest do
       assert body["public_key"]
       assert body["protocol_version"] == "0.1.0"
       assert body["supported_versions"] == ["0.1.0"]
-      assert body["inbox_url"] == "https://test.example.com/inbox"
-      assert body["privacy_manifest"] == "https://test.example.com/.well-known/privacy-manifest"
+      assert body["inbox_url"] == "http://test.example.com/inbox"
+      assert body["privacy_manifest"] == "http://test.example.com/.well-known/privacy-manifest"
+      assert body["secure"] == false
     end
 
     test "returns 404 when federation disabled", %{conn: conn} do
@@ -109,7 +110,7 @@ defmodule CairnWeb.FederationControllerTest do
       assert [link] = body["links"]
       assert link["rel"] == "self"
       assert link["type"] == "application/activity+json"
-      assert link["href"] == "https://test.example.com/users/feduser"
+      assert link["href"] == "http://test.example.com/users/feduser"
     end
 
     test "returns 404 for unknown user", %{conn: conn} do
