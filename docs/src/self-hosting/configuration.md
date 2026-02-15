@@ -29,6 +29,24 @@ cairn-ctl config CAIRN_DOMAIN x.com # set one
 | `ALTCHA_HMAC_KEY` | HMAC key for proof-of-work challenges | `openssl rand -base64 32` |
 | `TURN_SECRET` | TURN server shared secret | `openssl rand -base64 32` |
 
+```sh
+# /opt/cairn/.env — example with required variables
+CAIRN_DOMAIN=cairn.example.com
+SECRET_KEY_BASE=generated-with-openssl-rand-base64-48
+JWT_SECRET=generated-with-openssl-rand-base64-48
+POSTGRES_PASSWORD=generated-with-openssl-rand-base64-32
+MEILI_MASTER_KEY=generated-with-openssl-rand-base64-32
+SFU_AUTH_SECRET=generated-with-openssl-rand-base64-32
+ALTCHA_HMAC_KEY=generated-with-openssl-rand-base64-32
+TURN_SECRET=generated-with-openssl-rand-base64-32
+
+# Optional
+FORCE_SSL=true
+FEDERATION_ENABLED=false
+FEDERATION_ALLOW_INSECURE=false
+STORAGE_BACKEND=local
+```
+
 ### Optional
 
 | Variable | Description | Default |
