@@ -51,6 +51,8 @@ defmodule Cairn.Release do
   end
 
   defp start_app do
+    # Disable the web server — eval runs inside the container where port 4000 is already bound
+    System.delete_env("PHX_SERVER")
     Application.ensure_all_started(@app)
   end
 
