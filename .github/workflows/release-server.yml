@@ -40,8 +40,8 @@ jobs:
       - name: Build web client
         if: matrix.component == 'server'
         run: |
-          cd proto && npm ci && npm run build
-          cd ../client/web && npm ci && npm run build
+          (cd proto && npm ci && npm run build)
+          (cd client/web && npm ci && npm run build)
           mkdir -p server/priv/static/app
           cp -r client/web/dist/* server/priv/static/app/
 
