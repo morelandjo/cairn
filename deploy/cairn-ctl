@@ -250,8 +250,7 @@ cmd_federation() {
 
   case "$subcmd" in
     list)
-      $COMPOSE exec -T server bin/cairn eval \
-        "Cairn.Federation.list_nodes() |> Enum.each(fn n -> IO.puts(\"\#{n.domain} [\#{n.status}] \#{if n.secure, do: \"secure\", else: \"insecure\"}\") end)"
+      $COMPOSE exec -T server bin/cairn eval "Cairn.Release.list_nodes()"
       ;;
     allow-insecure)
       local value="${1:-}"

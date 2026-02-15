@@ -20,22 +20,38 @@ defmodule Cairn.Release do
   end
 
   def create_admin(username, password) do
-    load_app()
+    start_app()
 
-    {:ok, _, _} =
-      Ecto.Migrator.with_repo(Cairn.Repo, fn _repo ->
-        case Cairn.Accounts.register_user(%{username: username, password: password}) do
-          {:ok, {user, _codes}} ->
-            IO.puts("Admin account '#{user.username}' created.")
+    case Cairn.Accounts.register_user(%{username: username, password: password}) do
+      {:ok, {user, _codes}} ->
+        IO.puts("Admin account '#{user.username}' created.")
 
-          {:error, changeset} ->
-            IO.puts("Failed to create account:")
+      {:error, changeset} ->
+        IO.puts("Failed to create account:")
 
-            Enum.each(changeset.errors, fn {field, {msg, _}} ->
-              IO.puts("  #{field}: #{msg}")
-            end)
-        end
+        Enum.each(changeset.errors, fn {field, {msg, _}} ->
+          IO.puts("  #{field}: #{msg}")
+        end)
+    end
+  end
+
+  def list_nodes do
+    start_app()
+
+    nodes = Cairn.Federation.list_nodes()
+
+    if Enum.empty?(nodes) do
+      IO.puts("No federated nodes.")
+    else
+      Enum.each(nodes, fn n ->
+        secure = if n.secure, do: "secure", else: "insecure"
+        IO.puts("#{n.domain} [#{n.status}] #{secure}")
       end)
+    end
+  end
+
+  defp start_app do
+    Application.ensure_all_started(@app)
   end
 
   defp repos do
