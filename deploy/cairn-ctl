@@ -50,6 +50,18 @@ cmd_logs() {
 cmd_upgrade() {
   echo -e "${GREEN}Upgrading Cairn...${NC}"
 
+  # Self-update cairn-ctl
+  echo "Updating cairn-ctl..."
+  local ctl_url="https://raw.githubusercontent.com/morelandjo/cairn/main/deploy/cairn-ctl"
+  if curl -sSL "$ctl_url" -o /usr/local/bin/cairn-ctl.tmp; then
+    chmod +x /usr/local/bin/cairn-ctl.tmp
+    mv /usr/local/bin/cairn-ctl.tmp /usr/local/bin/cairn-ctl
+    echo -e "${GREEN}cairn-ctl updated.${NC}"
+  else
+    echo -e "${YELLOW}cairn-ctl self-update failed, continuing with current version.${NC}"
+    rm -f /usr/local/bin/cairn-ctl.tmp
+  fi
+
   # Pre-upgrade backup
   echo "Creating pre-upgrade backup..."
   cmd_backup
