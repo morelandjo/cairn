@@ -51,8 +51,11 @@ defmodule Cairn.Release do
   end
 
   defp start_app do
-    # Disable the web server — eval runs inside the container where port 4000 is already bound
-    System.delete_env("PHX_SERVER")
+    # Disable the web server — eval runs inside the container where port 4000 is already bound.
+    # runtime.exs is already evaluated at boot, so we override the endpoint config directly.
+    endpoint_config = Application.get_env(:cairn, CairnWeb.Endpoint, [])
+    Application.put_env(:cairn, CairnWeb.Endpoint, Keyword.put(endpoint_config, :server, false))
+    Application.put_env(:cairn, :start_prom_ex, false)
     Application.ensure_all_started(@app)
   end
 
