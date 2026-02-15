@@ -25,3 +25,11 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 murmuring-*.tar
 
+# Runtime data (uploads, exports, keys are created at runtime)
+/priv/uploads/
+/priv/exports/
+/priv/keys/
+
+# Web client dist (copied in before Docker build, not committed)
+/priv/static/app/
+

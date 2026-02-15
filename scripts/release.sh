@@ -213,6 +213,17 @@ step_docker() {
   local ver="${VERSION:-dev}"
   info "Step 4: Building Docker images (tag: $ver)"
 
+  # Bundle web client into server image
+  info "  Copying web client dist into server/priv/static/app/"
+  rm -rf "$ROOT/server/priv/static/app"
+  mkdir -p "$ROOT/server/priv/static/app"
+  if [[ -d "$ROOT/client/web/dist" ]]; then
+    cp -r "$ROOT/client/web/dist/"* "$ROOT/server/priv/static/app/"
+    ok "web client bundled ($(du -sh "$ROOT/server/priv/static/app" | awk '{print $1}'))"
+  else
+    warn "client/web/dist not found — SPA will not be served. Run 'cd client/web && npm run build' first."
+  fi
+
   docker build \
     --build-arg "APP_VERSION=${ver}" \
     -t "ghcr.io/morelandjo/cairn-server:${ver}" \
@@ -322,27 +333,11 @@ step_git() {
     ok "created tag $TAG"
   fi
 
-  # Push to origin (private)
-  if confirm "Push to origin (private)?"; then
+  # Push to origin
+  if confirm "Push to origin?"; then
     git -C "$ROOT" push origin main
     git -C "$ROOT" push origin "$TAG"
     ok "pushed to origin"
-  fi
-
-  # Squash-push to public
-  if confirm "Squash-push to public?"; then
-    git -C "$ROOT" fetch public
-    git -C "$ROOT" checkout -b temp-public public/main
-    git -C "$ROOT" merge --squash main --allow-unrelated-histories || true
-    # Resolve any conflicts by taking main's version
-    git -C "$ROOT" checkout main -- .
-    git -C "$ROOT" add -A
-    git -C "$ROOT" commit -m "Release ${TAG}" || true
-    git -C "$ROOT" push public temp-public:main
-    git -C "$ROOT" push public "$TAG"
-    git -C "$ROOT" checkout main
-    git -C "$ROOT" branch -D temp-public
-    ok "squash-pushed to public"
   fi
 
   echo ""
@@ -358,7 +353,7 @@ step_release() {
 
   info "Step 8: Creating GitHub release"
 
-  if ! confirm "Create release $TAG on public repo?"; then
+  if ! confirm "Create release $TAG on origin?"; then
     warn "skipped release creation"
     echo ""
     return
@@ -413,7 +408,7 @@ step_deploy_docs() {
 
   info "Step 9: Deploying docs to gh-pages"
 
-  if ! confirm "Push docs to gh-pages on public repo?"; then
+  if ! confirm "Push docs to gh-pages on origin?"; then
     warn "skipped docs deploy"
     echo ""
     return
@@ -422,16 +417,16 @@ step_deploy_docs() {
   local tmp_worktree
   tmp_worktree=$(mktemp -d)
 
-  git -C "$ROOT" fetch public
+  git -C "$ROOT" fetch origin
 
-  # Check if gh-pages branch exists on public
-  if git -C "$ROOT" ls-remote --heads public gh-pages | grep -q gh-pages; then
+  # Check if gh-pages branch exists on origin
+  if git -C "$ROOT" ls-remote --heads origin gh-pages | grep -q gh-pages; then
     git clone --branch gh-pages --single-branch --depth 1 \
-      "$(git -C "$ROOT" remote get-url public)" "$tmp_worktree"
+      "$(git -C "$ROOT" remote get-url origin)" "$tmp_worktree"
   else
     git init "$tmp_worktree"
     git -C "$tmp_worktree" checkout --orphan gh-pages
-    git -C "$tmp_worktree" remote add public "$(git -C "$ROOT" remote get-url public)"
+    git -C "$tmp_worktree" remote add origin "$(git -C "$ROOT" remote get-url origin)"
   fi
 
   # Replace contents with built docs
@@ -444,7 +439,7 @@ step_deploy_docs() {
     warn "no docs changes to deploy"
   else
     git -C "$tmp_worktree" commit -m "docs: update for ${TAG:-latest}"
-    git -C "$tmp_worktree" push public gh-pages
+    git -C "$tmp_worktree" push origin gh-pages
     ok "docs deployed"
   fi
 

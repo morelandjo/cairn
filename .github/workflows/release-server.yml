@@ -27,6 +27,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        if: matrix.component == 'server'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Set up Rust (for proto WASM build)
+        if: matrix.component == 'server'
+        run: rustup target add wasm32-unknown-unknown && cargo install wasm-bindgen-cli
+
+      - name: Build web client
+        if: matrix.component == 'server'
+        run: |
+          cd proto && npm ci && npm run build
+          cd ../client/web && npm ci && npm run build
+          mkdir -p server/priv/static/app
+          cp -r client/web/dist/* server/priv/static/app/
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
