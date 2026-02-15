@@ -29,9 +29,11 @@ defmodule CairnWeb.Endpoint do
     only: CairnWeb.static_paths(),
     raise_on_missing_only: code_reloading?
 
-  # Serve the web client SPA assets (hashed filenames → immutable cache)
+  # Serve the web client SPA assets (hashed filenames → immutable cache).
+  # Vite builds to priv/static/app/ with paths like /assets/index-XXX.js.
+  # Serve at "/" so the HTML references resolve correctly.
   plug Plug.Static,
-    at: "/app",
+    at: "/",
     from: {:cairn, "priv/static/app"},
     gzip: not code_reloading?,
     cache_control_for_etags: "public, max-age=31536000, immutable",
