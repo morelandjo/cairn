@@ -701,8 +701,12 @@ main() {
     echo -e "${BLUE}?${NC} Create an admin account"
     prompt ADMIN_USERNAME "  Admin username" ""
     while true; do
-      read -srp "$(echo -e "${BLUE}?${NC}   Admin password: ")" ADMIN_PASSWORD < /dev/tty
+      read -srp "$(echo -e "${BLUE}?${NC}   Admin password (min 10 chars): ")" ADMIN_PASSWORD < /dev/tty
       echo ""
+      if [ "${#ADMIN_PASSWORD}" -lt 10 ]; then
+        warn "Password must be at least 10 characters. Try again."
+        continue
+      fi
       read -srp "$(echo -e "${BLUE}?${NC}   Confirm password: ")" ADMIN_PASSWORD_CONFIRM < /dev/tty
       echo ""
       if [ "$ADMIN_PASSWORD" = "$ADMIN_PASSWORD_CONFIRM" ]; then

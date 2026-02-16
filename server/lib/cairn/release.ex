@@ -29,8 +29,11 @@ defmodule Cairn.Release do
       {:error, changeset} ->
         IO.puts("Failed to create account:")
 
-        Enum.each(changeset.errors, fn {field, {msg, _}} ->
-          IO.puts("  #{field}: #{msg}")
+        Enum.each(changeset.errors, fn {field, {msg, opts}} ->
+          rendered = Enum.reduce(opts, msg, fn {key, val}, acc ->
+            String.replace(acc, "%{#{key}}", to_string(val))
+          end)
+          IO.puts("  #{field}: #{rendered}")
         end)
     end
   end

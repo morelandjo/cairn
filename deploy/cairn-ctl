@@ -232,6 +232,11 @@ cmd_admin() {
       local password="${2:-}"
       if [ -z "$username" ] || [ -z "$password" ]; then
         echo "Usage: cairn-ctl admin create <username> <password>"
+        echo "  Password must be at least 10 characters."
+        exit 1
+      fi
+      if [ "${#password}" -lt 10 ]; then
+        echo -e "${RED}Password must be at least 10 characters.${NC}"
         exit 1
       fi
       echo "Creating admin account..."
