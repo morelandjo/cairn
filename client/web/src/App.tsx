@@ -197,10 +197,12 @@ function AppRoutes() {
         path="/"
         element={
           <RequireAuth>
-            <ServerRedirect />
+            <MainLayout />
           </RequireAuth>
         }
-      />
+      >
+        <Route index element={<ServerRedirect />} />
+      </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
