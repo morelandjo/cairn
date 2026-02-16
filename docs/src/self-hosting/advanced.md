@@ -1,8 +1,6 @@
-# Advanced Installation
+# Manual Installation
 
 These guides cover manual configuration, custom proxy setups, and federation. If you used the [install script](quickstart.md), most of this was handled automatically.
-
-## Manual installation
 
 You can skip the wizard by providing a pre-filled `.env` file:
 

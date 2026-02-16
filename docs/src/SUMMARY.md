@@ -5,7 +5,7 @@
 # Self-Hosting
 
 - [Quick Start](self-hosting/quickstart.md)
-- [Advanced Installation](self-hosting/advanced.md)
+- [Manual Installation](self-hosting/advanced.md)
   - [Configuration](self-hosting/configuration.md)
   - [Reverse Proxy](self-hosting/reverse-proxy.md)
   - [Federation](self-hosting/federation.md)
